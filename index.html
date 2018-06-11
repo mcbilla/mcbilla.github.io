@@ -305,7 +305,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/05/hello-world/" itemprop="url">Hello World</a></h1>
+                <a class="post-title-link" href="/2018/06/05/hello-world/" itemprop="url">Hexo+GitHub搭建个人博客教程</a></h1>
         
 
         <div class="post-meta">
@@ -327,6 +327,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hexo/" itemprop="url" rel="index">
+                    <span itemprop="name">Hexo</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -357,15 +379,94 @@
       
         
           
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+            <blockquote>
+<p><a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> 是一款基于Node.js的支持Markdown的静态站点生成框架，利用 Hexo+GitHub 可以轻松打造属于个人的免费博客。经过本人一番摸索最终搭建成功，心得分享如下。</p>
+</blockquote>
+<h2 id="一、环境配置"><a href="#一、环境配置" class="headerlink" title="一、环境配置"></a><strong>一、环境配置</strong></h2><p>在搭建之前电脑需要的环境配置如下：</p>
+<ul>
+<li><a href="https://git-scm.com/" target="_blank" rel="noopener">git</a></li>
+<li><a href="https://nodejs.org/en/" target="_blank" rel="noopener">node.js</a></li>
+<li><a href="https://pages.github.com/" target="_blank" rel="noopener">github pages</a> 仓库</li>
+</ul>
+<p>我们可以在控制台中输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ node -v #查看node.js版本</span><br><span class="line">$ git --version #查看git版本</span><br></pre></td></tr></table></figure></p>
+<p>如果没有报错则说明git和node.js已经安装成功，可直接跳到<a href="#1">第3点</a>,如果报错则需要重新安装</p>
+<h3 id="1、安装git"><a href="#1、安装git" class="headerlink" title="1、安装git"></a><strong>1、安装git</strong></h3><h4 id="1）windows用户"><a href="#1）windows用户" class="headerlink" title="1）windows用户"></a>1）windows用户</h4><p>直接下载<a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git安装程序</a>根据提示进行安装</p>
+<h4 id="2）mac用户"><a href="#2）mac用户" class="headerlink" title="2）mac用户"></a>2）mac用户</h4><p>通过homebrew进行安装，没有安装的需要先安装<a href="https://brew.sh/" target="_blank" rel="noopener">homebrew</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew install git</span><br></pre></td></tr></table></figure></p>
+<p>也可通过下载<a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git安装程序</a>进行安装</p>
+<h4 id="3）linux用户"><a href="#3）linux用户" class="headerlink" title="3）linux用户"></a>3）linux用户</h4><p>通过命令行安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install git-core</span><br></pre></td></tr></table></figure></p>
+<p>安装完成后再在控制台输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git --version</span><br></pre></td></tr></table></figure></p>
+<p>如果没有报错则说明安装成功</p>
+<h3 id="2、安装node-js"><a href="#2、安装node-js" class="headerlink" title="2、安装node.js"></a><strong>2、安装node.js</strong></h3><h4 id="1）下载安装程序（推荐）"><a href="#1）下载安装程序（推荐）" class="headerlink" title="1）下载安装程序（推荐）"></a>1）下载安装程序（推荐）</h4><p>直接下载<a href="https://nodejs.org/en/" target="_blank" rel="noopener">node.js安装程序</a>进行安装，比较快捷省事，适用于mac和windows用户</p>
+<h4 id="2）使用nvm安装"><a href="#2）使用nvm安装" class="headerlink" title="2）使用nvm安装"></a>2）使用nvm安装</h4><p>cURL:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl https://raw.github.com/creationix/nvm/master/install.sh | sh</span><br></pre></td></tr></table></figure></p>
+<p>Wget:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ wget -qO- https://raw.github.com/creationix/nvm/master/install.sh | sh</span><br></pre></td></tr></table></figure></p>
+<p>安装完成后，重启终端并执行下列命令即可安装 Node.js。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nvm install stable</span><br></pre></td></tr></table></figure></p>
+<p>安装完成后再在控制台输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ node -v</span><br></pre></td></tr></table></figure></p>
+<p>如果没有报错则说明安装成功</p>
+<h3 id="3、github-pages"><a href="#3、github-pages" class="headerlink" title="3、github pages"></a><strong>3、github pages</strong></h3><p>我们用来托管博客的服务叫做 <a href="https://pages.github.com/" target="_blank" rel="noopener">Github Pages</a>，它是 Github 用来提供给个人/组织或者项目的网页服务，只需要部署到你的 Github Repository，推送代码，便可以实时呈现。</p>
+<h4 id="1）申请github账号"><a href="#1）申请github账号" class="headerlink" title="1）申请github账号"></a>1）申请github账号</h4><p>首先你需要申请注册一个 <a href="https://github.com/" target="_blank" rel="noopener">github</a> 账号</p>
+<h4 id="2）创建托管仓库"><a href="#2）创建托管仓库" class="headerlink" title="2）创建托管仓库"></a>2）创建托管仓库</h4><p>点击右上角 New Repository 新建一个仓库来作为托管仓库，注意命名为<strong><em>username.github.io（username是你的账号名)。</em></strong></p>
+<blockquote>
+<p>GitHub Pages 有两种类型：User/Organization Pages 和 Project Pages，两者的区别是：</p>
+<ol>
+<li>User Pages 是用来展示用户的，而 Project Pages 是用来展示项目的。</li>
+<li>用于存放 User Pages 的仓库必须使用username.github.io的命名规则，而 Project Pages 则没有特殊的要求。</li>
+<li>User Pages 将使用仓库的 master 分支，而 Project Pages 将使用 gh-pages 分支。</li>
+<li>User Pages 通过 http(s)://username.github.io 进行访问，而 Projects Pages通过 http(s)://username.github.io/projectname 进行访问。</li>
+</ol>
+</blockquote>
+<p>一般搭建个人博客都是用 User Pages，所以命名需要按照规范命名。</p>
+<h4 id="3）配置SSH（可跳过）"><a href="#3）配置SSH（可跳过）" class="headerlink" title="3）配置SSH（可跳过）"></a>3）配置SSH（可跳过）</h4><p>SSH实现本地 git 项目和远程 github 的连接，github 通过 <strong>SSH 密钥识别特定的可信任电脑</strong>，该部分电脑在向 github 推送的时候不需要输入用户名和密码</p>
+<h5 id="1-查看电脑是否已经配置-ssh-key"><a href="#1-查看电脑是否已经配置-ssh-key" class="headerlink" title="1. 查看电脑是否已经配置 ssh key"></a>1. 查看电脑是否已经配置 ssh key</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ls -al ~/.ssh</span><br></pre></td></tr></table></figure>
+<p>默认情况下，public keys的文件名是以下的格式之一：<strong>id_dsa.pub、id_ecdsa.pub、id_ed25519.pub、id_rsa.pub</strong>。因此，如果列出的文件有public和private钥匙对（例如id_ras.pub和id_rsa），证明已存在SSH keys。如果提示 <code>No such file or directory</code> 则说明未安装</p>
+<h5 id="2-生成新的-SSH-Key"><a href="#2-生成新的-SSH-Key" class="headerlink" title="2. 生成新的 SSH Key"></a>2. 生成新的 SSH Key</h5><p>第一次安装完 git 需要先<strong>初始化配置 git</strong>（已经初始化过可跳过）,这里的用户名和邮箱和github上的用户名和密码要对应<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config –global user.name &quot;yourusername&quot;</span><br><span class="line">git config --global user.email &quot;youremail@example.com&quot;</span><br></pre></td></tr></table></figure></p>
+<p>生成ssh key，这里的邮箱和上面设置的邮箱对应<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C &quot;youremail@example.com&quot;</span><br></pre></td></tr></table></figure></p>
+<p>输入密码之类的可以省略，一路回车就行</p>
+<h5 id="3-复制key"><a href="#3-复制key" class="headerlink" title="3. 复制key"></a>3. 复制key</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure>
+<p>复制执行命令后显示的内容</p>
+<h5 id="4-添加到github中"><a href="#4-添加到github中" class="headerlink" title="4. 添加到github中"></a>4. 添加到github中</h5><p>点击右上角的 Settings –&gt; SSH and GPG keys –&gt; New SSH key ，Title 自由填写，Key 粘贴刚才复制的那段代码，点击 Add SSH Key</p>
+<h5 id="5-测试连接"><a href="#5-测试连接" class="headerlink" title="5. 测试连接"></a>5. 测试连接</h5><p>控制台输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh -T git@github.com</span><br></pre></td></tr></table></figure></p>
+<p>如果看到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">The authenticity of host &apos;github.com (207.97.227.239)&apos; can&apos;t be established.</span><br><span class="line">RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.</span><br><span class="line">Are you sure you want to continue connecting (yes/no)?</span><br></pre></td></tr></table></figure></p>
+<p>输入<code>yes</code>，回车看到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hi username! You&apos;ve successfully authenticated, but GitHub does not</span><br><span class="line">provide shell access.</span><br></pre></td></tr></table></figure></p>
+<p>表示连接成功，ssh的配置至此完成</p>
+<h2 id="二、安装Hexo"><a href="#二、安装Hexo" class="headerlink" title="二、安装Hexo"></a><strong>二、安装Hexo</strong></h2><p>hexo的安装相当简单，在确保以上环境已经配置好的情况下</p>
+<h3 id="1、下载Hexo"><a href="#1、下载Hexo" class="headerlink" title="1、下载Hexo"></a>1、下载Hexo</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
+<p>有些教程会用命令 <code>$ npm install -g hexo</code>，作用同上，均为下载Hexo的安装包</p>
+<h3 id="2、初始化安装"><a href="#2、初始化安装" class="headerlink" title="2、初始化安装"></a>2、初始化安装</h3><p>执行以下命令Hexo可把文件安装到指定文件夹<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ hexo init &lt;folder&gt;</span><br><span class="line">$ cd &lt;folder&gt;</span><br><span class="line">$ npm install</span><br></pre></td></tr></table></figure></p>
+<p>新建一个名为<folder>的文件夹（可带路径），通过 <code>hexo init</code> 初始化该文件夹，然后切换到该文件夹中，执行 <code>npm install</code> 进行安装</folder></p>
+<h2 id="三、使用Hexo"><a href="#三、使用Hexo" class="headerlink" title="三、使用Hexo"></a><strong>三、使用Hexo</strong></h2><h3 id="1、Hexo目录简介"><a href="#1、Hexo目录简介" class="headerlink" title="1、Hexo目录简介"></a>1、Hexo目录简介</h3><p>如果以上的安装成功，在安装目录下将会出现以下的文件结构<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">├── _config.yml</span><br><span class="line">├── package.json</span><br><span class="line">├── scaffolds</span><br><span class="line">├── source</span><br><span class="line">|   ├── _drafts</span><br><span class="line">|   └── _posts</span><br><span class="line">└── themes</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><strong>_config.yml</strong>：网站的<strong>全局配置文件</strong></li>
+<li><strong>package.json</strong>：<strong>应用程序的信息</strong></li>
+<li><strong>scaffolds</strong>：<strong>模版文件夹</strong>，Hexo的模板是指<strong>在新建的markdown文件中默认填充的内容</strong>。当您新建文章时，Hexo 会根据 scaffold 来建立文件。例如，如果您修改scaffold/post.md中的Front-matter内容，那么每次新建一篇文章时都会包含这个修改。</li>
+<li><strong>source</strong>：<strong>资源文件夹</strong>，除 _posts 文件夹之外，开头命名为 _ (下划线)的文件 / 文件夹和隐藏的文件将会被忽略。<strong>Markdown 和 HTML 文件会被解析并放到 public 文件夹，而其他文件会被拷贝过去</strong>。例如用于域名解析的 CNAME 文件就可以放到该文件夹中，每次部署的时候都会自动添加该文件。</li>
+<li><strong>themes</strong>：<strong>主题文件夹</strong>，Hexo 会根据主题来生成静态页面。</li>
+</ul>
+<h3 id="2、创建文章"><a href="#2、创建文章" class="headerlink" title="2、创建文章"></a>2、创建文章</h3><p>执行以下命令可新建文章<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new [layout] &lt;title&gt;</span><br></pre></td></tr></table></figure></p>
+<h4 id="布局（layout）"><a href="#布局（layout）" class="headerlink" title="布局（layout）"></a>布局（layout）</h4><p>hexo有三种默认布局，用户也可以自定义布局，不同布局对应不同的存储路径</p>
+<ul>
+<li><strong>post</strong>：一般文章布局，自定义布局和post的对应的存储路径为 <code>source/_posts</code></li>
+<li><strong>page</strong>：页面布局，例如可以用于生成标签（tags）或分类（categories）等主页面，就是点击菜单直接显示的页面，对应的存储路径为 <code>source</code></li>
+<li><strong>draft</strong>：草稿布局，草稿默认不会显示在页面上，已完成的草稿可用 <code>$ hexo publish [layout] &lt;title&gt;</code> 来发布，对应的存储路径为 <code>source/_drafts</code></li>
+</ul>
+<h4 id="标题（title）"><a href="#标题（title）" class="headerlink" title="标题（title）"></a>标题（title）</h4><p>Hexo 默认以标题做为文件名称，但您可编辑 <code>new_post_name</code> 参数来改变默认的文件名称，举例来说，设为 <code>:year-:month-:day-:title.md</code> 可让您更方便的通过日期来管理文章。其中 :title 默认会转为小写，空格将会被替换为短杠</p>
+<p>例如新建一篇名为 hello world 的新文章<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new post &quot;hello world&quot;</span><br></pre></td></tr></table></figure></p>
+<p>source/_posts下面会自动生成一个名为 hello-world 的md文件（空格会自动转换为短杠），这就是我们新建的文章</p>
+<h3 id="3、编辑文章"><a href="#3、编辑文章" class="headerlink" title="3、编辑文章"></a>3、编辑文章</h3><h4 id="前页（Front-matter）"><a href="#前页（Front-matter）" class="headerlink" title="前页（Front-matter）"></a>前页（Front-matter）</h4><p>Front-matter 是文件最上方以 — 分隔的区域，指定该文件的变量，支持的变量有：</p>
+<ul>
+<li><strong>layout</strong>：布局</li>
+<li><strong>title</strong>：标题</li>
+<li><strong>date</strong>：建立日期，默认为文件建立日期</li>
+<li><strong>updated</strong>：更新日期，默认为文件更新日期</li>
+<li><strong>comments</strong>：开启文章的评论功能，默认为true</li>
+<li><strong>tags</strong>：标签，不适用于布局为 <code>page</code> 的的页面</li>
+<li><strong>categories</strong>：分类，不适用于布局为 <code>page</code> 的的页面</li>
+<li><strong>permalink</strong>：覆盖文章网址</li>
+</ul>
+<h5 id="分类（categories）和标签（tags）的区别"><a href="#分类（categories）和标签（tags）的区别" class="headerlink" title="分类（categories）和标签（tags）的区别"></a>分类（categories）和标签（tags）的区别</h5><p><strong>分类具有顺序性和层次性</strong>，例如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">categories:</span><br><span class="line">- Diary</span><br><span class="line">- Life</span><br></pre></td></tr></table></figure></p>
+<p>会使 Life 成为 Diary 的子类，而不是并列分类。<br><strong>标签没有顺序和层次</strong>。</p>
+<p>例如编辑一篇新文章的 front-matter 为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: hello-world</span><br><span class="line">date: 2018-06-10 16:15:04</span><br><span class="line">categories:</span><br><span class="line">- Diary</span><br><span class="line">- Life</span><br><span class="line">tags:</span><br><span class="line">- happy</span><br><span class="line">- friend</span><br><span class="line">comments: false</span><br><span class="line">---</span><br></pre></td></tr></table></figure></p>
+<p>—以下的内容可自由编辑</p>
+<p>&lt;未完待续&gt;</p>
 
           
         
@@ -458,7 +559,25 @@
             
 
             
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
 
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
             
 
           </nav>
