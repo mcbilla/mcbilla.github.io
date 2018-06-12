@@ -404,7 +404,7 @@
 <p>如果没有报错则说明安装成功</p>
 <h3 id="3、github-pages"><a href="#3、github-pages" class="headerlink" title="3、github pages"></a><strong>3、github pages</strong></h3><p>我们用来托管博客的服务叫做 <a href="https://pages.github.com/" target="_blank" rel="noopener">Github Pages</a>，它是 Github 用来提供给个人/组织或者项目的网页服务，只需要部署到你的 Github Repository，推送代码，便可以实时呈现。</p>
 <h4 id="1）申请github账号"><a href="#1）申请github账号" class="headerlink" title="1）申请github账号"></a>1）申请github账号</h4><p>首先你需要申请注册一个 <a href="https://github.com/" target="_blank" rel="noopener">github</a> 账号</p>
-<h4 id="2）创建托管仓库"><a href="#2）创建托管仓库" class="headerlink" title="2）创建托管仓库"></a>2）创建托管仓库</h4><p>点击右上角 New Repository 新建一个仓库来作为托管仓库，注意命名为<strong><em>username.github.io（username是你的账号名)。</em></strong></p>
+<h4 id="2）创建托管仓库"><a href="#2）创建托管仓库" class="headerlink" title="2）创建托管仓库"></a>2）创建托管仓库</h4><p>点击右上角 New Repository 新建一个仓库来作为托管仓库，注意命名为<strong>username.github.io（username是你的账号名)。</strong></p>
 <blockquote>
 <p>GitHub Pages 有两种类型：User/Organization Pages 和 Project Pages，两者的区别是：</p>
 <ol>
@@ -415,10 +415,10 @@
 </ol>
 </blockquote>
 <p>一般搭建个人博客都是用 User Pages，所以命名需要按照规范命名。</p>
-<h4 id="3）配置SSH（可跳过）"><a href="#3）配置SSH（可跳过）" class="headerlink" title="3）配置SSH（可跳过）"></a>3）配置SSH（可跳过）</h4><p>SSH实现本地 git 项目和远程 github 的连接，github 通过 <strong>SSH 密钥识别特定的可信任电脑</strong>，该部分电脑在向 github 推送的时候不需要输入用户名和密码</p>
+<h4 id="3）配置SSH（可跳过）"><a href="#3）配置SSH（可跳过）" class="headerlink" title="3）配置SSH（可跳过）"></a>3）配置SSH（可跳过）</h4><p>SSH实现本地 git 项目和远程 github 的连接，github 通过 <strong><em>SSH 密钥识别特定的可信任电脑</em></strong>，该部分电脑在向 github 推送的时候不需要输入用户名和密码</p>
 <h5 id="1-查看电脑是否已经配置-ssh-key"><a href="#1-查看电脑是否已经配置-ssh-key" class="headerlink" title="1. 查看电脑是否已经配置 ssh key"></a>1. 查看电脑是否已经配置 ssh key</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ls -al ~/.ssh</span><br></pre></td></tr></table></figure>
 <p>默认情况下，public keys的文件名是以下的格式之一：<strong>id_dsa.pub、id_ecdsa.pub、id_ed25519.pub、id_rsa.pub</strong>。因此，如果列出的文件有public和private钥匙对（例如id_ras.pub和id_rsa），证明已存在SSH keys。如果提示 <code>No such file or directory</code> 则说明未安装</p>
-<h5 id="2-生成新的-SSH-Key"><a href="#2-生成新的-SSH-Key" class="headerlink" title="2. 生成新的 SSH Key"></a>2. 生成新的 SSH Key</h5><p>第一次安装完 git 需要先<strong>初始化配置 git</strong>（已经初始化过可跳过）,这里的用户名和邮箱和github上的用户名和密码要对应<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config –global user.name &quot;yourusername&quot;</span><br><span class="line">git config --global user.email &quot;youremail@example.com&quot;</span><br></pre></td></tr></table></figure></p>
+<h5 id="2-生成新的-SSH-Key"><a href="#2-生成新的-SSH-Key" class="headerlink" title="2. 生成新的 SSH Key"></a>2. 生成新的 SSH Key</h5><p>第一次安装完 git 需要先<strong><em>初始化配置 git</em></strong>（已经初始化过可跳过）,这里的用户名和邮箱和github上的用户名和密码要对应<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config –global user.name &quot;yourusername&quot;</span><br><span class="line">git config --global user.email &quot;youremail@example.com&quot;</span><br></pre></td></tr></table></figure></p>
 <p>生成ssh key，这里的邮箱和上面设置的邮箱对应<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C &quot;youremail@example.com&quot;</span><br></pre></td></tr></table></figure></p>
 <p>输入密码之类的可以省略，一路回车就行</p>
 <h5 id="3-复制key"><a href="#3-复制key" class="headerlink" title="3. 复制key"></a>3. 复制key</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure>
@@ -437,11 +437,13 @@
 <ul>
 <li><strong>_config.yml</strong>：网站的<strong>全局配置文件</strong></li>
 <li><strong>package.json</strong>：<strong>应用程序的信息</strong></li>
-<li><strong>scaffolds</strong>：<strong>模版文件夹</strong>，Hexo的模板是指<strong>在新建的markdown文件中默认填充的内容</strong>。当您新建文章时，Hexo 会根据 scaffold 来建立文件。例如，如果您修改scaffold/post.md中的Front-matter内容，那么每次新建一篇文章时都会包含这个修改。</li>
-<li><strong>source</strong>：<strong>资源文件夹</strong>，除 _posts 文件夹之外，开头命名为 _ (下划线)的文件 / 文件夹和隐藏的文件将会被忽略。<strong>Markdown 和 HTML 文件会被解析并放到 public 文件夹，而其他文件会被拷贝过去</strong>。例如用于域名解析的 CNAME 文件就可以放到该文件夹中，每次部署的时候都会自动添加该文件。</li>
+<li><strong>scaffolds</strong>：<strong>模版文件夹</strong>，Hexo的模板是指<strong><em>在新建的markdown文件中默认填充的内容</em></strong>。当您新建文章时，Hexo 会根据 scaffold 来建立文件。例如，如果您修改scaffold/post.md中的Front-matter内容，那么每次新建一篇文章时都会包含这个修改。</li>
+<li><strong>source</strong>：<strong>资源文件夹</strong>，除 _posts 文件夹之外，开头命名为 _ (下划线)的文件 / 文件夹和隐藏的文件将会被忽略。<strong><em>Markdown 和 HTML 文件会被解析并放到 public 文件夹，而其他文件会被拷贝过去</em></strong>。例如用于域名解析的 CNAME 文件就可以放到该文件夹中，每次部署的时候都会自动添加该文件。</li>
 <li><strong>themes</strong>：<strong>主题文件夹</strong>，Hexo 会根据主题来生成静态页面。</li>
 </ul>
-<h3 id="2、创建文章"><a href="#2、创建文章" class="headerlink" title="2、创建文章"></a>2、创建文章</h3><p>执行以下命令可新建文章<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new [layout] &lt;title&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="2、启动"><a href="#2、启动" class="headerlink" title="2、启动"></a>2、启动</h3><p>输入命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure></p>
+<p>进行启动，可简化为 <code>$ hexo s</code> ，也可启动调试模式 <code>$ hexo server --debug</code></p>
+<h3 id="3、创建文章"><a href="#3、创建文章" class="headerlink" title="3、创建文章"></a>3、创建文章</h3><p>执行以下命令可新建文章<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new [layout] &lt;title&gt;</span><br></pre></td></tr></table></figure></p>
 <h4 id="布局（layout）"><a href="#布局（layout）" class="headerlink" title="布局（layout）"></a>布局（layout）</h4><p>hexo有三种默认布局，用户也可以自定义布局，不同布局对应不同的存储路径</p>
 <ul>
 <li><strong>post</strong>：一般文章布局，自定义布局和post的对应的存储路径为 <code>source/_posts</code></li>
@@ -451,7 +453,7 @@
 <h4 id="标题（title）"><a href="#标题（title）" class="headerlink" title="标题（title）"></a>标题（title）</h4><p>Hexo 默认以标题做为文件名称，但您可编辑 <code>new_post_name</code> 参数来改变默认的文件名称，举例来说，设为 <code>:year-:month-:day-:title.md</code> 可让您更方便的通过日期来管理文章。其中 :title 默认会转为小写，空格将会被替换为短杠</p>
 <p>例如新建一篇名为 hello world 的新文章<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new post &quot;hello world&quot;</span><br></pre></td></tr></table></figure></p>
 <p>source/_posts下面会自动生成一个名为 hello-world 的md文件（空格会自动转换为短杠），这就是我们新建的文章</p>
-<h3 id="3、编辑文章"><a href="#3、编辑文章" class="headerlink" title="3、编辑文章"></a>3、编辑文章</h3><h4 id="前页（Front-matter）"><a href="#前页（Front-matter）" class="headerlink" title="前页（Front-matter）"></a>前页（Front-matter）</h4><p>Front-matter 是文件最上方以 — 分隔的区域，指定该文件的变量，支持的变量有：</p>
+<h3 id="4、编辑文章"><a href="#4、编辑文章" class="headerlink" title="4、编辑文章"></a>4、编辑文章</h3><h4 id="前页（Front-matter）"><a href="#前页（Front-matter）" class="headerlink" title="前页（Front-matter）"></a>前页（Front-matter）</h4><p>Front-matter 是文件最上方以 — 分隔的区域，指定该文件的变量，支持的变量有：</p>
 <ul>
 <li><strong>layout</strong>：布局</li>
 <li><strong>title</strong>：标题</li>
@@ -462,11 +464,21 @@
 <li><strong>categories</strong>：分类，不适用于布局为 <code>page</code> 的的页面</li>
 <li><strong>permalink</strong>：覆盖文章网址</li>
 </ul>
-<h5 id="分类（categories）和标签（tags）的区别"><a href="#分类（categories）和标签（tags）的区别" class="headerlink" title="分类（categories）和标签（tags）的区别"></a>分类（categories）和标签（tags）的区别</h5><p><strong>分类具有顺序性和层次性</strong>，例如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">categories:</span><br><span class="line">- Diary</span><br><span class="line">- Life</span><br></pre></td></tr></table></figure></p>
-<p>会使 Life 成为 Diary 的子类，而不是并列分类。<br><strong>标签没有顺序和层次</strong>。</p>
+<p>分类（categories）和标签（tags）的区别：<strong><em>分类具有顺序性和层次性</em></strong>，<strong><em>标签没有顺序和层次</em></strong>。例如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">categories:</span><br><span class="line">- Diary</span><br><span class="line">- Life</span><br></pre></td></tr></table></figure></p>
+<p>会使 Life 成为 Diary 的子类，而不是并列分类。  </p>
 <p>例如编辑一篇新文章的 front-matter 为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: hello-world</span><br><span class="line">date: 2018-06-10 16:15:04</span><br><span class="line">categories:</span><br><span class="line">- Diary</span><br><span class="line">- Life</span><br><span class="line">tags:</span><br><span class="line">- happy</span><br><span class="line">- friend</span><br><span class="line">comments: false</span><br><span class="line">---</span><br></pre></td></tr></table></figure></p>
 <p>—以下的内容可自由编辑</p>
-<p>&lt;未完待续&gt;</p>
+<h3 id="5、发布文章"><a href="#5、发布文章" class="headerlink" title="5、发布文章"></a>5、发布文章</h3><p>我们在本地编辑的文章只能在本地查看，如果想把文章发布到网上，我们需要把文章上传到上面配置好的 github pages 中。在发布文章前我们需要进行一些配置。</p>
+<h4 id="配置-config-yml文件"><a href="#配置-config-yml文件" class="headerlink" title="配置_config.yml文件"></a>配置_config.yml文件</h4><p>编辑<strong><em>安装目录</em></strong>下的_config.yml文件，找到下面 <code># Deployment</code>部分内容，把 <code>type</code> 改成 <code>git</code>，<code>repo</code> 改成你自己的仓库地址，该地址可以直接上 github 上获取。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># Deployment</span><br><span class="line">## Docs: https://hexo.io/docs/deployment.html</span><br><span class="line">deploy:</span><br><span class="line"> type: git</span><br><span class="line"> repo: https://github.com/18814122746/18814122746.github.io.git</span><br></pre></td></tr></table></figure></p>
+<p>注意：<strong><em><code>type:</code> 和 <code>git</code>之间必须带一个空格</em></strong></p>
+<h4 id="安装deployer工具"><a href="#安装deployer工具" class="headerlink" title="安装deployer工具"></a>安装deployer工具</h4><p><a href="https://github.com/hexojs/hexo-deployer-git" target="_blank" rel="noopener">hexo-deployer-git</a> 为hexo自动部署安装工具，可通过命令安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-deployer-git  --save</span><br></pre></td></tr></table></figure></p>
+<p>配置完后就可以发布文章。发布文章可分为<strong>清空、生成</strong>和<strong>部署</strong>三部分</p>
+<h4 id="1）清空"><a href="#1）清空" class="headerlink" title="1）清空"></a>1）清空</h4><p>主要用来清除缓存文件 (db.json) 和已生成的静态文件 (public)，执行命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo clean</span><br></pre></td></tr></table></figure></p>
+<h4 id="2）生成"><a href="#2）生成" class="headerlink" title="2）生成"></a>2）生成</h4><p>生成public静态文件夹，执行命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure></p>
+<p>也可简化成 <code>$ hexo g</code></p>
+<h4 id="3）部署"><a href="#3）部署" class="headerlink" title="3）部署"></a>3）部署</h4><p>部署到 github 上面，执行命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure></p>
+<p>也可简化成 <code>$ hexo d</code><br>在浏览器输入 <a href="https://username.github.io" target="_blank" rel="noopener">https://username.github.io</a> 就可以浏览你的刚才发布的博客，例如本人的博客网址为 <a href="https://18814122746.github.io/" target="_blank" rel="noopener">https://18814122746.github.io/</a> ，至此 Hexo + Github 的个人博客<strong><em>搭建已经完成</em></strong>。</p>
+<h4 id="6、Hexo常用命令汇总"><a href="#6、Hexo常用命令汇总" class="headerlink" title="6、Hexo常用命令汇总"></a>6、Hexo常用命令汇总</h4><p>&lt;未完待续&gt;</p>
 
           
         
