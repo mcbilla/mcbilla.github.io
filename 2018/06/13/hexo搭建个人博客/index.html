@@ -83,11 +83,11 @@
 <meta name="keywords" content="Hexo,Github,教程">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hexo+GitHub搭建个人博客教程">
-<meta property="og:url" content="http://yoursite.com/2018/06/05/hello-world/index.html">
+<meta property="og:url" content="http://yoursite.com/2018/06/13/hexo搭建个人博客/index.html">
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="Hexo 是一款基于Node.js的支持Markdown的静态站点生成框架，利用 Hexo+GitHub 可以轻松打造属于个人的免费博客。经过本人一番摸索最终搭建成功，心得分享如下。  一、环境配置在搭建之前电脑需要的环境配置如下：  git node.js github pages 仓库  我们可以在控制台中输入12$ node -v #查看node.js版本$ git --version #">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-17T06:26:58.222Z">
+<meta property="og:updated_time" content="2018-06-17T06:34:04.075Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo+GitHub搭建个人博客教程">
 <meta name="twitter:description" content="Hexo 是一款基于Node.js的支持Markdown的静态站点生成框架，利用 Hexo+GitHub 可以轻松打造属于个人的免费博客。经过本人一番摸索最终搭建成功，心得分享如下。  一、环境配置在搭建之前电脑需要的环境配置如下：  git node.js github pages 仓库  我们可以在控制台中输入12$ node -v #查看node.js版本$ git --version #">
@@ -120,7 +120,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/06/05/hello-world/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/06/13/hexo搭建个人博客/"/>
 
 
 
@@ -220,6 +220,16 @@
           </a>
         </li>
       
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
 
       
         <li class="menu-item menu-item-search">
@@ -287,7 +297,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/13/hexo搭建个人博客/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="mcb">
@@ -316,8 +326,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T22:54:08+08:00">
-                2018-06-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-13T00:00:00+08:00">
+                2018-06-13
               </time>
             
 
@@ -475,13 +485,14 @@
 <p>也可简化成 <code>$ hexo g</code></p>
 <h4 id="3）部署"><a href="#3）部署" class="headerlink" title="3）部署"></a>3）部署</h4><p>部署到 github 上面，执行命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure></p>
 <p>也可简化成 <code>$ hexo d</code><br>在浏览器输入 <a href="https://username.github.io" target="_blank" rel="noopener">https://username.github.io</a> 就可以浏览你的刚才发布的博客，例如本人的博客网址为 <a href="https://18814122746.github.io/" target="_blank" rel="noopener">https://18814122746.github.io/</a> ，至此 Hexo + Github 的个人博客<strong><em>搭建已经完成</em></strong>。</p>
-<h4 id="6、Hexo常用命令汇总"><a href="#6、Hexo常用命令汇总" class="headerlink" title="6、Hexo常用命令汇总"></a>6、Hexo常用命令汇总</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ hexo init [folder] #初始化 folder 文件夹为网站根目录，如果没有 folder 默认在目前的文件夹初始化</span><br><span class="line">$ hexo new &lt;title&gt; #新建文章</span><br><span class="line">$ hexo new page &lt;title&gt; #新建页面</span><br><span class="line">$ hexo server #启动服务器，默认情况下，访问网址为： http://localhost:4000/</span><br><span class="line">$ hexo clean #清空静态文件和缓存文件</span><br><span class="line">$ hexo generate #生成静态文件到public目录，可简写为 hexo -g</span><br><span class="line">$ hexo deploy #部署文件到远程服务器，可简写为 hexo -d</span><br><span class="line">$ hexo help  #查看帮助</span><br><span class="line">$ hexo version  #查看Hexo的版本</span><br></pre></td></tr></table></figure>
+<h3 id="6、Hexo常用命令汇总"><a href="#6、Hexo常用命令汇总" class="headerlink" title="6、Hexo常用命令汇总"></a>6、Hexo常用命令汇总</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ hexo init [folder] #初始化 folder 文件夹为网站根目录，如果没有 folder 默认在目前的文件夹初始化</span><br><span class="line">$ hexo new &lt;title&gt; #新建文章</span><br><span class="line">$ hexo new page &lt;title&gt; #新建页面</span><br><span class="line">$ hexo server #启动服务器，默认情况下，访问网址为： http://localhost:4000/</span><br><span class="line">$ hexo clean #清空静态文件和缓存文件</span><br><span class="line">$ hexo generate #生成静态文件到public目录，可简写为 hexo -g</span><br><span class="line">$ hexo deploy #部署文件到远程服务器，可简写为 hexo -d</span><br><span class="line">$ hexo help  #查看帮助</span><br><span class="line">$ hexo version  #查看Hexo的版本</span><br></pre></td></tr></table></figure>
 <h4 id="模式"><a href="#模式" class="headerlink" title="模式"></a>模式</h4><p>模式可配合上述命令行进行使用，例如以调试模式启动服务器 <code>$ hexo s --debug</code></p>
 <h5 id="1）安全模式"><a href="#1）安全模式" class="headerlink" title="1）安全模式"></a>1）安全模式</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo --safe</span><br></pre></td></tr></table></figure>
 <p>在安全模式下，不会载入插件和脚本。当您在安装新插件遭遇问题时，可以尝试以安全模式重新执行。</p>
 <h5 id="2）安全模式"><a href="#2）安全模式" class="headerlink" title="2）安全模式"></a>2）安全模式</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo --debug</span><br></pre></td></tr></table></figure>
 <p>在终端中显示调试信息并记录到 debug.log。</p>
 <h5 id="3）简洁模式"><a href="#3）简洁模式" class="headerlink" title="3）简洁模式"></a>3）简洁模式</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo --silent</span><br></pre></td></tr></table></figure>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="noopener">Hexo官方中文文档</a><br><a href="http://baixin.io/2015/08/HEXO%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" target="_blank" rel="noopener">HEXO搭建个人博客</a><br><a href="https://www.jianshu.com/p/189fd945f38f" target="_blank" rel="noopener">搭建个人博客-hexo+github详细完整步骤</a><br><a href="https://www.jianshu.com/p/05289a4bc8b2" target="_blank" rel="noopener">如何搭建一个独立博客——简明Github Pages与Hexo教程</a><br><a href="http://crazymilk.github.io/2015/12/28/GitHub-Pages-Hexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/#more" target="_blank" rel="noopener">GitHub Pages + Hexo搭建博客</a><br><a href="https://www.jianshu.com/p/70f3cfae1ef4" target="_blank" rel="noopener">使用Hexo搭建个人静态博客</a></p>
 
       
     </div>
@@ -512,6 +523,22 @@
       
       
 
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/17/next主题配置/" rel="prev" title="next主题配置">
+                next主题配置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
 
       
@@ -630,9 +657,9 @@
             
               <div class="site-state-item site-state-posts">
               
-                <a href="/archives">
+                <a href="/archives/">
               
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -654,7 +681,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -697,7 +724,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、环境配置"><span class="nav-number">1.</span> <span class="nav-text">一、环境配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、安装git"><span class="nav-number">1.1.</span> <span class="nav-text">1、安装git</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）windows用户"><span class="nav-number">1.1.1.</span> <span class="nav-text">1）windows用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）mac用户"><span class="nav-number">1.1.2.</span> <span class="nav-text">2）mac用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）linux用户"><span class="nav-number">1.1.3.</span> <span class="nav-text">3）linux用户</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、安装node-js"><span class="nav-number">1.2.</span> <span class="nav-text">2、安装node.js</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）下载安装程序（推荐）"><span class="nav-number">1.2.1.</span> <span class="nav-text">1）下载安装程序（推荐）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）使用nvm安装"><span class="nav-number">1.2.2.</span> <span class="nav-text">2）使用nvm安装</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、github-pages"><span class="nav-number">1.3.</span> <span class="nav-text">3、github pages</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）申请github账号"><span class="nav-number">1.3.1.</span> <span class="nav-text">1）申请github账号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）创建托管仓库"><span class="nav-number">1.3.2.</span> <span class="nav-text">2）创建托管仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）配置SSH（可跳过）"><span class="nav-number">1.3.3.</span> <span class="nav-text">3）配置SSH（可跳过）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-查看电脑是否已经配置-ssh-key"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">1. 查看电脑是否已经配置 ssh key</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-生成新的-SSH-Key"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">2. 生成新的 SSH Key</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-复制key"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">3. 复制key</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-添加到github中"><span class="nav-number">1.3.3.4.</span> <span class="nav-text">4. 添加到github中</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-测试连接"><span class="nav-number">1.3.3.5.</span> <span class="nav-text">5. 测试连接</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、安装Hexo"><span class="nav-number">2.</span> <span class="nav-text">二、安装Hexo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、下载Hexo"><span class="nav-number">2.1.</span> <span class="nav-text">1、下载Hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、初始化安装"><span class="nav-number">2.2.</span> <span class="nav-text">2、初始化安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、使用Hexo"><span class="nav-number">3.</span> <span class="nav-text">三、使用Hexo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、Hexo目录简介"><span class="nav-number">3.1.</span> <span class="nav-text">1、Hexo目录简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、启动"><span class="nav-number">3.2.</span> <span class="nav-text">2、启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、创建文章"><span class="nav-number">3.3.</span> <span class="nav-text">3、创建文章</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#布局（layout）"><span class="nav-number">3.3.1.</span> <span class="nav-text">布局（layout）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#标题（title）"><span class="nav-number">3.3.2.</span> <span class="nav-text">标题（title）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、编辑文章"><span class="nav-number">3.4.</span> <span class="nav-text">4、编辑文章</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#前页（Front-matter）"><span class="nav-number">3.4.1.</span> <span class="nav-text">前页（Front-matter）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、发布文章"><span class="nav-number">3.5.</span> <span class="nav-text">5、发布文章</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-config-yml文件"><span class="nav-number">3.5.1.</span> <span class="nav-text">配置_config.yml文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装deployer工具"><span class="nav-number">3.5.2.</span> <span class="nav-text">安装deployer工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1）清空"><span class="nav-number">3.5.3.</span> <span class="nav-text">1）清空</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）生成"><span class="nav-number">3.5.4.</span> <span class="nav-text">2）生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）部署"><span class="nav-number">3.5.5.</span> <span class="nav-text">3）部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6、Hexo常用命令汇总"><span class="nav-number">3.5.6.</span> <span class="nav-text">6、Hexo常用命令汇总</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模式"><span class="nav-number">3.5.7.</span> <span class="nav-text">模式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1）安全模式"><span class="nav-number">3.5.7.1.</span> <span class="nav-text">1）安全模式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2）安全模式"><span class="nav-number">3.5.7.2.</span> <span class="nav-text">2）安全模式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3）简洁模式"><span class="nav-number">3.5.7.3.</span> <span class="nav-text">3）简洁模式</span></a></li></ol></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、环境配置"><span class="nav-number">1.</span> <span class="nav-text">一、环境配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、安装git"><span class="nav-number">1.1.</span> <span class="nav-text">1、安装git</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）windows用户"><span class="nav-number">1.1.1.</span> <span class="nav-text">1）windows用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）mac用户"><span class="nav-number">1.1.2.</span> <span class="nav-text">2）mac用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）linux用户"><span class="nav-number">1.1.3.</span> <span class="nav-text">3）linux用户</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、安装node-js"><span class="nav-number">1.2.</span> <span class="nav-text">2、安装node.js</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）下载安装程序（推荐）"><span class="nav-number">1.2.1.</span> <span class="nav-text">1）下载安装程序（推荐）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）使用nvm安装"><span class="nav-number">1.2.2.</span> <span class="nav-text">2）使用nvm安装</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、github-pages"><span class="nav-number">1.3.</span> <span class="nav-text">3、github pages</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）申请github账号"><span class="nav-number">1.3.1.</span> <span class="nav-text">1）申请github账号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）创建托管仓库"><span class="nav-number">1.3.2.</span> <span class="nav-text">2）创建托管仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）配置SSH（可跳过）"><span class="nav-number">1.3.3.</span> <span class="nav-text">3）配置SSH（可跳过）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-查看电脑是否已经配置-ssh-key"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">1. 查看电脑是否已经配置 ssh key</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-生成新的-SSH-Key"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">2. 生成新的 SSH Key</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-复制key"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">3. 复制key</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-添加到github中"><span class="nav-number">1.3.3.4.</span> <span class="nav-text">4. 添加到github中</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-测试连接"><span class="nav-number">1.3.3.5.</span> <span class="nav-text">5. 测试连接</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、安装Hexo"><span class="nav-number">2.</span> <span class="nav-text">二、安装Hexo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、下载Hexo"><span class="nav-number">2.1.</span> <span class="nav-text">1、下载Hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、初始化安装"><span class="nav-number">2.2.</span> <span class="nav-text">2、初始化安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、使用Hexo"><span class="nav-number">3.</span> <span class="nav-text">三、使用Hexo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、Hexo目录简介"><span class="nav-number">3.1.</span> <span class="nav-text">1、Hexo目录简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、启动"><span class="nav-number">3.2.</span> <span class="nav-text">2、启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、创建文章"><span class="nav-number">3.3.</span> <span class="nav-text">3、创建文章</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#布局（layout）"><span class="nav-number">3.3.1.</span> <span class="nav-text">布局（layout）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#标题（title）"><span class="nav-number">3.3.2.</span> <span class="nav-text">标题（title）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、编辑文章"><span class="nav-number">3.4.</span> <span class="nav-text">4、编辑文章</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#前页（Front-matter）"><span class="nav-number">3.4.1.</span> <span class="nav-text">前页（Front-matter）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、发布文章"><span class="nav-number">3.5.</span> <span class="nav-text">5、发布文章</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-config-yml文件"><span class="nav-number">3.5.1.</span> <span class="nav-text">配置_config.yml文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装deployer工具"><span class="nav-number">3.5.2.</span> <span class="nav-text">安装deployer工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1）清空"><span class="nav-number">3.5.3.</span> <span class="nav-text">1）清空</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）生成"><span class="nav-number">3.5.4.</span> <span class="nav-text">2）生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）部署"><span class="nav-number">3.5.5.</span> <span class="nav-text">3）部署</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6、Hexo常用命令汇总"><span class="nav-number">3.6.</span> <span class="nav-text">6、Hexo常用命令汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#模式"><span class="nav-number">3.6.1.</span> <span class="nav-text">模式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1）安全模式"><span class="nav-number">3.6.1.1.</span> <span class="nav-text">1）安全模式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2）安全模式"><span class="nav-number">3.6.1.2.</span> <span class="nav-text">2）安全模式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3）简洁模式"><span class="nav-number">3.6.1.3.</span> <span class="nav-text">3）简洁模式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考链接"><span class="nav-number">3.7.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
             
 
           </div>
