@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="小程序,Modal," />
 
 
 
@@ -79,17 +79,21 @@
 
 
 
-<meta name="description" content="Constant dropping wears the stone">
-<meta property="og:type" content="website">
-<meta property="og:title" content="分类">
-<meta property="og:url" content="http://yoursite.com/categories/index.html">
+<meta name="description" content="在小程序 官方文档 中可以使用 wx.showModal() 方法来生成 Modal 蒙层弹框，但是其显示的内容只能为文本格式且由传入参数限定，显示方式比较单一，不能满足日常多样化的需求。本人查阅了相关资料完成一些自定义Modal组件，可以满足个性化需求。转载请说明出处。">
+<meta name="keywords" content="小程序,Modal">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小程序自定义Modal组件">
+<meta property="og:url" content="http://yoursite.com/2018/06/21/小程序自定义Modal组件-1/index.html">
 <meta property="og:site_name" content="飙戈的博客">
-<meta property="og:description" content="Constant dropping wears the stone">
+<meta property="og:description" content="在小程序 官方文档 中可以使用 wx.showModal() 方法来生成 Modal 蒙层弹框，但是其显示的内容只能为文本格式且由传入参数限定，显示方式比较单一，不能满足日常多样化的需求。本人查阅了相关资料完成一些自定义Modal组件，可以满足个性化需求。转载请说明出处。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-10T11:54:52.680Z">
+<meta property="og:image" content="http://yoursite.com/2018/06/21/小程序自定义Modal组件-1/docs.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/21/小程序自定义Modal组件-1/rs.jpeg">
+<meta property="og:updated_time" content="2018-06-21T07:31:29.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="分类">
-<meta name="twitter:description" content="Constant dropping wears the stone">
+<meta name="twitter:title" content="小程序自定义Modal组件">
+<meta name="twitter:description" content="在小程序 官方文档 中可以使用 wx.showModal() 方法来生成 Modal 蒙层弹框，但是其显示的内容只能为文本格式且由传入参数限定，显示方式比较单一，不能满足日常多样化的需求。本人查阅了相关资料完成一些自定义Modal组件，可以满足个性化需求。转载请说明出处。">
+<meta name="twitter:image" content="http://yoursite.com/2018/06/21/小程序自定义Modal组件-1/docs.png">
 
 
 
@@ -119,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/categories/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/06/21/小程序自定义Modal组件-1/"/>
 
 
 
 
 
-  <title>分类 | 飙戈的博客</title>
+  <title>小程序自定义Modal组件 | 飙戈的博客</title>
   
 
 
@@ -284,40 +288,234 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/21/小程序自定义Modal组件-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="mcb">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline">分类</h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <div class="category-all-page">
-            <div class="category-all-title">
-                目前共计 2 个分类
-            </div>
-            <div class="category-all">
-              <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/小程序/">小程序</a><span class="category-list-count">1</span></li></ul>
-            </div>
-          </div>
+          <h1 class="post-title" itemprop="name headline">小程序自定义Modal组件</h1>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-21T10:32:58+08:00">
+                2018-06-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/小程序/" itemprop="url" rel="index">
+                    <span itemprop="name">小程序</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <blockquote>
+<p>在小程序 <a href="https://developers.weixin.qq.com/miniprogram/dev/" target="_blank" rel="noopener">官方文档</a> 中可以使用 <a href="https://developers.weixin.qq.com/miniprogram/dev/api/api-react.html#wxshowmodalobject" target="_blank" rel="noopener">wx.showModal()</a> 方法来生成 Modal 蒙层弹框，但是其显示的内容只能为文本格式且由传入参数限定，显示方式比较单一，不能满足日常多样化的需求。本人查阅了相关资料完成一些自定义Modal组件，可以满足个性化需求。转载请说明出处。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><p>在这里的实现思路主要是通过微信小程序的原生 Modal 组件来实现，这个组件在最新版的官方文档中已经找不到，估计官方是想用 <code>wx.showModal()</code> 方法来代替使用，但是仍然可以向下兼容使用。通过原生的 Modal 组件我们可以自定义自己的内容界面，Modal 组件的 api 文档如下</p>
+<p><img src="/2018/06/21/小程序自定义Modal组件-1/docs.png" alt="原生Modal官方文档"></p>
+<p>再对比 <code>wx.showModal()</code> 的 api 文档不难看出其只是对 Modal 组件的进一步封装。</p>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><h3 id="wxml"><a href="#wxml" class="headerlink" title="wxml"></a>wxml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">......</span><br><span class="line"></span><br><span class="line">&lt;!--打印发货单蒙层--&gt;</span><br><span class="line">  &lt;modal hidden=&quot;&#123;&#123;hideModal&#125;&#125;&quot; class=&apos;modal&apos; cancel-text=&apos;返回&apos; confirm-text=&apos;下一步&apos; bindcancel=&quot;cancelPrint&quot; bindconfirm=&quot;confirmPrint&quot; catchtouchmove=&apos;preventTouchMove&apos;&gt;</span><br><span class="line">    &lt;view class=&apos;modal-box&apos;&gt;</span><br><span class="line">      &lt;radio-group bindchange=&apos;radioChange&apos;&gt;</span><br><span class="line">        &lt;label class=&apos;radio modal-item&apos;&gt;</span><br><span class="line">          &lt;view class=&apos;modal-item-hd&apos;&gt;</span><br><span class="line">            &lt;radio value=&apos;1&apos; checked=&apos;&#123;&#123;radioIndex == 1&#125;&#125;&apos;&gt;&lt;/radio&gt;</span><br><span class="line">            &lt;view&gt;根据手机号和提货码发货&lt;/view&gt;</span><br><span class="line">          &lt;/view&gt;</span><br><span class="line">          &lt;view class=&apos;modal-item-bd&apos;&gt;</span><br><span class="line">            &lt;view&gt;手机号：&#123;&#123;phone&#125;&#125;&lt;/view&gt;</span><br><span class="line">            &lt;view&gt;提货码：&#123;&#123;detail.ladingCode&#125;&#125;&lt;/view&gt;</span><br><span class="line">          &lt;/view&gt;</span><br><span class="line">        &lt;/label&gt;</span><br><span class="line">        &lt;label class=&apos;radio modal-item&apos;&gt;</span><br><span class="line">          &lt;view class=&apos;modal-item-hd&apos;&gt;</span><br><span class="line">            &lt;radio value=&apos;2&apos;&gt;&lt;/radio&gt;</span><br><span class="line">            &lt;view&gt;扫描二维码&lt;/view&gt;</span><br><span class="line">          &lt;/view&gt;</span><br><span class="line">          &lt;view class=&apos;modal-item-bd&apos;&gt;</span><br><span class="line">            &lt;view&gt;请点击下一步&lt;/view&gt;</span><br><span class="line">          &lt;/view&gt;</span><br><span class="line">        &lt;/label&gt;</span><br><span class="line">      &lt;/radio-group&gt;</span><br><span class="line">    &lt;/view&gt;</span><br><span class="line">  &lt;/modal&gt;</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+<p>wxml文件最关键部分是 <code>&lt;modal&gt;&lt;/modal&gt;</code> 组件的调用，参数解析如下</p>
+<ul>
+<li>通过 <code>hidden</code> 属性来控制蒙层的显示和隐藏</li>
+<li><code>bindcancel</code> 属性绑定返回时间</li>
+<li><code>bindconfirm</code> 属性绑定确认事件</li>
+<li><code>catchtouchmove</code> 防止触摸滑动穿透，即当 modal 弹层下的页面有滚动条，在 modal 弹层上触摸滑动时下面的页面仍跟着滚动的情况。</li>
+</ul>
+<h3 id="js"><a href="#js" class="headerlink" title="js"></a>js</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">data: &#123;</span><br><span class="line">  phone: null,</span><br><span class="line">  detail: null,</span><br><span class="line">  hideModal: true,</span><br><span class="line">  radioIndex: 1</span><br><span class="line">&#125;,</span><br><span class="line"></span><br><span class="line">......</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 显示modal组件</span><br><span class="line"> */</span><br><span class="line">printDel: function() &#123;</span><br><span class="line">  this.setData(&#123;</span><br><span class="line">    hideModal: false</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;,</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 隐藏modal组件</span><br><span class="line"> */</span><br><span class="line">cancelPrint: function() &#123;</span><br><span class="line">  this.setData(&#123;</span><br><span class="line">    hideModal: true</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;,</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 阻断蒙层事件向下传递</span><br><span class="line"> */</span><br><span class="line">preventTouchMove: function() &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 选择打印发货单方式</span><br><span class="line"> */</span><br><span class="line">radioChange: function(e) &#123;</span><br><span class="line">  this.setData(&#123;</span><br><span class="line">    radioIndex: e.detail.value</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;,</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 确认打印</span><br><span class="line"> */</span><br><span class="line">confirmPrint: function() &#123;</span><br><span class="line">  var radioIndex = this.data.radioIndex</span><br><span class="line">  if(radioIndex == 1) &#123;</span><br><span class="line">    //根据手机号和提货码发货</span><br><span class="line">    wx.showToast(&#123;</span><br><span class="line">      title: &apos;请在终端屏幕上输入手机号和提货码&apos;,</span><br><span class="line">      icon: &apos;none&apos;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;else &#123;</span><br><span class="line">    //扫描二维码</span><br><span class="line">    /** code */</span><br><span class="line">    this.setData(&#123;</span><br><span class="line">      hideModal: true</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;,</span><br><span class="line"></span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+<p>js 文件中最关键的是 <code>this.setData({ hideModal: true / false })</code> 来控制 Modal 组件的隐藏/显示，以及空方法 <code>preventTouchMove()</code> 阻止事件向父节点传递。</p>
+<blockquote>
+<p>以bind或catch开头，然后跟上事件的类型，bind事件绑定不会阻止冒泡事件向上冒泡，catch事件绑定可以阻止冒泡事件向上冒泡。</p>
+</blockquote>
+<p>详见 <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/view/wxml/event.html" target="_blank" rel="noopener">小程序事件</a></p>
+<h3 id="wxss"><a href="#wxss" class="headerlink" title="wxss"></a>wxss</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">......</span><br><span class="line"></span><br><span class="line">.modal-item-hd &#123;</span><br><span class="line">  display: flex;</span><br><span class="line">  align-items: center</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.modal-item-hd view &#123;</span><br><span class="line">  font-size: 32rpx;</span><br><span class="line">  color: #000;</span><br><span class="line">  padding-top: 5rpx</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.modal-item-bd &#123;</span><br><span class="line">  margin: 10rpx 0 20rpx 60rpx;</span><br><span class="line">  font-size: 36rpx;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+<p>wxss比较简单，在这里不做详细解析。</p>
+<h2 id="最终效果"><a href="#最终效果" class="headerlink" title="最终效果"></a>最终效果</h2><p><div style="width: 50%"><img src="/2018/06/21/小程序自定义Modal组件-1/rs.jpeg" alt="最终效果图"><div></div></div></p>
+<h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a href="https://blog.csdn.net/zhuyb829/article/details/73349295" target="_blank" rel="noopener">自定义模态对话框实例</a><br><a href="https://www.cnblogs.com/liululin/p/6001437.html" target="_blank" rel="noopener">微信小程序之—-弹框组件modal</a><br><a href="https://blog.csdn.net/u011072139/article/details/54016575" target="_blank" rel="noopener">小程序 实现遮罩层</a></p>
+
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/小程序/" rel="tag"># 小程序</a>
+          
+            <a href="/tags/Modal/" rel="tag"># Modal</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/17/next主题配置/" rel="next" title="next主题配置">
+                <i class="fa fa-chevron-left"></i> next主题配置
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/21/hexo插入图片和设置图片大小/" rel="prev" title="hexo插入图片和设置图片大小">
+                hexo插入图片和设置图片大小 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
   </div>
 
 
@@ -326,6 +524,15 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNzIyNC8xMzc1OA=="></div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -346,8 +553,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -421,6 +637,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现思路"><span class="nav-number">1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码"><span class="nav-number">2.</span> <span class="nav-text">源码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#wxml"><span class="nav-number">2.1.</span> <span class="nav-text">wxml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#js"><span class="nav-number">2.2.</span> <span class="nav-text">js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wxss"><span class="nav-number">2.3.</span> <span class="nav-text">wxss</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最终效果"><span class="nav-number">3.</span> <span class="nav-text">最终效果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文档"><span class="nav-number">4.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -600,6 +832,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
