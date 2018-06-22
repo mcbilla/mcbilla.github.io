@@ -1,0 +1,68 @@
+---
+title: hexo插入图片和设置图片大小
+date: 2018-06-21 15:36:10
+categories:
+- Hexo
+tags:
+- Hexo
+- 图片
+---
+
+> Hexo 插入图片有两种方式，第一种是网络引用，第二种是本地插入，本文主要介绍本地插入图片方式。另外由于 Hexo 是静态博客框架，所插入的图片默认会按照本身大小自动铺满，如果要设置图片大小需要另外写 css 来进行控制。转载请说明出处。
+
+<!--more-->
+## 前言
+Hexo 插入图片有 **网络图片插入** 和 **本地图片插入** 两种方式。
+
+网络图片插入的做法是先把图片上传到 [七牛云](https://www.qiniu.com/) 等云服务商提供的图床，然后通过 `![img-title](img-url)` 的方式，把 img-url 的地址替换成图片在图床的 url 地址即可。使用网络图片的好处是七牛云的cdn加速效果会大大提高图片的打开速度，缺点是多图片博客的编辑过程会比较繁琐，图片管理比较麻烦。
+
+本地图片插入把图片和博客保存在一起，方便图片管理，但是图片的网络打开速度会很慢。下面重点介绍本地图片插入。
+
+## 常规本地图片插入
+
+### 1、修改配置文件
+编辑 **hexo安装目录下的_config.yml** 文件，找到 `post_asset_folder`，把值改成 `true`。
+> 通过将 config.yml 文件中的 `post_asset_folder` 选项设为 `true` 来打开资源文件管理功能。当资源文件管理功能打开后，Hexo 将会在你每一次通过 `hexo new [layout] <title>` 命令创建新文章时自动创建一个文件夹。这个资源文件夹将会有与这个 markdown 文件一样的名字。将所有与你的文章有关的资源放在这个关联文件夹中之后，你可以通过相对路径来引用它们，这样你就得到了一个更简单而且方便得多的工作流。
+
+在建立文件时，Hexo会自动建立一个**与文章同名的文件夹**，您可以把与该文章相关的所有资源都放到那个文件夹，如此一来，您便可以更方便的使用资源。
+
+### 2、安装插件
+安装插件 [hexo-asset-image](https://github.com/CodeFalling/hexo-asset-image)，在 hexo 安装目录下运行
+```
+$ npm install hexo-asset-image --save
+```
+安装完成后需要重启一下服务器
+
+### 3、使用插入图片
+使用 `hexo new post "xxxx"` 来新建博客时，会发现在 `/source/_posts` 文件夹下会有一个同名的 `xxxx` 文件夹，对于已存在的博客可以新建一个同名文件夹。
+
+先把图片复制到同名文件夹中，然后在文章中使用
+
+```
+![图片替代文字](同名文件夹名称/img.jpg)
+```
+
+注意 img.jpg 前面的路径只需要同名文件夹的名称即可，不需要写什么绝对路径、相对路径。如
+
+```
+![赵霁](hexo插入图片和设置图片大小/example.jpeg)
+```
+
+效果图如下：
+
+![赵霁](hexo插入图片和设置图片大小/example.jpeg)
+
+## 设置图片大小
+图片默认会显示原本的图片大小并居中显示，如果需要对图片大小进行设置，需要另外写 css 样式进行控制。注意：该方法可能会覆盖原来的一些图片样式。
+
+```
+<div style="width: 200px; margin: auto">![赵霁](hexo插入图片和设置图片大小/example.jpeg)</div>
+
+```
+设置宽度为200px并设置居中（高度会自动缩放），效果图如下：
+<div style="width: 200px; margin: auto">![赵霁](hexo插入图片和设置图片大小/example.jpeg)</div>
+
+## 参考
+[Hexo 官方文档资源文件夹](https://hexo.io/zh-cn/docs/asset-folders.html)  
+[hexo博客图片问题](https://www.jianshu.com/p/c2ba9533088a)  
+[hexo生成博文插入图片](https://blog.csdn.net/sugar_rainbow/article/details/57415705)
