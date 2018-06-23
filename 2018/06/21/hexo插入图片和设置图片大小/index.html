@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/2018/06/21/hexo插入图片和设置图片大小/example.jpeg">
 <meta property="og:image" content="http://yoursite.com/2018/06/21/hexo插入图片和设置图片大小/example.jpeg">
-<meta property="og:updated_time" content="2018-06-21T15:50:11.979Z">
+<meta property="og:updated_time" content="2018-06-23T03:50:17.955Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hexo插入图片和设置图片大小">
 <meta name="twitter:description" content="Hexo 插入图片有两种方式，第一种是网络引用，第二种是本地插入，本文主要介绍本地插入图片方式。另外由于 Hexo 是静态博客框架，所插入的图片默认会按照本身大小自动铺满，如果要设置图片大小需要另外写 css 来进行控制。转载请说明出处。">
@@ -371,6 +371,11 @@
           
 
           
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 本文阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
 
           
 
@@ -405,13 +410,13 @@
 <p>安装完成后需要重启一下服务器</p>
 <h3 id="3、使用插入图片"><a href="#3、使用插入图片" class="headerlink" title="3、使用插入图片"></a>3、使用插入图片</h3><p>使用 <code>hexo new post &quot;xxxx&quot;</code> 来新建博客时，会发现在 <code>/source/_posts</code> 文件夹下会有一个同名的 <code>xxxx</code> 文件夹，对于已存在的博客可以新建一个同名文件夹。</p>
 <p>先把图片复制到同名文件夹中，然后在文章中使用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![图片替代文字](同名文件夹名称/img.jpg)</span><br></pre></td></tr></table></figure>
-<p>注意 img.jpg 前面的路径只需要同名文件夹的名称即可，不需要写什么绝对路径、相对路径。如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![赵霁](hexo插入图片和设置图片大小/example.jpeg)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![图片替代文字](img.jpg)</span><br></pre></td></tr></table></figure>
+<p>注意 img.jpg 前面的路径只需要同名文件夹的名称即可，不需要写什么绝对路径、相对路径。如我要引用 example.jpeg 图片，只需要把 example.jpeg 复制到同名文件夹，然后在文章中使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![赵霁](example.jpeg)</span><br></pre></td></tr></table></figure>
 <p>效果图如下：</p>
 <p><img src="/2018/06/21/hexo插入图片和设置图片大小/example.jpeg" alt="赵霁"></p>
 <h2 id="设置图片大小"><a href="#设置图片大小" class="headerlink" title="设置图片大小"></a>设置图片大小</h2><p>图片默认会显示原本的图片大小并居中显示，如果需要对图片大小进行设置，需要另外写 css 样式进行控制。注意：该方法可能会覆盖原来的一些图片样式。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;div style=&quot;width: 200px; margin: auto&quot;&gt;![赵霁](hexo插入图片和设置图片大小/example.jpeg)&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;div style=&quot;width: 200px; margin: auto&quot;&gt;![赵霁](example.jpeg)&lt;/div&gt;</span><br></pre></td></tr></table></figure>
 <p>设置宽度为200px并设置居中（高度会自动缩放），效果图如下：</p>
 <div style="width: 200px; margin: auto"><img src="/2018/06/21/hexo插入图片和设置图片大小/example.jpeg" alt="赵霁"></div>
 
@@ -448,7 +453,7 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/21/小程序自定义Modal组件-1/" rel="next" title="小程序自定义Modal组件">
+              <a href="/2018/06/21/小程序自定义Modal组件/" rel="next" title="小程序自定义Modal组件">
                 <i class="fa fa-chevron-left"></i> 小程序自定义Modal组件
               </a>
             
@@ -457,6 +462,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/22/Hexo多台电脑更新博客/" rel="prev" title="Hexo多台电脑更新博客">
+                Hexo多台电脑更新博客 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -509,7 +518,7 @@
   </script>
 
 <script>
-  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
 </script>
 
       
@@ -580,7 +589,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -689,6 +698,26 @@
 
 
         
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 总访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
 
 
 
