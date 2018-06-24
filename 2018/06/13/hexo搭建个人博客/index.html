@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="Hexo 是一款基于 Node.js 的支持 Markdown 的静态站点生成框架，利用 Hexo+GitHub 可以轻松打造属于个人的免费博客。经过本人一番摸索最终搭建成功。本人的博客地址为 飙戈的博客，欢迎大家前来指导，转载请说明出处。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-23T03:50:17.955Z">
+<meta property="og:updated_time" content="2018-06-24T07:32:45.463Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo+GitHub搭建个人博客教程">
 <meta name="twitter:description" content="Hexo 是一款基于 Node.js 的支持 Markdown 的静态站点生成框架，利用 Hexo+GitHub 可以轻松打造属于个人的免费博客。经过本人一番摸索最终搭建成功。本人的博客地址为 飙戈的博客，欢迎大家前来指导，转载请说明出处。">
@@ -401,7 +401,7 @@
 <li><a href="https://pages.github.com/" target="_blank" rel="noopener">github pages</a> 仓库</li>
 </ul>
 <p>我们可以在控制台中输入</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ node -v </span><br><span class="line">$ git --version</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ node -v</span><br><span class="line">$ git --version</span><br></pre></td></tr></table></figure>
 <p>如果没有报错则说明git和node.js已经安装成功，可直接跳过安装教程，如果报错则需要重新安装</p>
 <h3 id="1、安装git"><a href="#1、安装git" class="headerlink" title="1、安装git"></a><strong>1、安装git</strong></h3><ul>
 <li>windows 用户：直接下载<a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git安装程序</a>根据提示进行安装</li>
@@ -416,7 +416,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl https://raw.github.com/creationix/nvm/master/install.sh | sh</span><br></pre></td></tr></table></figure>
 <p>Wget:  </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ wget -qO- https://raw.github.com/creationix/nvm/master/install.sh | sh</span><br></pre></td></tr></table></figure>
-<p>安装完成后，重启终端并执行下列命令即可安装 Node.js。 </p>
+<p>安装完成后，重启终端并执行下列命令即可安装 Node.js。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nvm install stable</span><br></pre></td></tr></table></figure>
 <p>安装完成后再在控制台输入 <code>$ node -v</code> 如果没有报错则说明安装成功</p>
 <h3 id="3、github-pages"><a href="#3、github-pages" class="headerlink" title="3、github pages"></a><strong>3、github pages</strong></h3><p>我们用来托管博客的服务叫做 <a href="https://pages.github.com/" target="_blank" rel="noopener">Github Pages</a>，它是 Github 用来提供给个人/组织或者项目的网页服务，只需要部署到你的 Github Repository，推送代码，便可以实时呈现。</p>
@@ -520,7 +520,7 @@
 <p>注意：<strong><em><code>type:</code> 和 <code>git</code>之间必须带一个空格</em></strong></p>
 <h4 id="安装deployer工具"><a href="#安装deployer工具" class="headerlink" title="安装deployer工具"></a>安装deployer工具</h4><p><a href="https://github.com/hexojs/hexo-deployer-git" target="_blank" rel="noopener">hexo-deployer-git</a> 为hexo自动部署安装工具，可通过命令安装</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-deployer-git  --save</span><br></pre></td></tr></table></figure>
-<h4 id="开始发布"><a href="#开始发布" class="headerlink" title="开始发布"></a>开始发布</h4><p>发布文章可分为<strong>清空、生成</strong>和<strong>部署</strong>三部分</p>
+<h4 id="开始发布"><a href="#开始发布" class="headerlink" title="开始发布"></a>开始发布</h4><p>发布文章可分为 <strong>清空</strong>、<strong>生成</strong> 和 <strong>部署</strong> 三部分</p>
 <ul>
 <li><p>清除缓存文件 (db.json) 和已生成的静态文件 (public)，执行命令</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo clean</span><br></pre></td></tr></table></figure>
@@ -715,7 +715,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -737,7 +737,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
