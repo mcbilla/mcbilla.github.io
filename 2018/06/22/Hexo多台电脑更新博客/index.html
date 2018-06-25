@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="通过 Hexo 和 GitHub 搭建的博客，静态文件会上传到 GitHub 仓库的 master 分支，但是 Hexo 的安装目录还是保存在本地的。如果更换了电脑需要更新博客，我们需要 Hexo 的安装目录来生成/编辑/上传博客，并且这个安装目录需要随着博客的更新而更新。在这里提供一种便捷的办法来实现不同电脑之间同步更新博客。转载请说明出处。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-23T03:50:17.959Z">
+<meta property="og:updated_time" content="2018-06-25T13:27:32.507Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo多台电脑更新博客">
 <meta name="twitter:description" content="通过 Hexo 和 GitHub 搭建的博客，静态文件会上传到 GitHub 仓库的 master 分支，但是 Hexo 的安装目录还是保存在本地的。如果更换了电脑需要更新博客，我们需要 Hexo 的安装目录来生成/编辑/上传博客，并且这个安装目录需要随着博客的更新而更新。在这里提供一种便捷的办法来实现不同电脑之间同步更新博客。转载请说明出处。">
@@ -418,6 +418,7 @@
 <p>执行完之后你的目录下应该会出现一个 <code>yourusername.github.io</code> 的目录。</p>
 <h4 id="2、初始化为-Hexo-目录"><a href="#2、初始化为-Hexo-目录" class="headerlink" title="2、初始化为 Hexo 目录"></a>2、初始化为 Hexo 目录</h4><p><code>yourusername.github.io</code> 目录只是一个普通的 git 管理目录，需要把该目录初始化为 Hexo 目录。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ cd yourusername.github.io</span><br><span class="line">$ npm install hexo</span><br><span class="line">$ npm install</span><br><span class="line">$ npm install hexo-deployer-git</span><br></pre></td></tr></table></figure>
+<h4 id="3、安装插件（可跳过）"><a href="#3、安装插件（可跳过）" class="headerlink" title="3、安装插件（可跳过）"></a>3、安装插件（可跳过）</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-generator-searchdb --save # 安装本地搜索</span><br><span class="line">$ npm install hexo-asset-image --save # 安装图片插件</span><br></pre></td></tr></table></figure>
 <p>至此这台新电脑的初始化工作也已经完成，可以开始写博客了。</p>
 <h3 id="写博客步骤"><a href="#写博客步骤" class="headerlink" title="写博客步骤"></a>写博客步骤</h3><p>以后我们写博客都在 <code>hexo</code> 分支下进行，<code>master</code> 分支只是用来存放生成的静态文件。确认目前在 <code>hexo</code> 分支下，步骤如下：</p>
 <ol>
@@ -597,7 +598,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -608,7 +609,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -619,7 +620,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -662,7 +663,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现思路"><span class="nav-number">1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现过程"><span class="nav-number">2.</span> <span class="nav-text">实现过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#本地电脑"><span class="nav-number">2.1.</span> <span class="nav-text">本地电脑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、删除非默认主题文件的-git-目录（可跳过）"><span class="nav-number">2.1.1.</span> <span class="nav-text">1、删除非默认主题文件的 .git 目录（可跳过）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、把-Hexo-命令提交的分支改成-master-分支"><span class="nav-number">2.1.2.</span> <span class="nav-text">2、把 Hexo 命令提交的分支改成 master 分支</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、初始化-git-仓库"><span class="nav-number">2.1.3.</span> <span class="nav-text">3、初始化 git 仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4、提交到远端服务器"><span class="nav-number">2.1.4.</span> <span class="nav-text">4、提交到远端服务器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#另外一台电脑"><span class="nav-number">2.2.</span> <span class="nav-text">另外一台电脑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、拉取-hexo-分支"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、拉取 hexo 分支</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、初始化为-Hexo-目录"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、初始化为 Hexo 目录</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写博客步骤"><span class="nav-number">2.3.</span> <span class="nav-text">写博客步骤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现思路"><span class="nav-number">1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现过程"><span class="nav-number">2.</span> <span class="nav-text">实现过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#本地电脑"><span class="nav-number">2.1.</span> <span class="nav-text">本地电脑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、删除非默认主题文件的-git-目录（可跳过）"><span class="nav-number">2.1.1.</span> <span class="nav-text">1、删除非默认主题文件的 .git 目录（可跳过）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、把-Hexo-命令提交的分支改成-master-分支"><span class="nav-number">2.1.2.</span> <span class="nav-text">2、把 Hexo 命令提交的分支改成 master 分支</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、初始化-git-仓库"><span class="nav-number">2.1.3.</span> <span class="nav-text">3、初始化 git 仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4、提交到远端服务器"><span class="nav-number">2.1.4.</span> <span class="nav-text">4、提交到远端服务器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#另外一台电脑"><span class="nav-number">2.2.</span> <span class="nav-text">另外一台电脑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、拉取-hexo-分支"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、拉取 hexo 分支</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、初始化为-Hexo-目录"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、初始化为 Hexo 目录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、安装插件（可跳过）"><span class="nav-number">2.2.3.</span> <span class="nav-text">3、安装插件（可跳过）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写博客步骤"><span class="nav-number">2.3.</span> <span class="nav-text">写博客步骤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
