@@ -82,8 +82,15 @@ deploy:
  repo: https://github.com/18814122746/18814122746.github.io.git
  branch: master
 
+# 本地搜索
 search:
   path: search.xml
   field: post
   format: html
   limit: 10000
+
+# 自动生成sitemap
+sitemap:
+  path: sitemap.xml
+baidusitemap:
+  path: baidusitemap.xml
