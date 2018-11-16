@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="封装、继承和多态是 java 面向对象的三大特性，其中封装是面向对象编程的基础，继承在封装的基础上简化类编程和提高类的可复用性，并为多态的实现提供了前提，三大特性体现了面向对象编程的思想。在这里简单介绍一些基础知识，转载请说明出处。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-16T05:19:00.594Z">
+<meta property="og:updated_time" content="2018-11-16T10:44:25.781Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java封装、继承和多态">
 <meta name="twitter:description" content="封装、继承和多态是 java 面向对象的三大特性，其中封装是面向对象编程的基础，继承在封装的基础上简化类编程和提高类的可复用性，并为多态的实现提供了前提，三大特性体现了面向对象编程的思想。在这里简单介绍一些基础知识，转载请说明出处。">
@@ -395,7 +395,7 @@
 <p>封装、继承和多态是 java 面向对象的三大特性，其中封装是面向对象编程的基础，继承在封装的基础上简化类编程和提高类的可复用性，并为多态的实现提供了前提，三大特性体现了面向对象编程的思想。在这里简单介绍一些基础知识，转载请说明出处。</p>
 </blockquote>
 <a id="more"></a>
-<h2 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h2><h3 id="封装是什么"><a href="#封装是什么" class="headerlink" title="封装是什么"></a>封装是什么</h3><p>封装把方法和数据包围起来，控制方法和数据的访问级别，隐藏了类的内部实现机制，只向外界暴露特定的访问接口。外界只能通过这些公开的接口来访问数据。</p>
+<h2 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h2><h3 id="封装是什么"><a href="#封装是什么" class="headerlink" title="封装是什么"></a>封装是什么</h3><p><strong><em>封装把方法和数据包围起来，控制方法和数据的访问级别，隐藏了类的内部实现机制，只向外界暴露特定的访问接口</em></strong>。外界只能通过这些公开的接口来访问数据。</p>
 <p>封装的作用：对于类内部，保护私有数据不被轻易破坏，提高了类调用的安全性；对于类外部，调用者不需要了解类内部的具体实现细节，只需要根据接口的规则进行调用，简化编程过程，提高了模块的可复用性和可维护性。</p>
 <h3 id="深入封装"><a href="#深入封装" class="headerlink" title="深入封装"></a>深入封装</h3><h4 id="1、访问权限"><a href="#1、访问权限" class="headerlink" title="1、访问权限"></a>1、访问权限</h4><p>java 通过访问权限修饰符来控制类、属性和方法的可见范围，访问权限修饰符一共有四种，可见范围从大到小排列如下：</p>
 <ul>
@@ -404,32 +404,32 @@
 <li>protected: 子类可访问（包括直接子类和间接子类）</li>
 <li>private: 只有本身内部可访问</li>
 </ul>
-<p>在这里需要注意的是，子类继承父类时会继承父类的所有域和方法（包括 private 域和 private 方法），但是子类不能访问这些私有域和方法，看起来相当于没有继承一样。</p>
+<p>在这里需要注意的是，<strong><em>子类继承父类时会继承父类的所有域和方法（包括 private 域和 private 方法），但是子类不能访问这些私有域和方法，看起来相当于没有继承一样</em></strong>。</p>
 <p>属性和方法可以使用以上四种修饰符，类只能使用 public 和 default 两种修饰符。</p>
-<h4 id="2、构造器"><a href="#2、构造器" class="headerlink" title="2、构造器"></a>2、构造器</h4><p>当创建一个对象时，系统会为这个对象的实例进行默认的初始化，例如把基本类型数值类型的属性设为 0，把布尔类型的属性设为 false，把引用属性设为 null等等。通过构造器我们可以改变这种默认的初始化，把指定属性初始化为指定值。</p>
+<h4 id="2、构造器"><a href="#2、构造器" class="headerlink" title="2、构造器"></a>2、构造器</h4><p>当创建一个对象时，系统会为这个对象的实例进行默认的初始化，例如把基本类型数值类型的属性设为 0，把布尔类型的属性设为 false，把引用属性设为 null 等等。通过构造器我们可以改变这种默认的初始化，把指定属性初始化为指定值。</p>
 <p>构造器有以下特点：</p>
 <ul>
 <li>构造器必须和类同名。</li>
 <li>构造器不是方法，不能被继承。</li>
 <li>构造器没有返回值，也不允许出现返回值。如果出现返回值编译器不会报错，但是就不是构造器了，只是一个跟类同名的普通方法。</li>
-<li>构造器只能用 public、default、protected 和 private 四种修饰符，不能用其他的修饰符。例如 static（构造器总是关联具体对象使用，没必要使用 static）、final（构造器不会被继承，没必要使用 final 限制继承）、abstract（抽象类不能直接实例化）。</li>
-<li>可以在一个构造器里面通过 this 关键字来调用另一个构造器，该调用必须写在第一行，不能在普通方法里面调用构造器。</li>
+<li>构造器只能用 public、default、protected 或 private 四种访问限制修饰符，不能用其他的修饰符。例如 static（构造器总是关联具体对象使用，没必要使用 static）、final（构造器不会被继承，没必要使用 final 限制继承）、abstract（抽象类不能直接实例化）。</li>
+<li>可以在一个构造器里面通过 this 关键字来调用另一个构造器，<strong><em>该调用必须写在第一行</em></strong>，不能在普通方法里面调用构造器。</li>
 </ul>
 <p>参考 <a href="http://www.cnblogs.com/aademeng/articles/6188323.html" target="_blank" rel="noopener">java中构造器（Constructor）</a></p>
-<h4 id="3、this"><a href="#3、this" class="headerlink" title="3、this"></a>3、this</h4><p>this 关键字用来表示当前对象本身，或当前类的一个实例。this 关键字的用法如下：</p>
+<h4 id="3、this"><a href="#3、this" class="headerlink" title="3、this"></a>3、this</h4><p><strong><em>this 关键字用来表示当前对象本身</em></strong>。this 关键字的用法如下：</p>
 <ul>
 <li>在构造方法中通过 this 关键字来调用其他构造方法，该调用必须放在第一行。</li>
-<li>通过 this 关键字来访问类中的所有成员变量和方法，不受访问权限的控制，包括 private 成员和 static 成员。不过由于 static 成员可以通过类名直接访问，如果通过 this 来访问会有 “The static field ××× should be accessed in a static way” 的警告信息。不能在类的 static 成员或 static 块中使用this。</li>
+<li>通过 this 关键字来访问类中的所有成员变量和方法，<strong><em>不受访问权限的控制</em></strong>，包括 private 成员和 static 成员。不过由于 static 成员可以通过类名直接访问，如果通过 this 来访问会有 “The static field ××× should be accessed in a static way” 的警告信息。<strong><em>不能在类的 static 成员或 static 块中使用 this</em></strong>。</li>
 <li>表示当前类对象的引用，可作为参数传递。</li>
 </ul>
 <p>参考 <a href="https://blog.csdn.net/ccpat/article/details/44515335" target="_blank" rel="noopener">Java this 关键字用法</a></p>
-<h4 id="4、static"><a href="#4、static" class="headerlink" title="4、static"></a>4、static</h4><p>static 的作用是在没有创建对象的情况下来进行调用属性或方法。被 static 关键字修饰的属性和方法不需要依赖于对象来进行访问，只要类被加载了，就可以通过类名去进行访问。static 可以用来修饰类的成员方法、类的成员变量，另外可以编写 static 代码块来优化程序性能。</p>
-<h5 id="1）static-方法"><a href="#1）static-方法" class="headerlink" title="1）static 方法"></a>1）static 方法</h5><p>static 方法一般称作静态方法，由于静态方法不依赖于任何对象就可以进行访问，因此对于静态方法来说，是没有 this 的，因为它不依附于任何对象，既然都没有对象，就谈不上 this 了。并且由于这个特性，在静态方法中不能访问类的非静态成员变量和非静态成员方法，因为非静态成员方法/变量都是必须依赖具体的对象才能够被调用。</p>
+<h4 id="4、static"><a href="#4、static" class="headerlink" title="4、static"></a>4、static</h4><p><strong><em>被 static 关键字修饰的属性和方法不需要依赖于对象来进行访问，只要类被加载了，就可以通过类名去进行访问</em></strong>。static 的作用是在没有创建对象的情况下来进行调用属性或方法。static 可以用来修饰类的成员方法、类的成员变量，另外可以编写 static 代码块来优化程序性能。</p>
+<h5 id="1）static-方法"><a href="#1）static-方法" class="headerlink" title="1）static 方法"></a>1）static 方法</h5><p>static 方法一般称作静态方法，由于静态方法不依赖于任何对象就可以进行访问，因此对于静态方法来说，是没有 this 的，因为它不依附于任何对象，既然都没有对象，就谈不上 this 了。并且由于这个特性，<strong><em>在静态方法中不能访问类的非静态成员变量和非静态成员方法</em></strong>，因为非静态成员方法/变量都是必须依赖具体的对象才能够被调用。</p>
 <p>但是要注意的是，虽然在静态方法中不能访问非静态成员方法和非静态成员变量，但是在非静态成员方法中是可以访问静态成员方法/变量的。</p>
 <p>如果说想在不创建对象的情况下调用某个方法，就可以将这个方法设置为 static。我们最常见的 static 方法就是 main 方法，至于为什么 main 方法必须是 static 的，现在就很清楚了。因为程序在执行 main 方法的时候没有创建任何对象，因此只有通过类名来访问。</p>
 <h5 id="2）static-变量"><a href="#2）static-变量" class="headerlink" title="2）static 变量"></a>2）static 变量</h5><p>static 变量也称作静态变量，静态变量和非静态变量的区别是：静态变量被所有的对象所共享，在内存中只有一个副本，它当且仅当在类初次加载时会被初始化。而非静态变量是对象所拥有的，在创建对象的时候被初始化，存在多个副本，各个对象拥有的副本互不影响。</p>
-<p>static 成员变量的初始化顺序按照定义的顺序进行初始化。</p>
-<h5 id="3）static-代码块"><a href="#3）static-代码块" class="headerlink" title="3）static 代码块"></a>3）static 代码块</h5><p>static 代码块可以置于类中的任何地方，类中可以有多个 static 块。在类初次被加载的时候，会按照 static 块的顺序来执行每个 static 块，并且只会执行一次。因为这个特性可以将一些只需要进行一次的初始化操作都放在 static 代码块中进行，可以优化程序性能。</p>
+<p>static 成员变量的初始化顺序按照定义的顺序进行初始化，也就是说静态代码块和静态变量的级别是相同的，按照出现的顺序初始化。</p>
+<h5 id="3）static-代码块"><a href="#3）static-代码块" class="headerlink" title="3）static 代码块"></a>3）static 代码块</h5><p>static 代码块（包括静态方法）可以置于类中的任何地方，类中可以有多个 static 块。在类初次被加载的时候，会按照 static 块的顺序来执行每个 static 块，并且只会执行一次。因为这个特性可以将一些只需要进行一次的初始化操作都放在 static 代码块中进行，可以优化程序性能。</p>
 <p>参考 <a href="https://www.cnblogs.com/dolphin0520/p/3799052.html" target="_blank" rel="noopener">Java中的static关键字解析</a></p>
 <h4 id="5、类初始化和类实例化"><a href="#5、类初始化和类实例化" class="headerlink" title="5、类初始化和类实例化"></a>5、类初始化和类实例化</h4><p><strong>类初始化</strong>：类第一次加载到内存，虚拟机将类变量（static 修饰的变量）分配内存并设置零值的过程。在类初始化阶段，执行类构造器 <code>&lt;cinit&gt;()</code> 方法。<code>&lt;cinit&gt;()</code> 类初始化方法有如下特点：</p>
 <ol>
@@ -451,7 +451,7 @@
 <li>父类 <code>&lt;init&gt;()</code> + 父类构造器；</li>
 <li>子类 <code>&lt;init&gt;()</code> + 子类构造器；</li>
 </ol>
-<p>最后总结，<strong>具体执行顺序</strong> 如下：</p>
+<p>最后，具体执行顺序可以总结为 <strong><em>“先静态后非静态，先父类后子类”</em></strong>：</p>
 <ol>
 <li>父类静态变量和静态代码块（先声明的先执行）；</li>
 <li>子类静态变量和静态代码块（先声明的先执行）；</li>
@@ -472,7 +472,7 @@
 <li>子类构造器没有显示调用父类构造器。这时编译器会自动调用父类的无参构造器，即会自动在第一行调用 <code>super()</code>。如果父类没有无参构造器，编译报错。</li>
 </ul>
 <p>所以为了防止子类编译报错，我们在写父类的时候最好都加上无参构造器，就算是空方法体也行。</p>
-<h4 id="2、super"><a href="#2、super" class="headerlink" title="2、super"></a>2、super</h4><p>super 是用来访问父类的成员，作用和 this 类似：</p>
+<h4 id="2、super"><a href="#2、super" class="headerlink" title="2、super"></a>2、super</h4><p><strong><em>super 是用来访问父类的成员</em></strong>，作用和 this 类似：</p>
 <ul>
 <li>在构造器里面通过 super 来调用父类的构造方法，该调用必须写在子类构造器的第一行。</li>
 <li>访问有可见权限的父类的成员变量和方法，不能访问父类的 private 成员。例如当子类中出现和父类同名的成员变量或方法时，父类的成员会被隐藏，这时候可以通过 super 来访问父类中隐藏的成员。如果子类中没有重写父类的成员变量和成员方法，则子类会继承父类的所有非 private 的成员变量和成员方法。这时在子类中无论通过 this 来访问成员和通过 super 来访问成员，结果都是一样的。</li>
@@ -485,7 +485,7 @@
 <li>修饰变量，如果是基本数据类型的变量，则其数值一旦在初始化之后便不能更改；如果是引用类型的变量，则在对其初始化之后便不能再让其指向另一个对象。</li>
 </ol>
 <p>参考 <a href="http://www.cnblogs.com/dolphin0520/p/3736238.html" target="_blank" rel="noopener">浅析Java中的final关键字</a></p>
-<h4 id="4、抽象类"><a href="#4、抽象类" class="headerlink" title="4、抽象类"></a>4、抽象类</h4><p>抽象类是指 abstract 关键字修饰的类，子类通过 extends 关键字继承抽象类。</p>
+<h4 id="4、抽象类"><a href="#4、抽象类" class="headerlink" title="4、抽象类"></a>4、抽象类</h4><p><strong><em>抽象类是指 abstract 关键字修饰的类</em></strong>，子类通过 extends 关键字继承抽象类。</p>
 <p>抽象类是对普通类的抽象，我们可以把只有概念但是没有具体实现的信息添加到抽象类里面，然后再让继承类来具体实现这些信息。注意抽象类有以下特点：</p>
 <ul>
 <li>不能用抽象类来实例化对象。但是可以用抽象类来声明变量，然后用该抽象类的实现子类来实例化对象。</li>
@@ -504,7 +504,7 @@
 </li>
 <li><p>接口的方法都会隐式指定为 public abstract 方法且只能是 public abstract 方法（用其他关键字，比如 private、protected、static、 final 等修饰会报编译错误），并且接口中所有的方法不能有具体的实现。</p>
 </li>
-<li><p>实现接口的非抽象类必须要实现该接口的所有方法</p>
+<li><p>实现接口的非抽象类必须要实现该接口的所有方法，如果没有完全实现接口的所有方法就要被定义为抽象类。</p>
 </li>
 </ul>
 <p>例如下面这个例子：</p>
@@ -533,12 +533,12 @@
 <p>从这里可以看出， Door 的 open() 、close() 和 alarm() 根本就属于两个不同范畴内的行为，open() 和 close() 属于门本身固有的行为特性，而 alarm() 属于延伸的附加行为。因此最好的解决办法是单独将报警设计为一个接口，包含 alarm() 行为,Door 设计为单独的一个抽象类，包含 open 和 close 两种行为。再设计一个报警门继承 Door 类和实现 Alarm 接口。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">interface Alram &#123;</span><br><span class="line">    void alarm();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">abstract class Door &#123;</span><br><span class="line">    void open();</span><br><span class="line">    void close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class AlarmDoor extends Door implements Alarm &#123;</span><br><span class="line">    void oepn() &#123;</span><br><span class="line">      //....</span><br><span class="line">    &#125;</span><br><span class="line">    void close() &#123;</span><br><span class="line">      //....</span><br><span class="line">    &#125;</span><br><span class="line">    void alarm() &#123;</span><br><span class="line">      //....</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>以上参考 <a href="https://www.cnblogs.com/dolphin0520/p/3811437.html" target="_blank" rel="noopener">深入理解Java的接口和抽象类</a><br><a href="https://blog.csdn.net/chenssy/article/details/12858267" target="_blank" rel="noopener">java提高篇（四）—–抽象类与接口</a></p>
-<h2 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h2><h3 id="多态是什么"><a href="#多态是什么" class="headerlink" title="多态是什么"></a>多态是什么</h3><p>多态是指当当一个变量用父类类型声明，但用子类类型实例化时，该变量在编译阶段会表现为父类类型，在运行阶段会表现为子类类型，会使用子类类型的方法。例如下面这个例子：</p>
+<h2 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h2><h3 id="多态是什么"><a href="#多态是什么" class="headerlink" title="多态是什么"></a>多态是什么</h3><p><strong><em>多态是指当当一个变量用父类类型声明，但用子类类型实例化，该变量在编译阶段会表现为父类类型，在运行阶段会表现为子类类型，会使用子类类型的方法</em></strong>。例如下面这个例子：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">class Human &#123;</span><br><span class="line">  public void eat() &#123; //父类的 eat 方法</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Woman extends Human &#123;</span><br><span class="line">  @Override</span><br><span class="line">  public void eat() &#123; //Human 类重写 eat() 方法</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Man extends Human &#123;</span><br><span class="line">  public void eat() &#123; //Man 类重写 eat() 方法</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class HumanTest &#123;</span><br><span class="line">  public static void main(String[] args) &#123;</span><br><span class="line">    Human human = new Woman();</span><br><span class="line">    human.eat(); //会调用 Woman 类的 eat() 方法</span><br><span class="line"></span><br><span class="line">    human = new Man();</span><br><span class="line">    human.eat(); //会调用 Man 类的 eat() 方法</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>上面例子我们可以看到，一个用父类类型 Human 声明的变量 human 调用 eat() 方法，当该变量用子类 Woman 实例化时会调用 Woman 的 eat() 方法，用子类 Man 实例化时会调用 Man 的 eat() 方法，同一个类型声明的变量可以调用不同子类型的方法，具体调用哪个类的方法要等运行阶段实例化对象的时候才能确定，这就是多态性。</p>
 <h3 id="深入多态"><a href="#深入多态" class="headerlink" title="深入多态"></a>深入多态</h3><h4 id="1、动态绑定和静态绑定"><a href="#1、动态绑定和静态绑定" class="headerlink" title="1、动态绑定和静态绑定"></a>1、动态绑定和静态绑定</h4><p>绑定指的是一个方法的调用与方法所在的类(方法主体)关联起来。对 java 来说，绑定分为 <strong>静态绑定</strong> 和 <strong>动态绑定</strong>；或者叫做前期绑定和后期绑定。</p>
 <p><strong>静态绑定</strong>：</p>
-<p>在程序执行前方法已经被绑定，此时由编译器或其它连接程序实现。例如：C。<br>针对 Java 简单的可以理解为程序编译期的绑定；这里特别说明一点，java 当中的方法只有 final，static，private 和构造方法是前期绑定。</p>
+<p>在程序执行前方法已经被绑定，此时由编译器或其它连接程序实现。例如：C。<br>针对 Java 简单的可以理解为程序编译期的绑定。<strong><em>java 当中的方法只有 final，static，private 和构造方法是前期绑定</em></strong>。</p>
 <p><strong>动态绑定</strong>：</p>
 <p>在运行时根据具体对象的类型进行绑定。<br>若一种语言实现了后期绑定，同时必须提供一些机制，可在运行期间判断对象的类型，并分别调用适当的方法。也就是说，编译器此时依然不知道对象的类型，但方法调用机制能自己去调查，找到正确的方法主体。不同的语言对后期绑定的实现方法是有所区别的。但我们至少可以这样认为：它们都要在对象中安插某些特殊类型的信息。</p>
 <p><strong>java 方法的调用过程：</strong></p>
@@ -557,13 +557,13 @@
 <p>在 java 中，几乎所有的 方法（不是字段属性）都是后期绑定（动态绑定），除了 private、static、final 修饰的方法。</p>
 <ul>
 <li>对于 static 方法和 final 方法由于不能被继承，因此在编译时就可以确定他们的值，他们是属于前期绑定（静态绑定）的。</li>
-<li>对于 private 声明的方法和成员变量不能被子类继承，所有的 private 方法都被隐式的指定为 final 的(由此我们也可以知道：将方法声明为 final 类型的一是为了防止方法被覆盖，二是为了有效的关闭 java 中的动态绑定)。</li>
+<li>对于 private 声明的方法和成员变量不能被子类继承，所有的 private 方法都被隐式的指定为 final。由此我们也可以知道：将方法声明为 final 类型的一是为了防止方法被覆盖，二是为了有效的关闭 java 中的动态绑定。</li>
 </ul>
 <p>参考 <a href="https://my.oschina.net/u/566345/blog/81235" target="_blank" rel="noopener">java的动态绑定与静态绑定(彻底理解多态与重载)</a></p>
 <h4 id="2、向上转型和向下转型"><a href="#2、向上转型和向下转型" class="headerlink" title="2、向上转型和向下转型"></a>2、向上转型和向下转型</h4><p><strong>向上转型</strong>：父类引用指向子类对象</p>
 <p>好处：父类声明的变量（包括实参和形参）引用子类对象，可以直接调用子类对象中的方法，这样用一种类型声明的变量就可以调用其所有子类的方法，代码比较简介灵活。否则要调用子类的方法，有多少个子类就要声明多少种类型的变量。</p>
 <p>坏处：父类声明的对象只能调用子类重写父类的方法，子类内其他自定义的方法会丢失。</p>
-<p><strong>向下转型</strong>：父类引用指向子类对象后，再把父类引用类型转换后赋值给子类引用</p>
+<p><strong>向下转型</strong>：父类引用指向子类对象后，再把父类引用类型转换类型后赋值给子类引用</p>
 <p>好处：可以调用子类中所有的方法</p>
 <p>坏处：可能会存在类型转换失败，在编译时能通过，但是运行会出错，为了安全的类型转换，最好先用 if(A instanceof  B) 判断一下。</p>
 <h4 id="3、重载和重写"><a href="#3、重载和重写" class="headerlink" title="3、重载和重写"></a>3、重载和重写</h4><p><strong>重载（OverLoad）</strong> ：一个类中定义了多个方法名相同，参数的类型或者数量不同的方法</p>
@@ -624,9 +624,9 @@
 <h4 id="3、多态的三个必要条件"><a href="#3、多态的三个必要条件" class="headerlink" title="3、多态的三个必要条件"></a>3、多态的三个必要条件</h4><ol>
 <li><strong>存在继承关系</strong></li>
 <li><strong>子类要重写父类的方法</strong></li>
-<li><strong>父类数据类型的引用指向子类对象（向上转型）</strong></li>
+<li><strong>父类类型的引用指向子类对象（向上转型）</strong></li>
 </ol>
-<p>看下面这个例子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">class Animal &#123;</span><br><span class="line">  int num = 10;</span><br><span class="line">  static int age = 20;</span><br><span class="line">  public void eat() &#123;</span><br><span class="line">    System.out.println(&quot;动物吃饭&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  public static void sleep() &#123;</span><br><span class="line">    System.out.println(&quot;动物在睡觉&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  public void run()&#123;</span><br><span class="line">    System.out.println(&quot;动物在奔跑&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Cat extends Animal &#123;</span><br><span class="line">  int num = 80;</span><br><span class="line">  static int age = 90;</span><br><span class="line">  String name = &quot;tomCat&quot;;</span><br><span class="line">  public void eat() &#123;</span><br><span class="line">    System.out.println(&quot;猫吃饭&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  public static void sleep() &#123;</span><br><span class="line">    System.out.println(&quot;猫在睡觉&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  public void catchMouse() &#123;</span><br><span class="line">    System.out.println(&quot;猫在抓老鼠&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Demo_Test1 &#123;</span><br><span class="line">  public static void main(String[] args) &#123;</span><br><span class="line">    Animal am = new Cat();</span><br><span class="line">    am.eat();</span><br><span class="line">    am.sleep();</span><br><span class="line">    am.run();</span><br><span class="line">    //am.catchMouse();这里先注释掉，等会会说明</span><br><span class="line">    //System.out.println(am.name);//这里先注释，待会说明</span><br><span class="line">    System.out.println(am.num);</span><br><span class="line">    System.out.println(am.age);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>看下面这个例子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">class Animal &#123;</span><br><span class="line">    int num = 10;</span><br><span class="line">    static int age = 20;</span><br><span class="line"></span><br><span class="line">    public void eat() &#123;</span><br><span class="line">        System.out.println(&quot;动物吃饭&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void sleep() &#123;</span><br><span class="line">        System.out.println(&quot;动物在睡觉&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void run() &#123;</span><br><span class="line">        System.out.println(&quot;动物在奔跑&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Cat extends Animal &#123;</span><br><span class="line">    int num = 80;</span><br><span class="line">    static int age = 90;</span><br><span class="line">    String name = &quot;tomCat&quot;;</span><br><span class="line"></span><br><span class="line">    public void eat() &#123;</span><br><span class="line">        System.out.println(&quot;猫吃饭&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void sleep() &#123;</span><br><span class="line">        System.out.println(&quot;猫在睡觉&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void catchMouse() &#123;</span><br><span class="line">        System.out.println(&quot;猫在抓老鼠&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class AnimalTest &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Animal am = new Cat();</span><br><span class="line">        am.eat();</span><br><span class="line">        am.sleep();</span><br><span class="line">        am.run();</span><br><span class="line">        //am.catchMouse(); //这里需要注释掉，因为am不能调用子类特有的方法catchMouse()</span><br><span class="line">        //System.out.println(am.name); //这里需要注释掉，因为am不能调用子类特有的属性name</span><br><span class="line">        System.out.println(am.num);</span><br><span class="line">        System.out.println(am.age);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>以上的三段代码充分体现了多态的三个前提，即：</p>
 <ol>
 <li>存在继承关系<br>Cat 类继承了 Animal 类</li>
@@ -635,7 +635,11 @@
 </ol>
 <p>输出结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">猫吃饭</span><br><span class="line">动物在睡觉</span><br><span class="line">动物在奔跑</span><br><span class="line">10</span><br><span class="line">20</span><br></pre></td></tr></table></figure></p>
 <p>可以看出来<br>子类 Cat 重写了父类 Animal 的非静态成员方法 am.eat() 的输出结果为：猫吃饭。<br>子类重写了父类 (Animal) 的静态成员方法 am.sleep() 的输出结果为：动物在睡觉<br>未被子类（Cat）重写的父类（Animal）方法 am.run() 输出结果为：动物在奔跑</p>
-<p><strong>总结</strong>：<br>成员变量和静态方法，编译看父类，运行看父类<br>只有非静态的成员方法，编译看父类，运行看子类</p>
+<p>总结：<br>成员变量（包括静态和非静态）和静态方法，编译看父类，运行看父类<br>只有非静态的成员方法，编译看父类，运行看子类</p>
+<p>但是多态有一个弊端：<strong><em>多态后不能使用子类特有的成员属性和成员方法</em></strong>。例如上面的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">am.catchMouse();</span><br><span class="line">System.out.println(am.name);</span><br></pre></td></tr></table></figure>
+<p>在编译器期间会报错，因为 am 对象不能去获取子类特有的方法 catchMouse() 和属性 am.name。如果一定要调用子类特有的方法和方法，需要把父类引用转成子类类型，也就是向下转型。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">((Cat)am).catchMouse(); //强转成 Cat 类型再调用编译就不会报错了</span><br><span class="line">System.out.println(((Cat)am).name); //强转成 Cat 类型再调用编译就不会报错了</span><br></pre></td></tr></table></figure>
 <p>参考 <a href="https://www.zhihu.com/question/30082151" target="_blank" rel="noopener">JAVA的多态用几句话能直观的解释一下吗？</a></p>
 
       
