@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="Hexo 是一款基于 Node.js 的支持 Markdown 的静态站点生成框架，利用 Hexo+GitHub 可以轻松打造属于个人的免费博客。经过本人一番摸索最终搭建成功。本人的博客地址为 飙戈的博客，欢迎大家前来指导，转载请说明出处。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-08-02T12:49:46.644Z">
+<meta property="og:updated_time" content="2019-08-02T13:05:29.623Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo+GitHub搭建个人博客教程">
 <meta name="twitter:description" content="Hexo 是一款基于 Node.js 的支持 Markdown 的静态站点生成框架，利用 Hexo+GitHub 可以轻松打造属于个人的免费博客。经过本人一番摸索最终搭建成功。本人的博客地址为 飙戈的博客，欢迎大家前来指导，转载请说明出处。">
@@ -488,7 +488,7 @@
 <li>draft：草稿布局，草稿默认不会显示在页面上，已完成的草稿可用 <code>$ hexo publish [layout] &lt;title&gt;</code> 来发布，对应的存储路径为 <code>source/_drafts</code></li>
 </ul>
 <h3 id="2）标题（title）"><a href="#2）标题（title）" class="headerlink" title="2）标题（title）"></a>2）标题（title）</h3><p>Hexo 默认以标题做为文件名称，可以设置配置文件的 <code>new_post_name</code> 参数来改变默认的文件名称，例如设为 <code>:year-:month-:day-:title.md</code> ，文件名会带上年月日，其中 :title 默认会转为小写，空格将会被替换为短杠</p>
-<p>例如执行命令</p>
+<p>实例：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new post &quot;hello world&quot;</span><br></pre></td></tr></table></figure>
 <p>source/_posts下面会自动生成一个名为 2019-08-02-hello-world.md 文件。</p>
 <h2 id="3、编辑文章"><a href="#3、编辑文章" class="headerlink" title="3、编辑文章"></a>3、编辑文章</h2><p>文章编辑可以用普通的markdown编辑器，例如本人习惯使用typora编辑器。</p>
@@ -505,14 +505,12 @@
 <li>permalink：覆盖文章网址</li>
 </ul>
 <blockquote>
-<p>categories和tags的区别：categories具有顺序性和层次性，例如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; categories:</span><br><span class="line">&gt; - Diary</span><br><span class="line">&gt; - Life</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<p>categories和tags的区别：categories具有顺序性和层次性，例如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">categories:</span><br><span class="line"> - Diary</span><br><span class="line"> - Life</span><br></pre></td></tr></table></figure></p>
 </blockquote>
 <blockquote>
-<p>会使 Life 成为 Diary 的子类，而不是并列分类。</p>
-<p>tags没有顺序和层次。</p>
+<p>会使 Life 成为 Diary 的子类，而不是并列分类。<br>tags没有顺序和层次。</p>
 </blockquote>
-<p>前页实例：</p>
+<p>实例：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: hello-world</span><br><span class="line">date: 2018-06-10 16:15:04</span><br><span class="line">categories:</span><br><span class="line">- Diary</span><br><span class="line">- Life</span><br><span class="line">tags:</span><br><span class="line">- happy</span><br><span class="line">- friend</span><br><span class="line">comments: false</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
 <p>创建一篇文章题目为hello-world，文章创建时间是2018-06-10 16:15:04，分类归为Diary的子分类Life，贴上happy和friend两个标签，最后禁止评论</p>
 <h3 id="2）正文"><a href="#2）正文" class="headerlink" title="2）正文"></a>2）正文</h3><p>正文和普通的markdown编辑相同，在这里有一些使用技巧。</p>
@@ -727,7 +725,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -738,7 +736,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -749,7 +747,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
