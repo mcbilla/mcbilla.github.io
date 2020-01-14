@@ -296,6 +296,214 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/14/Hexo部署到个人服务器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="mcb">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/14/Hexo部署到个人服务器/" itemprop="url">Hexo部署到个人服务器</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-14T11:05:29+08:00">
+                2020-01-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>之前一直把 Hexo 博客托管在 github page 上，但是最近发现 github page 的打开速度越来越慢，有时候不翻墙甚至打不开，严重影响我写博客的心情，所以考虑把 Hexo 博客部署到个人服务器上，可以提高访问速度。</p>
+</blockquote>
+<h2 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h2><ul>
+<li>本地已经安装好 Hexo 环境</li>
+<li>一台云服务器</li>
+<li>一个注册域名（可跳过）</li>
+</ul>
+<p>基本思路：</p>
+<ol>
+<li><p>在服务器上安装 nginx 和 git ，用 nginx 来托管 Hexo 静态文件，用 git 搭建个人仓库用于存储本地提交，git 仓库和 nginx 托管目录使用钩子关联，保证每次本地 git 提交后都能更新 nginx 托管目录。</p>
+</li>
+<li><p>本地设置 Hexo 的部署目录为服务器的个人仓库地址，保证每次部署的时候都能自动 git 提交</p>
+</li>
+<li>设置域名解析指向服务器</li>
+</ol>
+<p>最终达到的效果：本地编辑文章完成后，使用一个部署命令即可更新服务器资源，使用域名访问可以实时看到更新后的资源。</p>
+<h2 id="服务器配置"><a href="#服务器配置" class="headerlink" title="服务器配置"></a>服务器配置</h2><h3 id="安装配置nginx"><a href="#安装配置nginx" class="headerlink" title="安装配置nginx"></a>安装配置nginx</h3><h4 id="1、安装"><a href="#1、安装" class="headerlink" title="1、安装"></a>1、安装</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y nginx</span><br></pre></td></tr></table></figure>
+<p>yum 安装的 nginx 默认安装目录为 <code>/etc/nginx</code>，nginx 全局配置文件路径为 <code>/etc/nginx/nginx.conf</code></p>
+<p>如果安装失败可以尝试加上 <code>sudo</code> 命令</p>
+<h4 id="2、检查nginx是否安装成功"><a href="#2、检查nginx是否安装成功" class="headerlink" title="2、检查nginx是否安装成功"></a>2、检查nginx是否安装成功</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nginx -v</span><br></pre></td></tr></table></figure>
+<p>显示nginx版本号例如 <code>nginx version: nginx/1.16.1</code> 表示安装成功</p>
+<h4 id="3、修改nginx配置"><a href="#3、修改nginx配置" class="headerlink" title="3、修改nginx配置"></a>3、修改nginx配置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/nginx/nginx.conf</span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen <span class="number">80</span>;</span><br><span class="line">    listen [::]:<span class="number">80</span>;</span><br><span class="line">    root /data/hexo; <span class="comment"># 设置为hexo静态文件存放的目录，也是git钩子指向的目录</span></span><br><span class="line">    server_name laoyuyu.me www.laoyuyu.me; <span class="comment"># 如果需要改域名访问，修改server_name 为域名便可</span></span><br><span class="line">    location / &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>保存后我们可以使用下面命令检查配置有没问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nginx -t</span><br></pre></td></tr></table></figure>
+<p>输出以下内容表示配置没问题，如果有错误会打印详细信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nginx: the configuration file /etc/nginx/nginx.conf syntax is ok</span><br><span class="line">nginx: configuration file /etc/nginx/nginx.conf test is successful</span><br></pre></td></tr></table></figure>
+<h4 id="4、启动"><a href="#4、启动" class="headerlink" title="4、启动"></a>4、启动</h4><p>启动nginx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl start nginx.service</span><br></pre></td></tr></table></figure>
+<p>下面为nginx相关命令，如果你的系统版本是 centos 7 以上，可以使用 <code>Systemd</code> 相关命令进行操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 设置开机启动</span><br><span class="line">systemctl enable nginx.service</span><br><span class="line"></span><br><span class="line"># 停止开机启动</span><br><span class="line">systemctl disable nginx.service</span><br><span class="line"></span><br><span class="line"># 启动</span><br><span class="line">systemctl start nginx.service</span><br><span class="line"></span><br><span class="line"># 停止</span><br><span class="line">systemctl stop nginx.service</span><br><span class="line"></span><br><span class="line"># 重启</span><br><span class="line">systemctl restart nginx</span><br></pre></td></tr></table></figure>
+<p>如果系统是旧版本，可以使用 <code>SysVinit</code> 相关命令进行操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 设置开机启动</span><br><span class="line">chkconfig nginx on</span><br><span class="line"></span><br><span class="line"># 停止开机启动</span><br><span class="line">chkconfig nginx off</span><br><span class="line"></span><br><span class="line"># 启动</span><br><span class="line">service nginx start</span><br><span class="line"></span><br><span class="line"># 停止</span><br><span class="line">service nginx stop</span><br><span class="line"></span><br><span class="line"># 重启</span><br><span class="line">service nginx restart</span><br></pre></td></tr></table></figure>
+<h3 id="安装配置git"><a href="#安装配置git" class="headerlink" title="安装配置git"></a>安装配置git</h3><h4 id="1、安装-1"><a href="#1、安装-1" class="headerlink" title="1、安装"></a>1、安装</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install git -y</span><br></pre></td></tr></table></figure>
+<h4 id="2、查看是否安装成功"><a href="#2、查看是否安装成功" class="headerlink" title="2、查看是否安装成功"></a>2、查看是否安装成功</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git —version</span><br></pre></td></tr></table></figure>
+<h4 id="3、创建git用户，用来运行git服务"><a href="#3、创建git用户，用来运行git服务" class="headerlink" title="3、创建git用户，用来运行git服务"></a>3、创建git用户，用来运行git服务</h4><p>创建系统用户git</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adduser git</span><br></pre></td></tr></table></figure>
+<p>设置密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">passwd git</span><br></pre></td></tr></table></figure>
+<p>切换到 git 用户，这步很重要</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">su git</span><br></pre></td></tr></table></figure>
+<p>创建 hexo 静态文件存放目录，对应上面 nginx 的 root 目录</p>
+<p>注意这一步如果显示没有权限创建目录，可以以 root 用户执行 <code>chmod 777 /data</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir /data/hexo</span><br></pre></td></tr></table></figure>
+<p>创建 git 私人仓库目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir /data/repo</span><br></pre></td></tr></table></figure>
+<p>在私人仓库下创建一个裸露仓库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd /data/repo</span><br><span class="line"></span><br><span class="line">git init --bare blog.git</span><br></pre></td></tr></table></figure>
+<p>创建 git 钩子，把裸露仓库和 hexo 静态文件存放目录关联起来</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim blog.git/hooks/post-receive</span><br></pre></td></tr></table></figure>
+<p>添加以下内容，其中 <code>/data/hexo</code> 为 hexo 静态文件存放目录，<code>/data/repo/blog.git</code> 为裸露仓库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git --work-tree=/data/hexo --git-dir=/data/repo/blog.git checkout -f</span><br></pre></td></tr></table></figure>
+<p>保存后添加权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">chmod +x post-receive</span><br><span class="line"></span><br><span class="line">exit // 退出到 root 登录</span><br><span class="line"></span><br><span class="line">chown -R git:git /data/repo/blog.git // 添加权限</span><br></pre></td></tr></table></figure>
+<p>测试 git 仓库是否可用，在本地执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@server_ip:/data/repo/blog.git</span><br></pre></td></tr></table></figure>
+<p>如果能把空仓库拉下来说明 git 仓库搭建成功了，<strong>注意这时候执行这个命令需要输入密码的</strong>。</p>
+<h4 id="4、设置-git-仓库安全控制"><a href="#4、设置-git-仓库安全控制" class="headerlink" title="4、设置 git 仓库安全控制"></a>4、设置 git 仓库安全控制</h4><p>找到本地创建的 <code>id_rsa.pub</code> 文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open ~/.ssh</span><br></pre></td></tr></table></figure>
+<p>本地电脑和 git 仓库建立 ssh 联系</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-copy-id -i C:/Users/yourname/.ssh/id_rsa.pub git@server_ip</span><br></pre></td></tr></table></figure>
+<p>测试能否登陆，<strong>注意这个时候登陆是不需要密码的，再执行 <code>git clone</code> 命令也不需要密码</strong>，否则就有问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh git@server_ip</span><br></pre></td></tr></table></figure>
+<p>为了安全起见禁用 git 用户的 shell 登录权限，从而只能用 git clone，git push 等登录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 查看 git-shell 是否在登录方式里面</span><br><span class="line">cat /etc/shells</span><br><span class="line"></span><br><span class="line"># 查看 git-shell 目录</span><br><span class="line">which git-shell</span><br><span class="line"></span><br><span class="line"># 添加第2步显示的路径</span><br><span class="line">vim /etc/shells</span><br></pre></td></tr></table></figure>
+<p>修改 <code>/etc/passwd</code> 中的权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 将原来的</span><br><span class="line">git:x:1000:1000::/home/git:/bin/bash</span><br><span class="line"></span><br><span class="line">// 修改为</span><br><span class="line">git:x:1000:1000:,,,:/home/git:/usr/bin/git-shell</span><br></pre></td></tr></table></figure>
+<h2 id="本地配置"><a href="#本地配置" class="headerlink" title="本地配置"></a>本地配置</h2><h3 id="配置-config-yml文件"><a href="#配置-config-yml文件" class="headerlink" title="配置_config.yml文件"></a>配置_config.yml文件</h3><p>进入 hexo 安装目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim _config.yml</span><br></pre></td></tr></table></figure>
+<p>设置 deploy 属性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: git@server_ip:/data/repo/blog.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
+<h3 id="配置package-json文件"><a href="#配置package-json文件" class="headerlink" title="配置package.json文件"></a>配置package.json文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&quot;scripts&quot;: &#123;</span><br><span class="line">  &quot;start&quot;: &quot;hexo clean &amp;&amp; hexo g &amp;&amp; hexo s&quot;,</span><br><span class="line">  &quot;debug&quot;: &quot;hexo clean &amp;&amp; hexo g&quot;,</span><br><span class="line">  &quot;deploy&quot;: &quot;hexo clean &amp;&amp; hexo g -d&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样我们可以快速本地启动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run start</span><br></pre></td></tr></table></figure>
+<p>本地调试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run debug</span><br></pre></td></tr></table></figure>
+<p>部署到远程服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run deploy</span><br></pre></td></tr></table></figure>
+<p>至此我们的本地环境和服务器环境已经搭建完毕。</p>
+<h2 id="域名配置"><a href="#域名配置" class="headerlink" title="域名配置"></a>域名配置</h2><p>如果你有个人域名，可以设置个人域名指向你的服务器ip</p>
+<p>以阿里云域名为例，登陆域名控制台，域名列表——操作——解析——添加记录</p>
+<p><img src="/2020/01/14/Hexo部署到个人服务器/Users/mochuangbiao/Library/Application Support/typora-user-images/image-20200114145436312.png" alt="image-20200114145436312"></p>
+<p>可以添加 <code>www</code> 和 <code>@</code> 两条主机记录，这样可以同时支持 <a href="http://www.domain.cn" target="_blank" rel="noopener">www.domain.cn</a> 和 domain.cn 两种访问方式。</p>
+<p><img src="/2020/01/14/Hexo部署到个人服务器/Users/mochuangbiao/Library/Application Support/typora-user-images/image-20200114145516255.png" alt="image-20200114145516255"></p>
+<p>保存 10 分钟后即生效。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://juejin.im/post/5b70d68ae51d45665d383281" target="_blank" rel="noopener">带你跳过各种坑，一次性把 Hexo 博客部署到自己的服务器</a></p>
+<p><a href="https://www.jianshu.com/p/70bf58c48010" target="_blank" rel="noopener">HEXO 部署到云服务器详细指南</a></p>
+<p><a href="https://blog.csdn.net/u012486840/article/details/52610320" target="_blank" rel="noopener">CentOS 7 yum 安装 Nginx</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/02/log4j详解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -475,7 +683,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-05T16:09:18+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-05T16:09:00+08:00">
                 2018-09-05
               </time>
             
@@ -919,7 +1127,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-23T11:54:32+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-23T11:54:00+08:00">
                 2018-07-23
               </time>
             
@@ -1620,154 +1828,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/01/Hadoop入门及安装/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="mcb">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/head.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="飙戈的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/01/Hadoop入门及安装/" itemprop="url">Hadoop入门及安装</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-01T23:36:59+08:00">
-                2018-07-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Hadoop/" itemprop="url" rel="index">
-                    <span itemprop="name">Hadoop</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <blockquote>
-<p>当我们需要从 TB 甚至 PB 级别以上的数据中分析获取我们需要的信息时，如果使用传统的系统架构进行处理速度将会非常慢并且对服务器造成巨大压力。Hadoop 就是用来存储并处理这种巨大数据量的分布式架构平台。用户在该平台上可以在不需要了解底层实现细节的情况下开发高效处理大数据的程序。下面介绍 Hadoop 的一些入门知识和安装配置。转载请说明出处。</p>
-</blockquote>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/07/01/Hadoop入门及安装/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1822,7 +1882,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
