@@ -79,7 +79,7 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
  type: git
- repo: https://github.com/18814122746/18814122746.github.io.git
+ repo: git@49.233.209.160:/data/repo/blog.git
  branch: master
 
 # 本地搜索
