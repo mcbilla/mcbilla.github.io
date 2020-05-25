@@ -79,25 +79,25 @@
 
 
 
-<meta name="description" content="本文通过简单介绍网络编程的发展，从 bio 发展到 nio 最后到 netty，我们可以清晰明白 netty 的作用以及给网络编程带来的极大便利性。">
+<meta name="description" content="上一篇文章介绍了 netty 的同步/异步/阻塞/非阻塞的概念和四种常用 IO 模型。本文介绍网络编程的发展，从 bio 发展到 nio 最后到 netty，我们可以感受到 netty 给网络编程带来的极大便利性。">
 <meta name="keywords" content="Netty">
 <meta property="og:type" content="article">
 <meta property="og:title" content="netty系列（二）：netty是什么">
-<meta property="og:url" content="http://yoursite.com/2020/01/17/netty系列（二）：netty是什么/index.html">
+<meta property="og:url" content="http://yoursite.com/2020/01/18/netty系列（二）：netty是什么/index.html">
 <meta property="og:site_name" content="飙戈的博客">
-<meta property="og:description" content="本文通过简单介绍网络编程的发展，从 bio 发展到 nio 最后到 netty，我们可以清晰明白 netty 的作用以及给网络编程带来的极大便利性。">
+<meta property="og:description" content="上一篇文章介绍了 netty 的同步/异步/阻塞/非阻塞的概念和四种常用 IO 模型。本文介绍网络编程的发展，从 bio 发展到 nio 最后到 netty，我们可以感受到 netty 给网络编程带来的极大便利性。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（二）：netty是什么/bio.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（二）：netty是什么/nio.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（二）：netty是什么/component.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（二）：netty是什么/buffer1.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（二）：netty是什么/buffer2.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（二）：netty是什么/buffer3.png">
-<meta property="og:updated_time" content="2020-05-24T18:12:37.424Z">
+<meta property="og:image" content="http://yoursite.com/2020/01/18/netty系列（二）：netty是什么/bio.png">
+<meta property="og:image" content="http://yoursite.com/2020/01/18/netty系列（二）：netty是什么/nio.png">
+<meta property="og:image" content="http://yoursite.com/2020/01/18/netty系列（二）：netty是什么/component.png">
+<meta property="og:image" content="http://yoursite.com/2020/01/18/netty系列（二）：netty是什么/buffer1.png">
+<meta property="og:image" content="http://yoursite.com/2020/01/18/netty系列（二）：netty是什么/buffer2.png">
+<meta property="og:image" content="http://yoursite.com/2020/01/18/netty系列（二）：netty是什么/buffer3.png">
+<meta property="og:updated_time" content="2020-05-25T10:35:38.189Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="netty系列（二）：netty是什么">
-<meta name="twitter:description" content="本文通过简单介绍网络编程的发展，从 bio 发展到 nio 最后到 netty，我们可以清晰明白 netty 的作用以及给网络编程带来的极大便利性。">
-<meta name="twitter:image" content="http://yoursite.com/2020/01/17/netty系列（二）：netty是什么/bio.png">
+<meta name="twitter:description" content="上一篇文章介绍了 netty 的同步/异步/阻塞/非阻塞的概念和四种常用 IO 模型。本文介绍网络编程的发展，从 bio 发展到 nio 最后到 netty，我们可以感受到 netty 给网络编程带来的极大便利性。">
+<meta name="twitter:image" content="http://yoursite.com/2020/01/18/netty系列（二）：netty是什么/bio.png">
 
 
 
@@ -127,7 +127,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2020/01/17/netty系列（二）：netty是什么/"/>
+  <link rel="canonical" href="http://yoursite.com/2020/01/18/netty系列（二）：netty是什么/"/>
 
 
 
@@ -304,7 +304,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/17/netty系列（二）：netty是什么/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/18/netty系列（二）：netty是什么/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="mcb">
@@ -333,8 +333,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-17T16:50:22+08:00">
-                2020-01-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-18T16:50:22+08:00">
+                2020-01-18
               </time>
             
 
@@ -399,7 +399,7 @@
 
       
         <blockquote>
-<p>本文通过简单介绍网络编程的发展，从 bio 发展到 nio 最后到 netty，我们可以清晰明白 netty 的作用以及给网络编程带来的极大便利性。</p>
+<p>上一篇文章介绍了 netty 的同步/异步/阻塞/非阻塞的概念和四种常用 IO 模型。本文介绍网络编程的发展，从 bio 发展到 nio 最后到 netty，我们可以感受到 netty 给网络编程带来的极大便利性。</p>
 </blockquote>
 <a id="more"></a>
 <p>网络编程，简单来说就是实现一个客户端与服务端进行网络通信的程序。我们从最传统的 BIO 开始介绍，本章只做简单介绍，不涉及深入原理。</p>
@@ -435,11 +435,14 @@
 </ol>
 <h2 id="NIO"><a href="#NIO" class="headerlink" title="NIO"></a>NIO</h2><p>为了解决 BIO 存在的问题，在 Java 1.4 中引入了 NIO 框架。 NIO 可以理解为 Non-blocking。</p>
 <p>在传统的 BIO 模型中一个连接对应一个 while 死循环，死循环的目的就是不断监测这条连接上是否有数据可以读，大多数情况下，1w个连接里面同一时刻只有少量的连接有数据可读，因此，很多个while死循环都白白浪费掉了，因为读不出啥数据。</p>
-<p><img src="/2020/01/17/netty系列（二）：netty是什么/bio.png" alt="bio"></p>
+<div style="width: 80%; margin: auto"><img src="/2020/01/18/netty系列（二）：netty是什么/bio.png" alt="bio"></div>
+
 <p>而在NIO模型中，他把这么多 while 死循环变成一个死循环，这个死循环由一个线程控制。这个线程就是 NIO 模型中的 selector。一条连接来了直接把这条连接注册到 selector 上，通过检查这个selector，就可以批量监测出有数据可读的连接，进而读取数据。这样导致线程数量大大减少。</p>
-<p><img src="/2020/01/17/netty系列（二）：netty是什么/nio.png" alt="nio"></p>
+<div style="width: 80%; margin: auto"><img src="/2020/01/18/netty系列（二）：netty是什么/nio.png" alt="nio"></div>
+
 <p>NIO 提供了 Channel、Buffer 和 Selector 三个核心组件。BIO 基于字节流和字符流进行操作，而 NIO 基于Channel 和 Buffer 进行操作，数据总是从通道读取到缓冲区中，或者从缓冲区写入到通道中。Selector 用于监听多个通道的事件（比如：连接打开，数据到达）。因此，单个线程可以监听多个数据通道。整体流程大致如下：</p>
-<p><img src="/2020/01/17/netty系列（二）：netty是什么/component.png" alt="component"></p>
+<div style="width: 80%; margin: auto"><img src="/2020/01/18/netty系列（二）：netty是什么/component.png" alt="component"></div>
+
 <h3 id="Channel"><a href="#Channel" class="headerlink" title="Channel"></a>Channel</h3><p>Channel 类似于 BIO 中的 Stream。只不过 Stream 是单向的，譬如：InputStream, OutputStream.而 Channel 是双向的，既可以用来进行读操作，又可以用来进行写操作。</p>
 <p>NIO 中的 Channel 的主要实现有：</p>
 <ul>
@@ -462,17 +465,17 @@
 <ol>
 <li>通过 <code>ByteBuffer.allocate(11)</code> 方法创建了一个 11 个 byte 的数组的缓冲区，初始状态如上图，position 的位置为 0，capacity 和 limit 默认都是数组长度。这个时候 ByteBuffer 处于写模式，等待 Channel 数据写入。</li>
 </ol>
-<div style="width: 50%; margin: auto"><img src="/2020/01/17/netty系列（二）：netty是什么/buffer1.png" alt="buffer1"></div>
+<div style="width: 50%; margin: auto"><img src="/2020/01/18/netty系列（二）：netty是什么/buffer1.png" alt="buffer1"></div>
 
 <ol start="2">
 <li>写入 5 个字节，postion 移动了 5 个位置，limit 和 capacity 保持不变。</li>
 </ol>
-<div style="width: 50%; margin: auto"><img src="/2020/01/17/netty系列（二）：netty是什么/buffer2.png" alt="buffer2"></div>
+<div style="width: 50%; margin: auto"><img src="/2020/01/18/netty系列（二）：netty是什么/buffer2.png" alt="buffer2"></div>
 
 <ol start="3">
 <li>调用 <code>ByteBuffer.flip()</code> 方法，将写模式改成读模式，position 设回 0，并将 limit 设成之前的 position 的值。这时 position 到 limit 这个区间内的就是可读数据。</li>
 </ol>
-<div style="width: 50%; margin: auto"><img src="/2020/01/17/netty系列（二）：netty是什么/buffer3.png" alt="buffer3"></div>
+<div style="width: 50%; margin: auto"><img src="/2020/01/18/netty系列（二）：netty是什么/buffer3.png" alt="buffer3"></div>
 
 <ol start="4">
 <li>在下一次写数据之前我们调用 <code>ByteBuffer.clear()</code> 方法，将读模式改成写模式。缓冲区的索引位置又回到了初始位置。注意这个时候 Buffer 中的数据并未被清除，只是这些标记告诉我们可以从哪里开始往 Buffer 里写数据。</li>
@@ -574,6 +577,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/20/netty系列（三）：netty架构和组件简介/" rel="prev" title="netty系列（三）：netty架构和组件简介">
+                netty系列（三）：netty架构和组件简介 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -697,7 +704,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-count">25</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

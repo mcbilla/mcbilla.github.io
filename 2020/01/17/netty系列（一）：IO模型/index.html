@@ -93,7 +93,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/asynchronousIO.png">
 <meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/signal-drivenIO.png">
 <meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/fiveIO.png">
-<meta property="og:updated_time" content="2020-05-20T14:57:34.139Z">
+<meta property="og:updated_time" content="2020-05-25T12:52:22.116Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="netty系列（一）：IO模型">
 <meta name="twitter:description" content="Netty 是目前比较火的网络编程框架，是 java 进阶的必备知识点，特此记录 Netty 学习过程中的一些知识点用于日后翻阅。本章介绍 Netty 的一些入门准备知识，包括同步和异步、阻塞和非阻塞的区别，还有常见的 IO 模型。">
@@ -405,22 +405,22 @@
 <h1 id="同步、异步、阻塞和非阻塞"><a href="#同步、异步、阻塞和非阻塞" class="headerlink" title="同步、异步、阻塞和非阻塞"></a>同步、异步、阻塞和非阻塞</h1><p>这四个概念都是针对一次调用发生的，我们可以这么理解，在一次调用里面存在<code>调用者</code>、<code>被调用者</code>和<code>调用结果</code>这三个概念。</p>
 <h2 id="一、同步和异步"><a href="#一、同步和异步" class="headerlink" title="一、同步和异步"></a>一、同步和异步</h2><p>同步和异步是从<code>调用结果通知机制</code>这个角度来区分的。</p>
 <ul>
-<li><p>同步：调用发生后，<code>调用者</code>主动去获取<code>调用结果</code>，这就是同步调用。</p>
+<li><p>同步：调用发生后，<code>调用者</code> 主动去获取 <code>调用结果</code>，这就是同步调用。</p>
 </li>
-<li><p>异步：调用发生后，<code>调用者</code>被动等待<code>被调用者</code>通知<code>调用结果</code>，这就是异步调用。通常过程是，调用发生后，<code>调用者</code>收到一个来自<code>被调用者</code>的回执，这个回执内容通常是是<code>被调用者</code>告诉<code>调用者</code>我已经收到这个任务了，但是这个任务具体什么时候执行，什么时候能得到执行结果，<code>调用者</code>不需要管。等到执行完成后，<code>被调用者</code>主动把<code>调用结果</code>通知给<code>调用者</code>，整个调用过程才算完成。</p>
+<li><p>异步：调用发生后，<code>调用者</code>被动等待 <code>被调用者</code> 通知 <code>调用结果</code>，这就是异步调用。通常过程是，调用发生后，<code>调用者</code>收到一个来自 <code>被调用者</code> 的回执，这个回执内容通常是是 <code>被调用者</code> 告诉 <code>调用者</code> 我已经收到这个任务了，但是这个任务具体什么时候执行，什么时候能得到执行结果，<code>调用者</code> 不需要管。等到执行完成后，<code>被调用者</code> 主动把 <code>调用结果</code> 通知给 <code>调用者</code>，整个调用过程才算完成。</p>
 </li>
 </ul>
-<h2 id="二、阻塞和非阻塞"><a href="#二、阻塞和非阻塞" class="headerlink" title="二、阻塞和非阻塞"></a>二、阻塞和非阻塞</h2><p>阻塞和非阻塞是从<code>调用者在获取到调用结果前的行为</code>这个角度进行区分的。</p>
+<h2 id="二、阻塞和非阻塞"><a href="#二、阻塞和非阻塞" class="headerlink" title="二、阻塞和非阻塞"></a>二、阻塞和非阻塞</h2><p>阻塞和非阻塞是从 <code>调用者在获取到调用结果前的行为</code> 这个角度进行区分的。</p>
 <ul>
-<li>阻塞：<code>调用者</code>在获取到<code>调用结果</code>前什么都不干，线程整个挂起一直等待<code>调用结果</code>，这就是阻塞调用。</li>
-<li>非阻塞：<code>调用者</code>在获取<code>调用结果</code>前可以做自己的事情，这就是非阻塞调用。</li>
+<li>阻塞：<code>调用者</code>在获取到 <code>调用结果</code> 前什么都不干，线程整个挂起一直等待 <code>调用结果</code>，这就是阻塞调用。</li>
+<li>非阻塞：<code>调用者</code> 在获取 <code>调用结果</code>前可以做自己的事情，这就是非阻塞调用。</li>
 </ul>
 <h2 id="三、四种概念组合"><a href="#三、四种概念组合" class="headerlink" title="三、四种概念组合"></a>三、四种概念组合</h2><p>综上所述，同步和异步、阻塞和非阻塞是两套完全不同而且并不矛盾的概念，所以产生以下四种概念组合：</p>
 <ul>
-<li>同步阻塞：<code>调用者</code>一直挂起什么都不做，主动去获取<code>调用结果</code>。</li>
-<li>同步非阻塞：<code>调用者</code>拿到回执后继续做自己的事情，然后通过轮询机制，每隔一段时间去询问<code>调用结果</code>，直到最终获取<code>调用结果</code>，调用才算完成。</li>
-<li>异步阻塞：<code>调用者</code>一直挂起什么都不做，直到<code>被调用者</code>通知<code>调用结果</code>。</li>
-<li>异步非阻塞：调用者拿到回执后继续做自己的事情，等到<code>被调用者</code>通知<code>调用结果</code>后，调用才算完成。</li>
+<li>同步阻塞：<code>调用者</code> 一直挂起什么都不做，主动去获取 <code>调用结果</code>。</li>
+<li>同步非阻塞：<code>调用者</code>拿到回执后继续做自己的事情，然后通过轮询机制，每隔一段时间去询问<code>调用结果</code>，直到最终获取 <code>调用结果</code>，调用才算完成。</li>
+<li>异步阻塞：<code>调用者</code> 一直挂起什么都不做，直到 <code>被调用者</code> 通知 <code>调用结果</code>。</li>
+<li>异步非阻塞：调用者拿到回执后继续做自己的事情，等到 <code>被调用者</code> 通知<code>调用结果</code>后，调用才算完成。</li>
 </ul>
 <p>这四种概念，是下面常见IO模型的基础。</p>
 <h1 id="IO模型"><a href="#IO模型" class="headerlink" title="IO模型"></a>IO模型</h1><h2 id="一、基础概念"><a href="#一、基础概念" class="headerlink" title="一、基础概念"></a>一、基础概念</h2><p>在进行解释之前，首先要说明几个概念：</p>
@@ -431,10 +431,9 @@
 <li>文件描述符</li>
 <li>缓存 IO</li>
 </ul>
-<h3 id="1、用户空间与内核空间"><a href="#1、用户空间与内核空间" class="headerlink" title="1、用户空间与内核空间"></a>1、用户空间与内核空间</h3><p>现在操作系统都是采用虚拟存储器，那么对32位操作系统而言，它的寻址空间（虚拟存储空间）为4G（2的32次方）。<code>操作系统的核心是内核，独立于普通的应用程序，可以访问受保护的内存空间，也有访问底层硬件设备的所有权限</code>。为了保证用户进程不能直接操作内核（kernel），保证内核的安全，<code>操作系统将虚拟空间划分为两部分，一部分为内核空间，一部分为用户空间</code>。针对linux操作系统而言，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF），供内核使用，称为内核空间，而将较低的3G字节（从虚拟地址0x00000000到0xBFFFFFFF），供各个进程使用，称为用户空间。</p>
-<h3 id="2、进程切换"><a href="#2、进程切换" class="headerlink" title="2、进程切换"></a>2、进程切换</h3><p>为了控制进程的执行，内核必须有能力挂起正在CPU上运行的进程，并恢复以前挂起的某个进程的执行。这种行为被称为进程切换。因此可以说，任何进程都是在操作系统内核的支持下运行的，是与内核紧密相关的。</p>
+<h3 id="用户空间与内核空间"><a href="#用户空间与内核空间" class="headerlink" title="用户空间与内核空间"></a>用户空间与内核空间</h3><p>现在操作系统都是采用虚拟存储器，那么对32位操作系统而言，它的寻址空间（虚拟存储空间）为4G（2的32次方）。操作系统的核心是内核，独立于普通的应用程序，可以访问受保护的内存空间，也有访问底层硬件设备的所有权限。为了保证用户进程不能直接操作内核（kernel），保证内核的安全，操作系统将虚拟空间划分为两部分，一部分为内核空间，一部分为用户空间`。针对linux操作系统而言，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF），供内核使用，称为内核空间，而将较低的3G字节（从虚拟地址0x00000000到0xBFFFFFFF），供各个进程使用，称为用户空间。</p>
+<h3 id="进程切换"><a href="#进程切换" class="headerlink" title="进程切换"></a>进程切换</h3><p>为了控制进程的执行，内核必须有能力挂起正在CPU上运行的进程，并恢复以前挂起的某个进程的执行。这种行为被称为进程切换。因此可以说，任何进程都是在操作系统内核的支持下运行的，是与内核紧密相关的。</p>
 <p>从一个进程的运行转到另一个进程上运行，这个过程中经过下面这些变化：</p>
-<blockquote>
 <ol>
 <li>保存处理机上下文，包括程序计数器和其他寄存器。</li>
 <li>更新PCB信息。</li>
@@ -443,99 +442,109 @@
 <li>更新内存管理的数据结构。</li>
 <li>恢复处理机上下文。</li>
 </ol>
-</blockquote>
-<h3 id="3、进程的阻塞"><a href="#3、进程的阻塞" class="headerlink" title="3、进程的阻塞"></a>3、进程的阻塞</h3><p>正在执行的进程，由于期待的某些事件未发生，如请求系统资源失败、等待某种操作的完成、新数据尚未到达或无新工作做等，则由系统自动执行阻塞(Block)，使自己由运行状态变为阻塞状态。可见，进程的阻塞是进程自身的一种主动行为，也因此只有处于运行态的进程（获得CPU），才可能将其转为阻塞状态。<code>当进程进入阻塞状态，是不占用CPU资源的</code>。</p>
-<h3 id="4、文件描述符fd"><a href="#4、文件描述符fd" class="headerlink" title="4、文件描述符fd"></a>4、文件描述符fd</h3><p>文件描述符（File descriptor）是计算机科学中的一个术语，<code>是一个用于表述指向文件的引用的抽象化概念</code>。</p>
+<h3 id="进程的阻塞"><a href="#进程的阻塞" class="headerlink" title="进程的阻塞"></a>进程的阻塞</h3><p>正在执行的进程，由于期待的某些事件未发生，如请求系统资源失败、等待某种操作的完成、新数据尚未到达或无新工作做等，则由系统自动执行阻塞(Block)，使自己由运行状态变为阻塞状态。可见，进程的阻塞是进程自身的一种主动行为，也因此只有处于运行态的进程（获得CPU），才可能将其转为阻塞状态。<code>当进程进入阻塞状态，是不占用CPU资源的</code>。</p>
+<h3 id="文件描述符fd"><a href="#文件描述符fd" class="headerlink" title="文件描述符fd"></a>文件描述符fd</h3><p>文件描述符（File descriptor）是计算机科学中的一个术语，是一个用于表述指向文件的引用的抽象化概念。</p>
 <p>文件描述符在形式上是一个非负整数。实际上，<code>它是一个索引值，指向内核为每一个进程所维护的该进程打开文件的记录表</code>。当程序打开一个现有文件或者创建一个新文件时，内核向进程返回一个文件描述符。在程序设计中，一些涉及底层的程序编写往往会围绕着文件描述符展开。但是文件描述符这一概念往往只适用于UNIX、Linux这样的操作系统。</p>
-<h3 id="5、缓存-IO"><a href="#5、缓存-IO" class="headerlink" title="5、缓存 IO"></a>5、缓存 IO</h3><p><code>缓存 IO 又被称作标准 IO，大多数文件系统的默认 IO 操作都是缓存 IO</code>。在 Linux 的缓存 IO 机制中，操作系统会将 IO 的数据缓存在文件系统的页缓存（ page cache ）中，也就是说，<code>数据会先被拷贝到操作系统内核的缓冲区中，然后才会从操作系统内核的缓冲区拷贝到应用程序的地址空间</code>。这个概念非常重要！</p>
-<h3 id="6、linux-IO-的过程"><a href="#6、linux-IO-的过程" class="headerlink" title="6、linux IO 的过程"></a>6、linux IO 的过程</h3><p>结合以上的基础概念，linux IO 的整体流程是<code>数据会先被拷贝到操作系统内核的缓冲区中，然后才会从操作系统内核的缓冲区拷贝到应用程序的地址空间</code></p>
+<h3 id="缓存-IO"><a href="#缓存-IO" class="headerlink" title="缓存 IO"></a>缓存 IO</h3><p>缓存 IO 又被称作标准 IO，大多数文件系统的默认 IO 操作都是缓存 IO。在 Linux 的缓存 IO 机制中，操作系统会将 IO 的数据缓存在文件系统的页缓存（ page cache ）中，也就是说，<code>数据会先被拷贝到操作系统内核的缓冲区中，然后才会从操作系统内核的缓冲区拷贝到应用程序的地址空间</code>。这个概念非常重要！</p>
+<h3 id="linux-IO-的过程"><a href="#linux-IO-的过程" class="headerlink" title="linux IO 的过程"></a>linux IO 的过程</h3><p>结合以上的基础概念，linux IO 的整体流程是 <code>数据会先被拷贝到操作系统内核的缓冲区中，然后才会从操作系统内核的缓冲区拷贝到应用程序的地址空间</code></p>
 <p>对于本地 read IO，分为以下两个阶段：</p>
-<blockquote>
-<p>第一阶段：等待数据准备 (Waiting for the data to be ready)。</p>
-<p>第二阶段：将数据从内核拷贝到进程中 (Copying the data from the kernel to the process)。</p>
-</blockquote>
+<ul>
+<li><p>第一阶段：等待数据准备 (Waiting for the data to be ready)。</p>
+</li>
+<li><p>第二阶段：将数据从内核拷贝到进程中 (Copying the data from the kernel to the process)。</p>
+</li>
+</ul>
 <p>对于网络 IO，<code>网络IO的本质是socket的读取，socket在linux系统被抽象为流，IO可以理解为对流的操作</code>。对于socket流而言，</p>
-<blockquote>
-<p>第一阶段：通常涉及等待网络上的数据分组到达，然后被复制到内核的某个缓冲区。</p>
-<p>第二阶段：把数据从内核缓冲区复制到应用进程缓冲区。</p>
-</blockquote>
+<ul>
+<li>第一阶段：通常涉及等待网络上的数据分组到达，然后被复制到内核的某个缓冲区。</li>
+<li>第二阶段：把数据从内核缓冲区复制到应用进程缓冲区。</li>
+</ul>
 <h2 id="二、五种常见IO模型"><a href="#二、五种常见IO模型" class="headerlink" title="二、五种常见IO模型"></a>二、五种常见IO模型</h2><p>根据以上基础知识，我们可以得到这样网络 IO 关系：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">网络数据—&gt;内核空间—&gt;拷贝到用户空间—&gt;应用程序收到结果</span><br></pre></td></tr></table></figure>
-<p><code>阻塞/非阻塞</code>概念可以发生在<code>网络数据—&gt;内核空间</code>和<code>内核空间—&gt;拷贝到用户空间</code>这两个阶段。如果应用程序什么事都不做直到本阶段完成就称作<code>阻塞</code>，如果应用程序在阶段完成前可以做自己的事情就称作<code>非阻塞</code>。</p>
-<p><code>同步/异步</code>概念发生在<code>应用程序怎么收到结果</code>这个阶段。如果应用程序主动去获取结果就称作<code>同步</code>，如果应用程序被动等待内核通知结果就称作<code>异步</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">网络数据 —&gt; 内核空间 —&gt; 拷贝到用户空间 —&gt; 应用程序收到结果</span><br></pre></td></tr></table></figure>
+<p><code>阻塞/非阻塞</code> 概念可以发生在 <code>网络数据—&gt;内核空间</code> 和 <code>内核空间—&gt;拷贝到用户空间</code> 这两个阶段。如果应用程序什么事都不做直到本阶段完成就称作 <code>阻塞</code>，如果应用程序在阶段完成前可以做自己的事情就称作 <code>非阻塞</code>。</p>
+<p><code>同步/异步</code> 概念发生在 <code>应用程序怎么收到结果</code> 这个阶段。如果应用程序主动去获取结果就称作 <code>同步</code>，如果应用程序被动等待内核通知结果就称作 <code>异步</code>。</p>
 <p>这些概念是下面 IO 模型的基础。</p>
-<h3 id="1、同步阻塞-IO（blocking-IO）"><a href="#1、同步阻塞-IO（blocking-IO）" class="headerlink" title="1、同步阻塞 IO（blocking IO）"></a>1、同步阻塞 IO（blocking IO）</h3><h4 id="网络模型"><a href="#网络模型" class="headerlink" title="网络模型"></a>网络模型</h4><p><code>同步阻塞 IO 模型是最常用的一个模型，也是最简单的模型</code>。在这个IO模型中，用户空间的应用程序执行一个系统调用（recvform），这会导致应用程序阻塞，什么也不干，直到数据准备好，并且将数据从内核复制到用户进程，最后进程再处理数据，<code>在等待数据到处理数据的两个阶段</code>，整个进程都被阻塞。不能处理别的网络IO。<code>调用应用程序处于一种不再消费 CPU 而只是简单等待响应的状态</code>，因此从处理的角度来看，这是非常有效的。在调用recv()/recvfrom()函数时，发生在内核中等待数据和复制数据的过程，大致如下图：</p>
+<h3 id="1、同步阻塞-IO（blocking-IO）"><a href="#1、同步阻塞-IO（blocking-IO）" class="headerlink" title="1、同步阻塞 IO（blocking IO）"></a>1、同步阻塞 IO（blocking IO）</h3><h4 id="网络模型"><a href="#网络模型" class="headerlink" title="网络模型"></a>网络模型</h4><p>同步阻塞 IO 模型是最常用的一个模型，也是最简单的模型。在这个 IO 模型中，用户空间的应用程序执行一个系统调用（recvform），这会导致应用程序阻塞，什么也不干，直到数据准备好，并且将数据从内核复制到用户进程，最后进程再处理数据。</p>
+<p>在等待数据到处理数据的两个阶段，整个进程都被阻塞。不能处理别的网络 IO。调用应用程序处于一种不再消费 CPU 而只是简单等待响应的状态，因此从处理的角度来看，这是非常有效的。流程图如下：</p>
 <p><img src="/2020/01/17/netty系列（一）：IO模型/blockingIO.png" alt="blockingIO"></p>
-<h4 id="流程描述"><a href="#流程描述" class="headerlink" title="流程描述"></a>流程描述</h4><p>当用户进程调用了recv()/recvfrom()这个系统调用，<code>kernel就开始了IO的第一个阶段：准备数据</code>（对于网络IO来说，很多时候数据在一开始还没有到达。比如，还没有收到一个完整的UDP包。这个时候kernel就要等待足够的数据到来）。这个过程需要等待，也就是说数据被拷贝到操作系统内核的缓冲区中是需要一个过程的。而在用户进程这边，整个进程会被阻塞（当然，是进程自己选择的阻塞）。<code>第二个阶段：当kernel一直等到数据准备好了，它就会将数据从kernel中拷贝到用户内存</code>，然后kernel返回结果，用户进程才解除block的状态，重新运行起来。<strong>所以，blocking IO的特点就是在IO执行的两个阶段都被block了。</strong></p>
-<h4 id="优劣分析"><a href="#优劣分析" class="headerlink" title="优劣分析"></a>优劣分析</h4><blockquote>
-<p>优点</p>
-<ol>
-<li>能够及时返回数据，无延迟</li>
-<li>对内核开发者来说这是省事了</li>
-</ol>
-<p>缺点</p>
-<ol>
-<li>对用户来说处于等待就要付出性能的代价了；</li>
-</ol>
-</blockquote>
-<h3 id="2、同步非阻塞-IO（nonblocking-IO）"><a href="#2、同步非阻塞-IO（nonblocking-IO）" class="headerlink" title="2、同步非阻塞 IO（nonblocking IO）"></a>2、同步非阻塞 IO（nonblocking IO）</h3><h4 id="网络模型-1"><a href="#网络模型-1" class="headerlink" title="网络模型"></a>网络模型</h4><p><code>同步非阻塞就是 “每隔一会儿瞄一眼进度条” 的轮询（polling）方式</code>。在这种模型中，<code>设备是以非阻塞的形式打开的</code>。这意味着 IO 操作不会立即完成，read 操作可能会返回一个错误代码，说明这个命令不能立即满足（EAGAIN 或 EWOULDBLOCK）。</p>
-<p>在网络IO时候，非阻塞IO也会进行recvform系统调用，检查数据是否准备好，与阻塞IO不一样，”非阻塞将大的整片时间的阻塞分成N多的小的阻塞, 所以进程不断地有机会 ‘被’ CPU光顾”。</p>
-<p><code>也就是说非阻塞的recvform系统调用调用之后，进程并没有被阻塞，内核马上返回给进程，如果数据还没准备好，此时会返回一个error</code>。进程在返回之后，可以干点别的事情，然后再发起recvform系统调用。重复上面的过程，循环往复的进行recvform系统调用。<code>这个过程通常被称之为轮询</code>。轮询检查内核数据，直到数据准备好，再拷贝数据到进程，进行数据处理。<strong>需要注意，拷贝数据整个过程，进程仍然是属于阻塞的状态</strong>。</p>
-<p>在linux下，可以通过设置socket使其变为non-blocking。<code>当对一个non-blocking socket执行读操作时</code>，流程如图所示：</p>
+<h4 id="流程描述"><a href="#流程描述" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
+<li>第一个阶段：准备数据。当用户进程调用了 <code>recv()/recvfrom()</code> 这个系统调用之后，用户进程就开始阻塞等待数据。对于网络 IO 来说，很多时候数据在一开始还没有到达。比如，还没有收到一个完整的UDP包。这个时候 kernel 就要等待足够的数据到来。这个过程也需要等待。也就是说数据被拷贝到操作系统内核的缓冲区中是需要一个过程的。</li>
+<li>第二个阶段：当kernel 一直等到数据准备好了，它就会将数据从 kernel 中拷贝到用户内存。然后 kernel 返回结果，用户进程才解除 block 的状态，重新运行起来。</li>
+</ul>
+<h4 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h4><p><strong>特点</strong></p>
+<p>在 IO 执行的两个阶段都被阻塞。</p>
+<p><strong>优点</strong></p>
+<ul>
+<li>能够及时返回数据，无延迟。</li>
+<li>对内核开发者来说这是省事了。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<p>性能差，不能支持高并发的应用场景。</p>
+<h3 id="2、同步非阻塞-IO（nonblocking-IO）"><a href="#2、同步非阻塞-IO（nonblocking-IO）" class="headerlink" title="2、同步非阻塞 IO（nonblocking IO）"></a>2、同步非阻塞 IO（nonblocking IO）</h3><h4 id="网络模型-1"><a href="#网络模型-1" class="headerlink" title="网络模型"></a>网络模型</h4><p>同步非阻塞就是「每隔一会儿瞄一眼进度条」的轮询方式。在这种模型中，非阻塞也会调用 <code>recvform</code> 系统调用，不管数据是否准备好，内核都会马上返回给进程。如果数据还没准备好，就会返回一个错误代码（EAGAIN 或 EWOULDBLOCK），说明这个命令不能立即满足。进程在返回之后，可以干点别的事情，过一段时间再发起<code>recvform</code> 系统调用，重复上面的过程。这个过程通常被称之为轮询。直到数据准备好，再拷贝数据到进程，进行数据处理。需要注意，拷贝数据整个过程，进程仍然是属于阻塞的状态。流程如图所示：</p>
 <p><img src="/2020/01/17/netty系列（一）：IO模型/nonblockingIO.png" alt="nonblockingIO"></p>
-<h4 id="流程描述-1"><a href="#流程描述-1" class="headerlink" title="流程描述"></a>流程描述</h4><p>当用户进程发出read操作时，如果kernel中的数据还没有准备好，那么它并不会block用户进程，而是立刻返回一个error。从用户进程角度讲，它发起一个read操作后，并不需要等待，而是马上就得到了一个结果。用户进程判断结果是一个error时，它就知道数据还没有准备好，于是它可以再次发送read操作。一旦kernel中的数据准备好了，并且又再次收到了用户进程的system call，那么它马上就将数据拷贝到了用户内存，然后返回。<strong>所以，nonblocking IO的特点是用户进程需要不断的主动询问kernel数据好了没有。</strong></p>
-<h4 id="优劣分析-1"><a href="#优劣分析-1" class="headerlink" title="优劣分析"></a>优劣分析</h4><p>同步非阻塞方式相比同步阻塞方式：</p>
-<blockquote>
-<p>优点：能够在等待任务完成的时间里干其他活了（包括提交其他任务，也就是 “后台” 可以有多个任务在同时执行）。</p>
-<p>缺点：任务完成的响应延迟增大了，因为每过一段时间才去轮询一次read操作，而任务可能在两次轮询之间的任意时间完成。这会导致整体数据吞吐量的降低。</p>
-</blockquote>
-<h3 id="3、IO-多路复用（-IO-multiplexing）"><a href="#3、IO-多路复用（-IO-multiplexing）" class="headerlink" title="3、IO 多路复用（ IO multiplexing）"></a>3、IO 多路复用（ IO multiplexing）</h3><h4 id="网络模型-2"><a href="#网络模型-2" class="headerlink" title="网络模型"></a>网络模型</h4><p>由于同步非阻塞方式需要不断主动轮询，轮询占据了很大一部分过程，轮询会消耗大量的CPU时间，而 “后台” 可能有多个任务在同时进行，人们就想到了循环查询多个任务的完成状态，只要有任何一个任务完成，就去处理它。如果轮询不是进程的用户态，而是有人帮忙就好了。<code>那么这就是所谓的 “IO 多路复用”</code>。UNIX/Linux 下的 select、poll、epoll 就是干这个的（epoll 比 poll、select 效率高，做的事情是一样的）。</p>
-<p><code>IO多路复用有两个特别的系统调用select、poll、epoll函数</code>。select调用是内核级别的，select轮询相对非阻塞的轮询的区别在于—<code>前者可以等待多个socket，能实现同时对多个IO端口进行监听</code>，当其中任何一个socket的数据准好了，<code>就能返回进行可读</code>，<code>然后进程再进行recvform系统调用，将数据由内核拷贝到用户进程，当然这个过程是阻塞的</code>。select或poll调用之后，会阻塞进程，与blocking IO阻塞不同在于，<code>此时的select不是等到socket数据全部到达再处理, 而是有了一部分数据就会调用用户进程来处理</code>。如何知道有一部分数据到达了呢？<code>监视的事情交给了内核，内核负责数据到达的处理。也可以理解为&quot;非阻塞&quot;吧</code>。</p>
-<p><code>I/O复用模型会用到select、poll、epoll函数，这几个函数也会使进程阻塞，但是和阻塞I/O所不同的的，这两个函数可以同时阻塞多个I/O操作</code>。而且可以同时对多个读操作，多个写操作的I/O函数进行检测，直到有数据可读或可写时（注意不是全部数据可读或可写），才真正调用I/O操作函数。</p>
-<p>对于多路复用，也就是轮询多个socket。<code>多路复用既然可以处理多个IO，也就带来了新的问题，多个IO之间的顺序变得不确定了</code>，当然也可以针对不同的编号。具体流程，如下图所示：</p>
+<h4 id="流程描述-1"><a href="#流程描述-1" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
+<li>用户进程发出 read 操作时，马上就得到了一个结果。<ul>
+<li>kernel中的数据还没有准备好，返回一个 error 信号。</li>
+<li>用户进程接收到一个 error 信号时，就知道数据还没有准备好，这时候用户进程可以去做自己的事情。</li>
+<li>过一段时间再进行 read 操作。一直等到 kernel 中的数据准备好，返回一个数据已经准备好的信号。</li>
+</ul>
+</li>
+<li>用户进程收到数据准备好的信号后，开始阻塞自己，将 kernel 的数据拷到用户进程空间。</li>
+</ul>
+<h4 id="分析-1"><a href="#分析-1" class="headerlink" title="分析"></a>分析</h4><p><strong>特点</strong></p>
+<p>nonblocking IO 的特点是用户进程需要不断的主动询问 kernel 数据好了没有。</p>
+<p>同步非阻塞方式相比同步阻塞方式：</p>
+<p><strong>优点</strong></p>
+<p>能够在等待任务完成的时间里干其他活了（包括提交其他任务，也就是 “后台” 可以有多个任务在同时执行）。</p>
+<p><strong>缺点</strong></p>
+<ul>
+<li>任务完成的响应延迟增大了，因为每过一段时间才去轮询一次 read 操作，而任务可能在两次轮询之间的任意时间完成。这会导致整体数据吞吐量的降低。</li>
+<li>由于同步非阻塞方式需要不断主动轮询，轮询占据了很大一部分过程，轮询会消耗大量的CPU时间</li>
+</ul>
+<h3 id="3、IO-多路复用（-IO-multiplexing）"><a href="#3、IO-多路复用（-IO-multiplexing）" class="headerlink" title="3、IO 多路复用（ IO multiplexing）"></a>3、IO 多路复用（ IO multiplexing）</h3><h4 id="网络模型-2"><a href="#网络模型-2" class="headerlink" title="网络模型"></a>网络模型</h4><p>IO 多路复用就是用一个单独的非用户态的进程去完成同步非阻塞的轮询工作。和同步非阻塞 IO 的区别是，同步非阻塞 IO使用用户态的进程去完成这个轮询工作，而 IO多路复用使用 UNIX/Linux 下的内核函数 <code>select、poll、epoll</code> 都可以完成这个轮询工作（epoll 比 poll、select 效率高，做的事情是一样的）。我们可以把这类函数的工作称为 select 轮询。</p>
+<p>select 轮询是内核级别的，可以监听多个 socket，能实现同时对多个IO端口进行监听，直到有数据可读或可写时（注意不是全部数据可读或可写），才真正调用 I/O 操作函数。然后进程再进行 recvform 系统调用，将数据由内核拷贝到用户进程，当然这个过程是阻塞的。流程图如下：</p>
 <p><img src="/2020/01/17/netty系列（一）：IO模型/IOmultiplexing.png" alt="IOmultiplexing"></p>
-<h4 id="流程描述-2"><a href="#流程描述-2" class="headerlink" title="流程描述"></a>流程描述</h4><p>IO multiplexing就是我们说的select，poll，epoll，有些地方也称这种IO方式为event driven IO。<code>select/epoll的好处就在于单个process就可以同时处理多个网络连接的IO</code>。它的基本原理就是select，poll，epoll这个function会不断的轮询所负责的所有socket，当某个socket有数据到达了，就通知用户进程。</p>
-<p><code>当用户进程调用了select，那么整个进程会被block</code>，而同时，kernel会“监视”所有select负责的socket，<code>当任何一个socket中的数据准备好了，select就会返回</code>。这个时候用户进程再调用read操作，将数据从kernel拷贝到用户进程。</p>
-<blockquote>
-<p>多路复用的特点是<code>通过一种机制实现一个进程能同时等待多个IO文件描述符</code>，内核监视这些文件描述符（套接字描述符），其中的任意一个进入读就绪状态，select， poll，epoll函数就可以返回。对于监视的方式，又可以分为 select， poll， epoll三种方式。</p>
-</blockquote>
+<h4 id="流程描述-2"><a href="#流程描述-2" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
+<li>当用户进程调用了 select，整个进程会被 block，而同时，kernel 会监视所有 select 负责的 socket</li>
+<li>当任何一个 socket 中的数据准备好了，select 就会返回。</li>
+<li>用户进程开始阻塞，将数据从 kernel 拷贝到用户进程。</li>
+</ul>
 <p>上面的图和blocking IO的图其实并没有太大的不同，事实上，还更差一些。<code>因为这里需要使用两个system call (select 和 recvfrom)，而blocking IO只调用了一个system call (recvfrom)</code>。但是，<code>用select的优势在于它可以同时处理多个connection</code>。</p>
-<p>所以，如果处理的连接数不是很高的话，使用select/epoll的web server不一定比使用multi-threading + blocking IO的web server性能更好，可能延迟还更大。<strong>select/epoll的优势并不是对于单个连接能处理得更快，而是在于能处理更多的连接。</strong></p>
-<p>在IO multiplexing Model中，<code>实际中，对于每一个socket，一般都设置成为non-blocking</code>。至于为什么要被设置成<code>non-blocking</code>，可以参考这个<a href="https://www.zhihu.com/question/37271342?sort=created" target="_blank" rel="noopener">回答</a></p>
-<p>如上图所示，整个用户的process其实是一直被block的。<code>只不过process是被select这个函数block，而不是被socket IO给block</code>。所以<strong>IO多路复用是阻塞在select，epoll这样的系统调用之上，而没有阻塞在真正的I/O系统调用如recvfrom之上。</strong></p>
-<p>在I/O编程过程中，<code>当需要同时处理多个客户端接入请求时，可以利用多线程或者I/O多路复用技术进行处理</code>。I/O多路复用技术<code>通过把多个I/O的阻塞复用到同一个select的阻塞上，从而使得系统在单线程的情况下可以同时处理多个客户端请求</code>。与传统的多线程/多进程模型比，<code>I/O多路复用的最大优势是系统开销小</code>，系统不需要创建新的额外进程或者线程，也不需要维护这些进程和线程的运行，降底了系统的维护工作量，节省了系统资源，<code>所以高并发的程序一般使用同步非阻塞方式而非多线程 + 同步阻塞方式</code>。I/O多路复用的主要应用场景如下：</p>
-<blockquote>
-<p>服务器需要同时处理多个处于监听状态或者多个连接状态的套接字。</p>
-<p>服务器需要同时处理多种网络协议的套接字。</p>
-</blockquote>
-<p>了解了前面三种IO模式，在用户进程进行系统调用的时候，<strong>他们在等待数据到来的时候，处理的方式不一样，直接等待，轮询，select或poll轮询</strong>，两个阶段过程：</p>
-<blockquote>
-<p>第一个阶段有的阻塞，有的不阻塞，有的可以阻塞又可以不阻塞。</p>
-<p>第二个阶段可以阻塞又可以不阻塞。</p>
-</blockquote>
-<p><strong>从整个IO过程来看，他们都是同步模型(synchronous)，因为都属于应用程序主动等待且向内核检查状态。【此句很重要！！！】</strong></p>
-<h3 id="4、异步非阻塞-IO（asynchronous-IO）"><a href="#4、异步非阻塞-IO（asynchronous-IO）" class="headerlink" title="4、异步非阻塞 IO（asynchronous IO）"></a>4、异步非阻塞 IO（asynchronous IO）</h3><h4 id="网络模型-3"><a href="#网络模型-3" class="headerlink" title="网络模型"></a>网络模型</h4><p>相对于同步IO，异步IO不是顺序执行。<code>用户进程进行aio_read系统调用之后，无论内核数据是否准备好，都会直接返回给用户进程，然后用户态进程可以去做别的事情</code>。等到socket数据准备好了，内核直接复制数据给进程，<code>然后从内核向进程发送通知</code>。<code>IO两个阶段，进程都是非阻塞的</code>。</p>
-<p>Linux提供了AIO库函数实现异步，但是用的很少。目前有很多开源的异步IO库，例如libevent、libev、libuv。异步过程如下图所示：</p>
+<h4 id="分析-2"><a href="#分析-2" class="headerlink" title="分析"></a>分析</h4><p>如果处理的连接数不是很高的话，使用 select/epoll 不一定比使用 multi-threading + blocking IO 性能更好，可能延迟还更大。<strong>select/epoll的优势并不是对于单个连接能处理得更快，而是在于能处理更多的连接。</strong>I/O 多路复用技术通过把多个 I/O 的阻塞复用到同一个 select 的阻塞上，从而使得系统在单线程的情况下可以同时处理多个客户端请求，大大降低系统开销小，节省了系统资源。</p>
+<p>I/O多路复用的主要应用场景如下：</p>
+<ul>
+<li><p>服务器需要同时处理多个处于监听状态或者多个连接状态的套接字。</p>
+</li>
+<li><p>服务器需要同时处理多种网络协议的套接字。</p>
+</li>
+</ul>
+<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>前面三种IO模式，在用户进程进行系统调用的两个阶段：</p>
+<ul>
+<li>第一个阶段有的阻塞，有的不阻塞，有的可以阻塞又可以不阻塞。</li>
+<li>第二个阶段可以阻塞又可以不阻塞。</li>
+</ul>
+<p><strong>从整个IO过程来看，他们都是同步模型，因为都属于应用程序主动等待且向内核检查状态。</strong></p>
+<h3 id="4、异步非阻塞-IO（asynchronous-IO）"><a href="#4、异步非阻塞-IO（asynchronous-IO）" class="headerlink" title="4、异步非阻塞 IO（asynchronous IO）"></a>4、异步非阻塞 IO（asynchronous IO）</h3><h4 id="网络模型-3"><a href="#网络模型-3" class="headerlink" title="网络模型"></a>网络模型</h4><p>相对于同步IO，异步IO不是顺序执行。用户进程进行 aio_read 系统调用之后，无论内核数据是否准备好，都会直接返回给用户进程，然后用户态进程可以去做别的事情。等到socket数据准备好了，内核直接复制数据给进程，然后从内核向进程发送通知。IO两个阶段，进程都是非阻塞的。</p>
+<p>Linux 提供了 AIO 库函数实现异步，但是用的很少。目前有很多开源的异步IO库，例如 libevent、libev、libuv。异步过程如下图所示：</p>
 <p><img src="/2020/01/17/netty系列（一）：IO模型/asynchronousIO.png" alt="asynchronousIO"></p>
-<h4 id="流程描述-3"><a href="#流程描述-3" class="headerlink" title="流程描述"></a>流程描述</h4><p>用户进程发起aio_read操作之后，立刻就可以开始去做其它的事。而另一方面，从kernel的角度，当它受到一个asynchronous read之后，<code>首先它会立刻返回，所以不会对用户进程产生任何block</code>。然后，kernel会等待数据准备完成，然后将数据拷贝到用户内存，<code>当这一切都完成之后，kernel会给用户进程发送一个signal或执行一个基于线程的回调函数来完成这次 IO 处理过程</code>，告诉它read操作完成了。<code>果这个进程正在用户态忙着做别的事（例如在计算两个矩阵的乘积），那就强行打断之，调用事先注册的信号处理函数</code>，这个函数可以决定何时以及如何处理这个异步任务。由于信号处理函数是突然闯进来的，因此跟中断处理程序一样，有很多事情是不能做的，因此保险起见，<code>一般是把事件 “登记” 一下放进队列，然后返回该进程原来在做的事</code>。</p>
-<blockquote>
-<p><code>如果这个进程正在内核态忙着做别的事</code>，例如以同步阻塞方式读写磁盘，<code>那就只好把这个通知挂起来了，等到内核态的事情忙完了，快要回到用户态的时候，再触发信号通知</code>。</p>
-<p><code>如果这个进程现在被挂起了，例如无事可做 sleep 了，那就把这个进程唤醒</code>，下次有 CPU 空闲的时候，就会调度到这个进程，触发信号通知。</p>
-</blockquote>
-<p>异步 API 说来轻巧，做来难，这主要是对 API 的实现者而言的。Linux 的异步 IO（AIO）支持是 2.6.22 才引入的，还有很多系统调用不支持异步 IO。Linux 的异步 IO 最初是为数据库设计的，<code>因此通过异步 IO 的读写操作不会被缓存或缓冲，这就无法利用操作系统的缓存与缓冲机制</code>。</p>
-<p><strong>很多人把 Linux 的 O_NONBLOCK 认为是异步方式，但事实上这是前面讲的同步非阻塞方式。</strong>需要指出的是，虽然 Linux 上的 IO API 略显粗糙，但每种编程框架都有封装好的异步 IO 实现。操作系统少做事，把更多的自由留给用户，正是 UNIX 的设计哲学，也是 Linux 上编程框架百花齐放的一个原因。</p>
-<p>从前面 IO 模型的分类中，我们可以看出 AIO 的动机：</p>
-<blockquote>
-<p>同步阻塞模型需要在 IO 操作开始时阻塞应用程序。这意味着不可能同时重叠进行处理和 IO 操作。</p>
-<p>同步非阻塞模型允许处理和 IO 操作重叠进行，但是这需要应用程序根据重现的规则来检查 IO 操作的状态。</p>
-<p>这样就剩下异步非阻塞 IO 了，它允许处理和 IO 操作重叠进行，包括 IO 操作完成的通知。</p>
-</blockquote>
-<p>IO多路复用和AIO的区别</p>
-<blockquote>
-<p>IO多路复用除了需要阻塞之外，<code>select 函数所提供的功能（异步阻塞 IO）与 AIO 类似</code>。不过，<code>它是对通知事件进行阻塞，而不是对 IO 调用进行阻塞</code>。</p>
-<p>IO多路复用：当内核数据在准备过程中，select函数一直被阻塞，等到数据准备完成后会通知应用程序数据准备好了，然后select函数的任务就完成了，至于后面把数据从内核空间复制到用户空间（通过阻塞/非阻塞形式都可以）这部分工作由应用程序本身完成。</p>
-<p>AIO：内核准备数据和把数据从内核空间复制到用户空间这两部分工作都由系统完成，也就是IO过程全部由系统控制，当应用程序收到通知的时候用户空间已经准备好数据了。</p>
-</blockquote>
+<h4 id="流程描述-3"><a href="#流程描述-3" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
+<li>用户进程发起 aio_read 操作之后，立刻就可以开始去做其它的事。从 kernel 的角度，当它受到一个asynchronous read 之后，首先它会立刻返回，所以不会对用户进程产生任何 block。</li>
+<li>kernel 会等待数据准备完成，然后将数据拷贝到用户内存。</li>
+<li>kernel 会给用户进程发送一个 signal 或执行一个基于线程的回调函数来完成这次 IO 处理过程，告诉它 read 操作完成了。如果这个进程正在处理别的事情，就看情况进行处理。<ul>
+<li>如果用户态忙着做别的事（例如在计算两个矩阵的乘积），那就强行打断之，调用事先注册的信号处理函数，这个函数可以决定何时以及如何处理这个异步任务。由于信号处理函数是突然闯进来的，因此跟中断处理程序一样，有很多事情是不能做的，因此保险起见，一般是把事件 “登记” 一下放进队列，然后返回该进程原来在做的事。</li>
+<li>如果这个进程正在内核态忙着做别的事，例如以同步阻塞方式读写磁盘，那就只好把这个通知挂起来了，等到内核态的事情忙完了，快要回到用户态的时候，再触发信号通知。</li>
+<li>如果这个进程现在被挂起了，例如无事可做 sleep 了，那就把这个进程唤醒，下次有 CPU 空闲的时候，就会调度到这个进程，触发信号通知。</li>
+</ul>
+</li>
+</ul>
+<p>Linux 的异步 IO（AIO）支持是 2.6.22 才引入的，还有很多系统调用不支持异步 IO。Linux 的异步 IO 最初是为数据库设计的，因此通过异步 IO 的读写操作不会被缓存或缓冲，这就无法利用操作系统的缓存与缓冲机制。</p>
+<h4 id="分析-3"><a href="#分析-3" class="headerlink" title="分析"></a>分析</h4><p>IO 多路复用和 AIO 都适合高并发的应用场景，两者的区别是：</p>
+<ul>
+<li><p>IO多路复用：IO 多路复用是同步非阻塞模式。select 函数所提供的功能（异步阻塞 IO）与 AIO 类似。不过，它是对通知事件进行阻塞，而不是对 IO 调用进行阻塞。当内核数据在准备过程中，select 函数一直被阻塞，等到数据准备完成后会通知应用程序数据准备好了，然后 select 函数的任务就完成了，至于后面把数据从内核空间复制到用户空间（通过阻塞/非阻塞形式都可以）这部分工作由应用程序本身完成。</p>
+</li>
+<li><p>AIO：AIO 是异步模式。内核准备数据和把数据从内核空间复制到用户空间这两部分工作都由系统完成，也就是 IO 过程全部由系统控制，当应用程序收到通知的时候用户空间已经准备好数据了。</p>
+</li>
+</ul>
 <h3 id="5、信号驱动式IO（signal-driven-IO）"><a href="#5、信号驱动式IO（signal-driven-IO）" class="headerlink" title="5、信号驱动式IO（signal-driven IO）"></a>5、信号驱动式IO（signal-driven IO）</h3><p>信号驱动式I/O：首先我们允许Socket进行信号驱动IO,并安装一个信号处理函数，进程继续运行并不阻塞。当数据准备好时，进程会收到一个SIGIO信号，可以在信号处理函数中调用I/O操作函数处理数据。过程如下图所示：</p>
 <p><img src="/2020/01/17/netty系列（一）：IO模型/signal-drivenIO.png" alt="signal-drivenIO"></p>
 <p>信号驱动IO实际使用得不多，所以在这里不做深入介绍。</p>
@@ -607,7 +616,7 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/01/17/netty系列（二）：netty是什么/" rel="prev" title="netty系列（二）：netty是什么">
+              <a href="/2020/01/18/netty系列（二）：netty是什么/" rel="prev" title="netty系列（二）：netty是什么">
                 netty系列（二）：netty是什么 <i class="fa fa-chevron-right"></i>
               </a>
             
@@ -733,7 +742,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-count">25</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -798,7 +807,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#同步、异步、阻塞和非阻塞"><span class="nav-number">1.</span> <span class="nav-text">同步、异步、阻塞和非阻塞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、同步和异步"><span class="nav-number">1.1.</span> <span class="nav-text">一、同步和异步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、阻塞和非阻塞"><span class="nav-number">1.2.</span> <span class="nav-text">二、阻塞和非阻塞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、四种概念组合"><span class="nav-number">1.3.</span> <span class="nav-text">三、四种概念组合</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IO模型"><span class="nav-number">2.</span> <span class="nav-text">IO模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、基础概念"><span class="nav-number">2.1.</span> <span class="nav-text">一、基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、用户空间与内核空间"><span class="nav-number">2.1.1.</span> <span class="nav-text">1、用户空间与内核空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、进程切换"><span class="nav-number">2.1.2.</span> <span class="nav-text">2、进程切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、进程的阻塞"><span class="nav-number">2.1.3.</span> <span class="nav-text">3、进程的阻塞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、文件描述符fd"><span class="nav-number">2.1.4.</span> <span class="nav-text">4、文件描述符fd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、缓存-IO"><span class="nav-number">2.1.5.</span> <span class="nav-text">5、缓存 IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6、linux-IO-的过程"><span class="nav-number">2.1.6.</span> <span class="nav-text">6、linux IO 的过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、五种常见IO模型"><span class="nav-number">2.2.</span> <span class="nav-text">二、五种常见IO模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、同步阻塞-IO（blocking-IO）"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、同步阻塞 IO（blocking IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优劣分析"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">优劣分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、同步非阻塞-IO（nonblocking-IO）"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、同步非阻塞 IO（nonblocking IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型-1"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述-1"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优劣分析-1"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">优劣分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、IO-多路复用（-IO-multiplexing）"><span class="nav-number">2.2.3.</span> <span class="nav-text">3、IO 多路复用（ IO multiplexing）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型-2"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述-2"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">流程描述</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、异步非阻塞-IO（asynchronous-IO）"><span class="nav-number">2.2.4.</span> <span class="nav-text">4、异步非阻塞 IO（asynchronous IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型-3"><span class="nav-number">2.2.4.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述-3"><span class="nav-number">2.2.4.2.</span> <span class="nav-text">流程描述</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、信号驱动式IO（signal-driven-IO）"><span class="nav-number">2.2.5.</span> <span class="nav-text">5、信号驱动式IO（signal-driven IO）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#同步、异步、阻塞和非阻塞"><span class="nav-number">1.</span> <span class="nav-text">同步、异步、阻塞和非阻塞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、同步和异步"><span class="nav-number">1.1.</span> <span class="nav-text">一、同步和异步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、阻塞和非阻塞"><span class="nav-number">1.2.</span> <span class="nav-text">二、阻塞和非阻塞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、四种概念组合"><span class="nav-number">1.3.</span> <span class="nav-text">三、四种概念组合</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IO模型"><span class="nav-number">2.</span> <span class="nav-text">IO模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、基础概念"><span class="nav-number">2.1.</span> <span class="nav-text">一、基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用户空间与内核空间"><span class="nav-number">2.1.1.</span> <span class="nav-text">用户空间与内核空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程切换"><span class="nav-number">2.1.2.</span> <span class="nav-text">进程切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程的阻塞"><span class="nav-number">2.1.3.</span> <span class="nav-text">进程的阻塞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件描述符fd"><span class="nav-number">2.1.4.</span> <span class="nav-text">文件描述符fd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存-IO"><span class="nav-number">2.1.5.</span> <span class="nav-text">缓存 IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-IO-的过程"><span class="nav-number">2.1.6.</span> <span class="nav-text">linux IO 的过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、五种常见IO模型"><span class="nav-number">2.2.</span> <span class="nav-text">二、五种常见IO模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、同步阻塞-IO（blocking-IO）"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、同步阻塞 IO（blocking IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、同步非阻塞-IO（nonblocking-IO）"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、同步非阻塞 IO（nonblocking IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型-1"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述-1"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析-1"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、IO-多路复用（-IO-multiplexing）"><span class="nav-number">2.2.3.</span> <span class="nav-text">3、IO 多路复用（ IO multiplexing）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型-2"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述-2"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析-2"><span class="nav-number">2.2.3.3.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注意"><span class="nav-number">2.2.3.4.</span> <span class="nav-text">注意</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、异步非阻塞-IO（asynchronous-IO）"><span class="nav-number">2.2.4.</span> <span class="nav-text">4、异步非阻塞 IO（asynchronous IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型-3"><span class="nav-number">2.2.4.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述-3"><span class="nav-number">2.2.4.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析-3"><span class="nav-number">2.2.4.3.</span> <span class="nav-text">分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、信号驱动式IO（signal-driven-IO）"><span class="nav-number">2.2.5.</span> <span class="nav-text">5、信号驱动式IO（signal-driven IO）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
