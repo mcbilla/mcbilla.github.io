@@ -87,12 +87,12 @@
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="上篇文章我们简单介绍了 Netty 的线程模型和基本组件，后面我们开始详细介绍 Netty 每个基本组件。本文先介绍 Netty 的启动器—Bootstrap，这个组件负责把 Netty 的基本组件进行组装配置，然后启动 Netty 服务。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2020/05/27/netty系列（四）：Bootstrap/Users/mochuangbiao/cache/inherit.png">
-<meta property="og:updated_time" content="2020-05-29T08:09:05.843Z">
+<meta property="og:image" content="http://yoursite.com/2020/05/27/netty系列（四）：Bootstrap/inherit.png">
+<meta property="og:updated_time" content="2020-05-29T08:12:00.752Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="netty系列（四）：Bootstrap">
 <meta name="twitter:description" content="上篇文章我们简单介绍了 Netty 的线程模型和基本组件，后面我们开始详细介绍 Netty 每个基本组件。本文先介绍 Netty 的启动器—Bootstrap，这个组件负责把 Netty 的基本组件进行组装配置，然后启动 Netty 服务。">
-<meta name="twitter:image" content="http://yoursite.com/2020/05/27/netty系列（四）：Bootstrap/Users/mochuangbiao/cache/inherit.png">
+<meta name="twitter:image" content="http://yoursite.com/2020/05/27/netty系列（四）：Bootstrap/inherit.png">
 
 
 
@@ -398,7 +398,7 @@
 </blockquote>
 <a id="more"></a>
 <p>Bootstrap 是 Netty 的启动器，负责把 Netty 的组件例如 EventLoopGroup 等组装起来，并配置系统属性，然后启动 Netty 服务。下面我们从 Bootstrap 类继承关系开始介绍。</p>
-<h1 id="Bootstrap-类分析"><a href="#Bootstrap-类分析" class="headerlink" title="Bootstrap 类分析"></a>Bootstrap 类分析</h1><h2 id="类分析"><a href="#类分析" class="headerlink" title="类分析"></a>类分析</h2><p><img src="/2020/05/27/netty系列（四）：Bootstrap/Users/mochuangbiao/cache/inherit.png" alt="inherit"></p>
+<h1 id="Bootstrap-类分析"><a href="#Bootstrap-类分析" class="headerlink" title="Bootstrap 类分析"></a>Bootstrap 类分析</h1><h2 id="类分析"><a href="#类分析" class="headerlink" title="类分析"></a>类分析</h2><p><img src="/2020/05/27/netty系列（四）：Bootstrap/inherit.png" alt="inherit"></p>
 <p>AbstractBootstrap 中定义了一系列属性供子类使用，每个属性都有 setter 和 getter 方法，另外还有用于验证、启动等其他方法。</p>
 <p>ServerBootstrap 和 Bootstrap 都继承自抽象类 AbstractBootstrap，都能使用父类中的属性。其中 ServerBootstrap 是服务器端的启动类，Bootstrap 是客户端的系统类。两者在类方法上的区别有：</p>
 <ul>
