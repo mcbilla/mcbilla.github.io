@@ -2,16 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://yoursite.com/2020/05/27/netty%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9ABootstrap/</loc>
+    <loc>http://yoursite.com/2020/05/28/netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9AEventLoop%E5%92%8CEventLoopGroup/</loc>
     
-    <lastmod>2020-05-29T08:12:00.752Z</lastmod>
+    <lastmod>2020-06-08T13:18:13.220Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2020/01/20/netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Anetty%E5%8E%9F%E7%90%86%E5%92%8C%E7%BB%84%E4%BB%B6%E7%AE%80%E4%BB%8B/</loc>
     
-    <lastmod>2020-05-26T14:50:09.592Z</lastmod>
+    <lastmod>2020-06-08T12:51:39.945Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2020/05/27/netty%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9ABootstrap/</loc>
+    
+    <lastmod>2020-05-29T08:12:00.752Z</lastmod>
     
   </url>
   
