@@ -17,7 +17,7 @@ Bootstrap 是 Netty 的启动器，负责把 Netty 的组件例如 EventLoopGrou
 
 ## 类分析
 
-![inherit](/Users/mochuangbiao/cache/inherit.png)
+![inherit](inherit.png)
 
 AbstractBootstrap 中定义了一系列属性供子类使用，每个属性都有 setter 和 getter 方法，另外还有用于验证、启动等其他方法。
 
