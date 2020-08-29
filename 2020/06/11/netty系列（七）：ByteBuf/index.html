@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo," />
+  <meta name="keywords" content="Netty," />
 
 
 
@@ -79,18 +79,25 @@
 
 
 
-<meta name="description" content="通过 Hexo 和 GitHub 搭建的博客，静态文件会上传到 GitHub 仓库的 master 分支，但是 Hexo 的安装目录还是保存在本地的。如果更换了电脑需要更新博客，我们需要 Hexo 的安装目录来生成/编辑/上传博客，并且这个安装目录需要随着博客的更新而更新。在这里提供一种便捷的办法来实现不同电脑之间同步更新博客。转载请说明出处。">
-<meta name="keywords" content="Hexo">
+<meta name="description" content="上一节我们介绍了 Netty 的通讯通道 Channel，这一节我们开始介绍 Netty 的数据容器 ByteBuf，包括 ByteBuf 的原理、内存管理和常用方法等。">
+<meta name="keywords" content="Netty">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hexo多台电脑更新博客">
-<meta property="og:url" content="http://yoursite.com/2018/06/22/Hexo多台电脑更新博客/index.html">
+<meta property="og:title" content="netty系列（七）：ByteBuf">
+<meta property="og:url" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/index.html">
 <meta property="og:site_name" content="飙戈的博客">
-<meta property="og:description" content="通过 Hexo 和 GitHub 搭建的博客，静态文件会上传到 GitHub 仓库的 master 分支，但是 Hexo 的安装目录还是保存在本地的。如果更换了电脑需要更新博客，我们需要 Hexo 的安装目录来生成/编辑/上传博客，并且这个安装目录需要随着博客的更新而更新。在这里提供一种便捷的办法来实现不同电脑之间同步更新博客。转载请说明出处。">
+<meta property="og:description" content="上一节我们介绍了 Netty 的通讯通道 Channel，这一节我们开始介绍 Netty 的数据容器 ByteBuf，包括 ByteBuf 的原理、内存管理和常用方法等。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-12T10:39:43.044Z">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161504609.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161522409.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161537757.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161559803.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161611487.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706211316006.png">
+<meta property="og:updated_time" content="2020-08-29T09:02:46.319Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo多台电脑更新博客">
-<meta name="twitter:description" content="通过 Hexo 和 GitHub 搭建的博客，静态文件会上传到 GitHub 仓库的 master 分支，但是 Hexo 的安装目录还是保存在本地的。如果更换了电脑需要更新博客，我们需要 Hexo 的安装目录来生成/编辑/上传博客，并且这个安装目录需要随着博客的更新而更新。在这里提供一种便捷的办法来实现不同电脑之间同步更新博客。转载请说明出处。">
+<meta name="twitter:title" content="netty系列（七）：ByteBuf">
+<meta name="twitter:description" content="上一节我们介绍了 Netty 的通讯通道 Channel，这一节我们开始介绍 Netty 的数据容器 ByteBuf，包括 ByteBuf 的原理、内存管理和常用方法等。">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161504609.png">
 
 
 
@@ -120,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/06/22/Hexo多台电脑更新博客/"/>
+  <link rel="canonical" href="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/"/>
 
 
 
 
 
-  <title>Hexo多台电脑更新博客 | 飙戈的博客</title>
+  <title>netty系列（七）：ByteBuf | 飙戈的博客</title>
   
 
 
@@ -297,7 +304,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/22/Hexo多台电脑更新博客/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="mcb">
@@ -314,7 +321,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hexo多台电脑更新博客</h1>
+          <h1 class="post-title" itemprop="name headline">netty系列（七）：ByteBuf</h1>
         
 
         <div class="post-meta">
@@ -326,8 +333,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-22T11:01:38+08:00">
-                2018-06-22
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-11T13:50:55+08:00">
+                2020-06-11
               </time>
             
 
@@ -349,8 +356,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Hexo/" itemprop="url" rel="index">
-                    <span itemprop="name">Hexo</span>
+                  <a href="/categories/Netty/" itemprop="url" rel="index">
+                    <span itemprop="name">Netty</span>
                   </a>
                 </span>
 
@@ -392,46 +399,123 @@
 
       
         <blockquote>
-<p>通过 Hexo 和 GitHub 搭建的博客，静态文件会上传到 GitHub 仓库的 master 分支，但是 Hexo 的安装目录还是保存在本地的。如果更换了电脑需要更新博客，我们需要 Hexo 的安装目录来生成/编辑/上传博客，并且这个安装目录需要随着博客的更新而更新。在这里提供一种便捷的办法来实现不同电脑之间同步更新博客。转载请说明出处。</p>
+<p>上一节我们介绍了 Netty 的通讯通道 Channel，这一节我们开始介绍 Netty 的数据容器 ByteBuf，包括 ByteBuf 的原理、内存管理和常用方法等。</p>
 </blockquote>
 <a id="more"></a>
-<h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><p>在 Github 用于存放博客的仓库 yourname.github.io 下面建立 <strong><code>master</code></strong> 和 <strong><code>hexo</code></strong> 两个分支</p>
+<h2 id="ByteBuf是什么"><a href="#ByteBuf是什么" class="headerlink" title="ByteBuf是什么"></a>ByteBuf是什么</h2><p>ByteBuf 是 Netty 的数据容器，简单来说就是申请一块内存，后续可以在这块内存中执行读写数据等操作。相比起 NIO 原生的数据容器 ByteBuffer，ByteBuf 做了许多优化和改进：</p>
 <ul>
-<li><code>master</code> 分支（默认创建），<em>通过 Hexo 命令提交</em>，用于存放上传的 Hexo 静态文件（例如 public 文件夹里面的内容），这个分支用于显示 <a href="https://yourname.github.io" target="_blank" rel="noopener">https://yourname.github.io</a> 打开的内容。</li>
-<li><code>hexo</code> 分支（手动创建），<em>通过 Git 命令提交/拉取</em>，用于存放 Hexo 的安装目录，该分支可设为 <strong>默认分支</strong> 。</li>
+<li>Bytebuffer 只有一个 index，读写公用，写模式到读模式转换需要调用 flip()，设置 index 值；Bytebuf 有读写两个 index,模式转换不用调用 flip()。</li>
+<li>Bytebuffer 不能扩容，每次 put 操作时，都会对可用空间进行校检，如果剩余空间不足，需要重新创建一个新的 ByteBuffer，然后将旧的 ByteBuffer 复制到新的 ByteBuffer 中去；而 ByteBuf 支持自动扩容。</li>
+<li>ByteBuf 用其内置的复合缓冲区可实现透明的零拷贝。</li>
+<li>ByteBuf 支持方法链接调用。</li>
+<li>ByteBuf 支持引用计数。</li>
+<li>ByteBuf 支持池技术(比如：线程池、数据库连接池)。</li>
 </ul>
-<p>这样我们写博客的大概流程就是 <em>在 <code>hexo</code> 分支上写上博客，并把写好的博客内容上传到 <code>master</code> 分支</em>，两个分支都通过 git 进行管理，所有的修改一目了然，非常方便。</p>
-<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><h3 id="本地电脑"><a href="#本地电脑" class="headerlink" title="本地电脑"></a>本地电脑</h3><p>如果你的电脑还没配置好 Hexo，请参考以前的教程 <a href="https://18814122746.github.io/2018/06/13/hexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" target="_blank" rel="noopener">Hexo+GitHub搭建个人博客教程</a><br>当你本地电脑的 Hexo 目录已经安装配置完毕之后，该目录可以 <em>通过 Hexo 命令向 GitHub 仓库的 <code>master</code> 分支提交内容</em>，但是该目录还不是 git 管理的目录，需要把该目录初始化为 git 管理的目录。</p>
-<h4 id="1、删除非默认主题文件的-git-目录（可跳过）"><a href="#1、删除非默认主题文件的-git-目录（可跳过）" class="headerlink" title="1、删除非默认主题文件的 .git 目录（可跳过）"></a>1、删除非默认主题文件的 .git 目录（可跳过）</h4><p>如果你使用的是非默认主题 landscape 的其他主题，而该主题的目录也是在通过 <code>git clone</code> 方式拉取下来的话，需要先取消该目录的 git 管理追踪，否则到时候提交 Hexo 安装目录的时候该文件夹会报类似于 <code>XXX目录: git modified content untracked content</code> 的错误。例如本人使用的是 next 主题，在 Hexo 安装目录下输入命令：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ cd themes/next</span><br><span class="line">$ ls -la # 显示 .git 的隐藏目录</span><br><span class="line">$ rm -rf .git</span><br><span class="line">$ ls -la # 确认 .git 目录是否成功删除</span><br></pre></td></tr></table></figure>
-<h4 id="2、把-Hexo-命令提交的分支改成-master-分支"><a href="#2、把-Hexo-命令提交的分支改成-master-分支" class="headerlink" title="2、把 Hexo 命令提交的分支改成 master 分支"></a>2、把 Hexo 命令提交的分支改成 <code>master</code> 分支</h4><p>编辑 Hexo 安装目录下的 _config.yaml 文件，在 <code>deploy</code> 参数里面添加 <code>branch: master</code>，如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line"> type: git</span><br><span class="line"> repo: https://github.com/yourusername/yourusername.github.io.git</span><br><span class="line"> branch: master</span><br></pre></td></tr></table></figure>
-<h4 id="3、初始化-git-仓库"><a href="#3、初始化-git-仓库" class="headerlink" title="3、初始化 git 仓库"></a>3、初始化 git 仓库</h4><p>在 Hexo 安装目录下输入命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git init</span><br><span class="line">$ git checkout -b hexo</span><br><span class="line">$ git add .</span><br><span class="line">$ git commit -m &apos;init&apos;</span><br></pre></td></tr></table></figure>
-<p>初始化为 git 目录并创建 <code>hexo</code> 分支</p>
-<h4 id="4、提交到远端服务器"><a href="#4、提交到远端服务器" class="headerlink" title="4、提交到远端服务器"></a>4、提交到远端服务器</h4><p>在 Hexo 安装目录下输入命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git remote add origin git@github.com:yourusername/yourusername.github.io.git</span><br><span class="line">$ git push -u origin hexo:hexo</span><br></pre></td></tr></table></figure>
-<p>与远端主机关联并提交 <code>hexo</code> 分支</p>
-<h3 id="另外一台电脑"><a href="#另外一台电脑" class="headerlink" title="另外一台电脑"></a>另外一台电脑</h3><p>当你在一台新电脑上需要写博客的时候，需要先把 <code>hexo</code> 分支拉取下来，再进行 Hexo 初始化。<em>前提是该电脑需要先安装 git 和 node.js，并与 GitHub 进行 ssh 关联（可选）</em>。如果这些工作还没完成请参考 <a href="https://18814122746.github.io/2018/06/13/hexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" target="_blank" rel="noopener">Hexo+GitHub搭建个人博客教程</a>  </p>
-<h4 id="1、拉取-hexo-分支"><a href="#1、拉取-hexo-分支" class="headerlink" title="1、拉取 hexo 分支"></a>1、拉取 <code>hexo</code> 分支</h4><p>在任意目录里面输入命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone -b hexo git@github.com: yourusername/yourusername.github.io.git</span><br></pre></td></tr></table></figure>
-<p>执行完之后你的目录下应该会出现一个 <code>yourusername.github.io</code> 的目录。</p>
-<h4 id="2、初始化为-Hexo-目录"><a href="#2、初始化为-Hexo-目录" class="headerlink" title="2、初始化为 Hexo 目录"></a>2、初始化为 Hexo 目录</h4><p><code>yourusername.github.io</code> 目录只是一个普通的 git 管理目录，需要把该目录初始化为 Hexo 目录。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ cd yourusername.github.io</span><br><span class="line">$ npm install hexo</span><br><span class="line">$ npm install</span><br><span class="line">$ npm install hexo-deployer-git</span><br></pre></td></tr></table></figure>
-<h4 id="3、安装插件（可跳过）"><a href="#3、安装插件（可跳过）" class="headerlink" title="3、安装插件（可跳过）"></a>3、安装插件（可跳过）</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-generator-searchdb --save # 本地搜索插件</span><br><span class="line">$ npm install hexo-asset-image --save # 图片插件</span><br><span class="line">$ npm install hexo-generator-sitemap --save # 谷歌站点地图插件</span><br><span class="line">$ npm install hexo-generator-baidu-sitemap --save # 百度站点地图插件</span><br></pre></td></tr></table></figure>
-<p>至此这台新电脑的初始化工作也已经完成，可以开始写博客了。</p>
-<h3 id="写博客步骤"><a href="#写博客步骤" class="headerlink" title="写博客步骤"></a>写博客步骤</h3><p>以后我们写博客都在 <code>hexo</code> 分支下进行，<code>master</code> 分支只是用来存放生成的静态文件。确认目前在 <code>hexo</code> 分支下，步骤如下：</p>
-<ol>
-<li><code>git pull</code> 每次写博客前拉取最新的 <code>hexo</code> 分支代码</li>
-<li><code>hexo new post &#39;新文章&#39;</code> 开始写博客</li>
-<li><code>hexo clean &amp;&amp; hexo g</code> 清空并生成新的静态文件和缓存文件</li>
-<li><code>git add .</code></li>
-<li><code>git commit -m &#39;备注&#39;</code></li>
-<li><code>git push</code> 提交到 <code>hexo</code> 分支</li>
-<li><code>hexo d</code> 提交到 <code>master</code> 分支</li>
-</ol>
-<p>至此我们就可以实现在多台电脑上同步更新博客</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://www.ruanyifeng.com/blog/2014/06/git_remote.html" target="_blank" rel="noopener">Git远程操作详解</a><br><a href="http://crazymilk.github.io/2015/12/28/GitHub-Pages-Hexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/#more" target="_blank" rel="noopener">GitHub Pages + Hexo搭建博客</a><br><a href="https://blog.csdn.net/mydo/article/details/51588008" target="_blank" rel="noopener">原git中status指令总是提示内容被修改的解决</a><br><a href="https://www.zhihu.com/question/38781463?sort=created" target="_blank" rel="noopener">hexo本地测试运行重启后页面空白</a></p>
+<h2 id="ByteBuf的工作原理"><a href="#ByteBuf的工作原理" class="headerlink" title="ByteBuf的工作原理"></a>ByteBuf的工作原理</h2><h3 id="ByteBuf的结构"><a href="#ByteBuf的结构" class="headerlink" title="ByteBuf的结构"></a>ByteBuf的结构</h3><p><strong>ByteBuf 本质是一个由不同的索引分别控制读访问和写访问的字节数组</strong>。以下是官方提供的 ByteBuf 的结构图：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+-------------------+------------------+------------------+</span><br><span class="line">| discardable bytes |  readable bytes  |  writable bytes  |</span><br><span class="line">|                   |     (CONTENT)    |                  |</span><br><span class="line">+-------------------+------------------+------------------+</span><br><span class="line">|                   |                  |                  |</span><br><span class="line">0      &lt;=      readerIndex   &lt;=   writerIndex    &lt;=    capacity</span><br></pre></td></tr></table></figure>
+<p>ByteBuf 包含三个参数：</p>
+<ul>
+<li>readerIndex：读索引，不超过 writerIndex，调用 <code>readXXX()</code> 或 <code>skipBytes()</code> 方法会移动该索引，调用 <code>getXXX()</code> 方法则不会移动。</li>
+<li>writerIndex：写索引，不超过 capacity，调用 <code>writeXXX()</code> 方法会移动该索引，调用 <code>setXXX()</code> 则不会移动。</li>
+<li>capacity：容量，超过 capacity 后会自动扩容，最大容量不超过 Integer.MAX_VALUE。</li>
+</ul>
+<p>ByteBuf 被起始索引和这三个参数所在的索引分成三部分：</p>
+<ul>
+<li>discardable bytes（可丢弃字节）：范围为 0 ~ readerIndex，这部分字节数据已经被读取完，空间等待回收。</li>
+<li>readable bytes（可读字节）：范围为 readerIndex ~ writerIndex，这部分字节数据已经准备好，等待用户读取。</li>
+<li>writable bytes（可写字节）：范围为 writerIndex ~ capacity，这部分空闲空间可写入字节。</li>
+</ul>
+<h3 id="ByteBuf的的工作过程"><a href="#ByteBuf的的工作过程" class="headerlink" title="ByteBuf的的工作过程"></a>ByteBuf的的工作过程</h3><h4 id="1、初始化"><a href="#1、初始化" class="headerlink" title="1、初始化"></a>1、初始化</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161504609.png" alt="image-20200706161504609"></p>
+<p>ByteBuf 初始化后 readerIndex 和 writeIndex 的取值一开始都是 0。</p>
+<h4 id="2、写入数据"><a href="#2、写入数据" class="headerlink" title="2、写入数据"></a>2、写入数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161522409.png" alt="image-20200706161522409"></p>
+<p>写入 N 个数据后（N &lt; capacity），writerIndex = N。</p>
+<h4 id="3、读取数据"><a href="#3、读取数据" class="headerlink" title="3、读取数据"></a>3、读取数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161537757.png" alt="image-20200706161537757"></p>
+<p>读取 M 个数据后（M &lt; writerIndex），readerIndex = M。</p>
+<h4 id="4、丢弃数据"><a href="#4、丢弃数据" class="headerlink" title="4、丢弃数据"></a>4、丢弃数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161559803.png" alt="image-20200706161559803"></p>
+<p>读取完数据后，我们调用 <code>discardReadBytes()</code> 丢弃 0 ~ readerIndex 间的数据，相当于 readerIndex 和 writerIndex 同时向前移动 M 个字节，最后 readerIndex = 0，writerIndex = N - M。</p>
+<h4 id="5、清空数据"><a href="#5、清空数据" class="headerlink" title="5、清空数据"></a>5、清空数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161611487.png" alt="image-20200706161611487"></p>
+<p>当我们已经读取完所有的数据后，可以调用 <code>clear()</code> 使 ByteBuf 恢复到初始状态，这时候 readerIndex = writerIndex = 0。</p>
+<h4 id="6、注意"><a href="#6、注意" class="headerlink" title="6、注意"></a>6、注意</h4><ul>
+<li>调用 <code>clear()</code>的开销没有 <code>discardReadBytes()</code>那么大，因为它不需要任何内存复制。</li>
+<li>readerIndex 和 writerIndex 超过边界值，会发生 IndexOutOfBoundException 异常。</li>
+</ul>
+<h2 id="ByteBuf的内存管理"><a href="#ByteBuf的内存管理" class="headerlink" title="ByteBuf的内存管理"></a>ByteBuf的内存管理</h2><h3 id="ByteBuf内存类型"><a href="#ByteBuf内存类型" class="headerlink" title="ByteBuf内存类型"></a>ByteBuf内存类型</h3><p>ByteBuf 按照数据的存储位置，可以分为 <strong>堆缓冲区(HEAP BUFFER)</strong>、<strong>直接缓冲区(DIRECT BUFFER)</strong> 和 <strong>复合缓冲区(COMPOSITE BUFFER)</strong>。</p>
+<ul>
+<li><p>堆缓冲区(HEAP BUFFER)：将数据存储在 JVM 的堆内存中，这些内存需要被 jvm 管理。</p>
+</li>
+<li><p>直接缓冲区(DIRECT BUFFER)：将数据存在  JVM 的堆内存外面，这些内存不需要被 jvm 管理。</p>
+</li>
+<li>复合缓冲区(COMPOSITE BUFFER)：以上两种方式的混合。</li>
+</ul>
+<h4 id="1-1、堆缓冲区"><a href="#1-1、堆缓冲区" class="headerlink" title="1.1、堆缓冲区"></a>1.1、堆缓冲区</h4><p>最常用的模式，这种模式直接将数据存储在 JVM 的堆空间中，这种情况下 ByteBuf 数组被称为支撑数组（backing array）。</p>
+<blockquote>
+<p>优点：能在没有使用池化的情况下提供快速的分配和释放，非常适合于有遗留的数据需要处理的情况。</p>
+<p>缺点：在 socket 发送前，需要先把数据拷贝到直接缓冲区，导致 IO 效率不高。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 创建支撑数组</span><br><span class="line">ByteBuf buf = new UnpooledHeapByteBuf(ByteBufAllocator.DEFAULT, initalCapacity, maxCapacity);</span><br><span class="line">// 检查 ByteBuf 是否有一个支撑数组，当 hasArray()方法返回 false 时，尝试访问支撑数组将触发一个 UnsupportedOperationException。</span><br><span class="line">if (buf.hasArray()) &#123; </span><br><span class="line">  byte[] array = buf.array();</span><br><span class="line">  // 处理</span><br><span class="line">  handleArray(array);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="1-2、直接缓冲区"><a href="#1-2、直接缓冲区" class="headerlink" title="1.2、直接缓冲区"></a>1.2、直接缓冲区</h4><p>将数据存储在 JVM 堆以外的内存，需要调用系统级别的 API</p>
+<blockquote>
+<p>优点：免去中间交换的内存拷贝，提高 IO 速度。</p>
+<p>缺点：分配和释放代价大，下文中池化的缓冲区可以缓解这个缺点。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 创建直接缓冲区</span><br><span class="line">ByteBuf buf = new UnpooledDirectByteBuf(ByteBufAllocator.DEFAULT, initalCapacity, maxCapacity);</span><br><span class="line">// buf.hasArray() 为 false表示为这是直接缓冲区</span><br><span class="line">if (!buf.hasArray()) &#123; </span><br><span class="line">  byte[] array = buf.array();</span><br><span class="line">  // 处理</span><br><span class="line">  handleArray(array);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="1-3、复合缓冲区"><a href="#1-3、复合缓冲区" class="headerlink" title="1.3、复合缓冲区"></a>1.3、复合缓冲区</h4><p>Netty通过ByteBuf的子类 CompositeByteBuf，提供了将多个 buffer 虚拟成一个合并的 Buffer 的技术。CompositeByteBuf 中的 ByteBuf 实例可能同时包含堆缓冲区的和直接缓冲区的。如果 CompositeByteBuf 只含有一个实例，调用 hasArray() 方法会返回这个实例的 hasArray() 方法的值；否则总是返回 false。</p>
+<p>例如一条消息包含 header 和 body 两部分，每条消息需要使用不同的 header 搭配同一个 body，就可以使用复合缓冲区。</p>
+<p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application Support/typora-user-images/image-20200706211316006.png" alt="image-20200706211316006"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">CompositeByteBuf messageBuf = Unpooled.compositeBuffer();</span><br><span class="line">// header使用堆内存每次分配</span><br><span class="line">ByteBuf headerBuf = new UnpooledHeapByteBuf(ByteBufAllocator.DEFAULT, initalCapacity, maxCapacity);</span><br><span class="line">// body需要重复使用，所以使用直接缓冲区，省去每次复制内存导致效率下降</span><br><span class="line">ByteBuf bodyBuf = new UnpooledDirectByteBuf(ByteBufAllocator.DEFAULT, initalCapacity, maxCapacity);</span><br><span class="line">// 将headerBuf和bodyBuf添加到CompositeByteBuf中</span><br><span class="line">messageBuf.addComponents(headerBuf, bodyBuf);</span><br><span class="line">.....</span><br><span class="line">//遍历messageBuf中的ByteBuf</span><br><span class="line">for (ByteBuf buf : messageBuf) &#123;</span><br><span class="line">    System.out.println(buf.toString());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>按内存对象是否可以重复利用，可以分为 <strong>池化内存(Pooled)</strong> 和 <strong>非池化内存(Unpooled)</strong>。</p>
+<ul>
+<li>池化内存(Pooled)：每次都从预先分配好的内存中去取出一段连续内存封装成一个 ByteBuf 给应用程序使用。</li>
+<li>非池化内存(Unpooled)：每次分配内存的时候，直接调用系统 api，向操作系统申请一块内存。</li>
+</ul>
+<h4 id="2-1、池化内存"><a href="#2-1、池化内存" class="headerlink" title="2.1、池化内存"></a>2.1、池化内存</h4><p>Netty 会先向系统申请一大块内存，通过池化算法管理这块内存，并向上层提供申请内存接口。我们需要使用内存的时候，再通过接口申请一段连续内存封装成一个 ByteBuf 给应用程序使用。</p>
+<blockquote>
+<p>优点：池对象可以回收复用，提高内存分配的效率。</p>
+<p>缺点：需要对预先申请的内存进行管理。</p>
+</blockquote>
+<h4 id="2-2、非池化内存"><a href="#2-2、非池化内存" class="headerlink" title="2.2、非池化内存"></a>2.2、非池化内存</h4><p>同 java 对象的创建销毁过程，直接向 JVM 申请内存创建 ByteBuf 对象，使用完后交给 JVM 进行 gc 回收。</p>
+<blockquote>
+<p>优点：使用简单</p>
+<p>缺点：对象不能复用，创建销毁代价很大。</p>
+</blockquote>
+<h3 id="创建ByteBuf实例"><a href="#创建ByteBuf实例" class="headerlink" title="创建ByteBuf实例"></a>创建ByteBuf实例</h3><h4 id="1、ByteBufAllocator"><a href="#1、ByteBufAllocator" class="headerlink" title="1、ByteBufAllocator"></a>1、ByteBufAllocator</h4><p>Netty 为创建 ByteBuf 实例专门提供了一个接口 <strong>ByteBufAllocator</strong>，该接口有 <strong>PooledByteBufAllocator</strong> 和 <strong>UnpooledByteBufAllocator</strong> 两种实现。前者返回池化实例，后者则直接返回非池化的新实例。</p>
+<p>Netty 默认使用了池化的 ByteBufAllocator，但我们可以在 Bootstrap 配置参数来自定义使用池化还是非池化分配器。</p>
+<p>ByteBufAllocator 适用于可以获取到 channelHandlerContext 或 channel 实例的场景。</p>
+<ul>
+<li>使用 PooledByteBufAllocator 创建 ByteBuf</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 通过 channelHandlerContext 获取 allocator</span><br><span class="line">ByteBufAllocator allocator1 = ctx.alloc();</span><br><span class="line">// 通过 channel 获取 allocator</span><br><span class="line">ByteBufAllocator allocator2 = ctx.channel().alloc();</span><br><span class="line"></span><br><span class="line">// 返回一个直接内存或者堆内存对象，具体实现由 netty 根据环境自动配置</span><br><span class="line">ByteBuf buf = allocator1.buffer();</span><br><span class="line">// 创建直接内存对象</span><br><span class="line">ByteBuf directBuf = allocator1.directBuffer();</span><br><span class="line">// 创建堆内存对象</span><br><span class="line">ByteBuf heapBuf = allocator1.heapBuffer();</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 UnpooledByteBufAllocator 创建 ByteBuf</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 在 bootstrap 中配置参数使用 UnpooledByteBufAllocator</span><br><span class="line">bootstrap.option(ChannelOption.ALLOCATOR, UnpooledByteBufAllocator.DEFAULT)</span><br><span class="line"></span><br><span class="line">// 后面使用同 PooledByteBufAllocator</span><br><span class="line">ByteBufAllocator allocator1 = ctx.alloc();</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+<h4 id="2、Unpooled"><a href="#2、Unpooled" class="headerlink" title="2、Unpooled"></a>2、Unpooled</h4><p>当没有办法获取到 channelHandlerContext 或 channel 实例的时候，推荐使用 Unpooled 类来创建 ByteBuf。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 创建堆内存对象</span><br><span class="line">ByteBuf heapBuf = Unpooled.buffer();</span><br><span class="line">// 创建直接内存对象</span><br><span class="line">ByteBuf directBuf = Unpooled.directBuffer();</span><br></pre></td></tr></table></figure>
+<h3 id="ByteBuf引用计数"><a href="#ByteBuf引用计数" class="headerlink" title="ByteBuf引用计数"></a>ByteBuf引用计数</h3><p>上面谈到 Netty 主要有四种类型的 ByteBuf，其中 UnpooledHeapByteBuf 能够依赖 JVM GC 回收器自动回收；UnpooledDirectByteBuf 除了等 JVM GC，最好也能主动进行回收；而 PooledHeapByteBuf 和 PooledDirectByteBuf，则必须要主动将用完的 bytebuf 放回池里，如果不释放，内存池会越来越大，直到内存溢出。所以，Netty ByteBuf 需要在 JVM 的 GC 机制之外，有自己的引用计数器和回收过程（主要是回收到netty申请的内存池）。</p>
+<p>所有 ByteBuf 的引用计数器初始值为1。可以增加/减少 ByteBuf 的引用计数器，当 ByteBuf 的引用计数器为 0 时该对象就会被释放内存或回收到内存池。访问一个被释放的 ByteBuf 会抛 IllegalReferenceCountException 异常。</p>
+<p>ByteBuf 引用计数器的常用方法有：</p>
+<ul>
+<li><code>release()</code>：计数器减1。从 InBound 里读取的 ByteBuf 和自己创建的 ByteBuf 要自己调用 <code>release()</code> 手动释放，写入到 OutBound 的 Bytebuf 例如调用 <code>writeAndFlush()</code> 由 netty 负责释放，不需要手动调用<code>release()</code>。</li>
+<li><code>retain()</code>：计数器加1。在使用派生缓冲区的时候，为了防止源 ByteBuf 突然被释放导致派生缓冲区操作异常，需要调用 <code>retain()</code> 来显示派生缓冲区的存在。</li>
+<li><code>refCnt()</code>：返回计数器的值。</li>
+<li><code>copy()</code>：返回源 ByteBuf 的完全拷贝。该拷贝和源 ByteBuf 完全独立，在新 ByteBuf 上修改不会影响旧 ByteBuf。</li>
+</ul>
+<p>以上方法都是直接在原生内存上进行操作，ByteBuf 还提供了一种视图的方式来读写内容，这种视图被称作<strong>派生缓冲区</strong>。派生缓冲区维护单独的 readIndex、writeIndex 和 markIndex，但与原生 ByteBuf 共享数据和引用计数器，这意味着派生缓冲区的创建开销很低，但是如果修改了其他内容，也同时修改对应的原生 ByteBuf。派生缓冲区的常用方法有：</p>
+<ul>
+<li><code>duplicate()</code>：返回源 ByteBuf 的完全拷贝的派生缓冲区区。该方法内部不会调用 <code>retain()</code> 方法，所以计数器不会增加。</li>
+<li><code>slice()</code>：返回源 ByteBuf 已经写入数据区域的拷贝的派生缓冲区。该方法内部不会调用 <code>retain()</code> 方法，所以计数器不会增加。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>ByteBuf 本质是一个由不同的索引分别控制读访问和写访问的字节数组。</li>
+<li>ByteBuf 有 readerIndex、writerIndex 和 capacity 三个参数，这三个负责控制 ByteBuf 的读写操作。</li>
+<li>ByteBuf 的内存管理，按照数据的存储位置，可以分为堆缓冲区、直接缓冲区和复合缓冲区；按内存对象是否可以重复利用，可以分为池化内存和非池化内存。</li>
+<li>创建 ByteBuf 实例，可以使用 ByteBufAllocator 接口或者 Unpooled 工具类。</li>
+<li>ByteBuf 具有引用计数器的概念，当引用计数器为 0 时 ByteBuf 对象会被回收。</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="">《Netty In Action》</a></p>
+<p><a href="https://www.jianshu.com/p/3fbf54b8e8ec" target="_blank" rel="noopener">ByteBuf：Netty的数据容器</a></p>
+<p><a href="https://www.dazhuanlan.com/2019/11/09/5dc5cfc71d669/" target="_blank" rel="noopener">ByteBuf工作原理</a></p>
+<p><a href="https://www.jianshu.com/p/175cd3644728" target="_blank" rel="noopener">ByteBuf : Netty的数据容器类</a></p>
 
       
     </div>
@@ -449,7 +533,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+            <a href="/tags/Netty/" rel="tag"># Netty</a>
           
         </div>
       
@@ -462,8 +546,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/21/hexo插入图片和设置图片大小/" rel="next" title="Hexo插入图片和设置图片大小">
-                <i class="fa fa-chevron-left"></i> Hexo插入图片和设置图片大小
+              <a href="/2020/06/09/netty系列（六）：Channel/" rel="next" title="netty系列（六）：Channel">
+                <i class="fa fa-chevron-left"></i> netty系列（六）：Channel
               </a>
             
           </div>
@@ -472,8 +556,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/06/24/Hexo个人博客绑定域名/" rel="prev" title="Hexo个人博客绑定域名">
-                Hexo个人博客绑定域名 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/06/11/：/" rel="prev" title="netty系列（七）：ByteBuf">
+                netty系列（七）：ByteBuf <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -663,7 +747,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现思路"><span class="nav-number">1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现过程"><span class="nav-number">2.</span> <span class="nav-text">实现过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#本地电脑"><span class="nav-number">2.1.</span> <span class="nav-text">本地电脑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、删除非默认主题文件的-git-目录（可跳过）"><span class="nav-number">2.1.1.</span> <span class="nav-text">1、删除非默认主题文件的 .git 目录（可跳过）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、把-Hexo-命令提交的分支改成-master-分支"><span class="nav-number">2.1.2.</span> <span class="nav-text">2、把 Hexo 命令提交的分支改成 master 分支</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、初始化-git-仓库"><span class="nav-number">2.1.3.</span> <span class="nav-text">3、初始化 git 仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4、提交到远端服务器"><span class="nav-number">2.1.4.</span> <span class="nav-text">4、提交到远端服务器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#另外一台电脑"><span class="nav-number">2.2.</span> <span class="nav-text">另外一台电脑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、拉取-hexo-分支"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、拉取 hexo 分支</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、初始化为-Hexo-目录"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、初始化为 Hexo 目录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、安装插件（可跳过）"><span class="nav-number">2.2.3.</span> <span class="nav-text">3、安装插件（可跳过）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写博客步骤"><span class="nav-number">2.3.</span> <span class="nav-text">写博客步骤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ByteBuf是什么"><span class="nav-number">1.</span> <span class="nav-text">ByteBuf是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ByteBuf的工作原理"><span class="nav-number">2.</span> <span class="nav-text">ByteBuf的工作原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf的结构"><span class="nav-number">2.1.</span> <span class="nav-text">ByteBuf的结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf的的工作过程"><span class="nav-number">2.2.</span> <span class="nav-text">ByteBuf的的工作过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、初始化"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、写入数据"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、写入数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、读取数据"><span class="nav-number">2.2.3.</span> <span class="nav-text">3、读取数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4、丢弃数据"><span class="nav-number">2.2.4.</span> <span class="nav-text">4、丢弃数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5、清空数据"><span class="nav-number">2.2.5.</span> <span class="nav-text">5、清空数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6、注意"><span class="nav-number">2.2.6.</span> <span class="nav-text">6、注意</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ByteBuf的内存管理"><span class="nav-number">3.</span> <span class="nav-text">ByteBuf的内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf内存类型"><span class="nav-number">3.1.</span> <span class="nav-text">ByteBuf内存类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1、堆缓冲区"><span class="nav-number">3.1.1.</span> <span class="nav-text">1.1、堆缓冲区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2、直接缓冲区"><span class="nav-number">3.1.2.</span> <span class="nav-text">1.2、直接缓冲区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3、复合缓冲区"><span class="nav-number">3.1.3.</span> <span class="nav-text">1.3、复合缓冲区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1、池化内存"><span class="nav-number">3.1.4.</span> <span class="nav-text">2.1、池化内存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2、非池化内存"><span class="nav-number">3.1.5.</span> <span class="nav-text">2.2、非池化内存</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建ByteBuf实例"><span class="nav-number">3.2.</span> <span class="nav-text">创建ByteBuf实例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、ByteBufAllocator"><span class="nav-number">3.2.1.</span> <span class="nav-text">1、ByteBufAllocator</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、Unpooled"><span class="nav-number">3.2.2.</span> <span class="nav-text">2、Unpooled</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf引用计数"><span class="nav-number">3.3.</span> <span class="nav-text">ByteBuf引用计数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>

@@ -90,7 +90,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/06/09/netty系列（六）：Channel/channel1.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/09/netty系列（六）：Channel/channel2.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/09/netty系列（六）：Channel/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200701181542816.png">
-<meta property="og:updated_time" content="2020-07-02T13:29:32.553Z">
+<meta property="og:updated_time" content="2020-07-05T10:13:59.875Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="netty系列（六）：Channel">
 <meta name="twitter:description" content="上一篇介绍了 Netty 的线程模型 EventLoop 和 EventLoopGroup，本文开始介绍 Netty 的传输流组件 Channel 以及相关组件 ChannelHandler、ChannelHandlerContext、ChannelPipline 和 ChannelFuture 等。">
@@ -399,7 +399,7 @@
 <p>上一篇介绍了 Netty 的线程模型 EventLoop 和 EventLoopGroup，本文开始介绍 Netty 的传输流组件 Channel 以及相关组件 ChannelHandler、ChannelHandlerContext、ChannelPipline 和 ChannelFuture 等。</p>
 </blockquote>
 <a id="more"></a>
-<h2 id="Channel"><a href="#Channel" class="headerlink" title="Channel"></a>Channel</h2><h3 id="什么是Channel"><a href="#什么是Channel" class="headerlink" title="什么是Channel"></a>什么是Channel</h3><p>Channel 是一个管道，用于连接字节缓冲区 Buf 和另一端的实体，这个实例可以是 Socket，也可以是 File，在 NIO 网络编程模型中，服务端和客户端进行 IO 数据交互(得到彼此推送的信息)的媒介就是 Channel。</p>
+<h2 id="Channel"><a href="#Channel" class="headerlink" title="Channel"></a>Channel</h2><h3 id="Channel是什么"><a href="#Channel是什么" class="headerlink" title="Channel是什么"></a>Channel是什么</h3><p>Channel 是一个管道，用于连接字节缓冲区 Buf 和另一端的实体，这个实例可以是 Socket，也可以是 File，在 NIO 网络编程模型中，服务端和客户端进行 IO 数据交互(得到彼此推送的信息)的媒介就是 Channel。</p>
 <p>Netty 对 NIO 的原生的 Channel 进行了封装和增强封装成 NioXXXChannel，相对于原生的 Channel，Netty 的 Channel 增加了如下的组件：</p>
 <ul>
 <li>id 标识唯一身份信息</li>
@@ -551,6 +551,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2020/06/11/netty系列（七）：ByteBuf/" rel="prev" title="netty系列（七）：ByteBuf">
+                netty系列（七）：ByteBuf <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -673,7 +677,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -738,7 +742,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Channel"><span class="nav-number">1.</span> <span class="nav-text">Channel</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是Channel"><span class="nav-number">1.1.</span> <span class="nav-text">什么是Channel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel的工作流程"><span class="nav-number">1.2.</span> <span class="nav-text">Channel的工作流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel的分类"><span class="nav-number">1.3.</span> <span class="nav-text">Channel的分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel-整体结构图"><span class="nav-number">1.4.</span> <span class="nav-text">Channel 整体结构图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ChannelPipline"><span class="nav-number">2.</span> <span class="nav-text">ChannelPipline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ChannelHandler"><span class="nav-number">3.</span> <span class="nav-text">ChannelHandler</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ChannelHandlerContext"><span class="nav-number">4.</span> <span class="nav-text">ChannelHandlerContext</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ChannelFuture、ChannelPromise"><span class="nav-number">5.</span> <span class="nav-text">ChannelFuture、ChannelPromise</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Channel"><span class="nav-number">1.</span> <span class="nav-text">Channel</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel是什么"><span class="nav-number">1.1.</span> <span class="nav-text">Channel是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel的工作流程"><span class="nav-number">1.2.</span> <span class="nav-text">Channel的工作流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel的分类"><span class="nav-number">1.3.</span> <span class="nav-text">Channel的分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Channel-整体结构图"><span class="nav-number">1.4.</span> <span class="nav-text">Channel 整体结构图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ChannelPipline"><span class="nav-number">2.</span> <span class="nav-text">ChannelPipline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ChannelHandler"><span class="nav-number">3.</span> <span class="nav-text">ChannelHandler</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ChannelHandlerContext"><span class="nav-number">4.</span> <span class="nav-text">ChannelHandlerContext</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ChannelFuture、ChannelPromise"><span class="nav-number">5.</span> <span class="nav-text">ChannelFuture、ChannelPromise</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>

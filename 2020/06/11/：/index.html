@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Netty," />
 
 
 
@@ -79,16 +79,24 @@
 
 
 
-<meta name="description" content="Constant dropping wears the stone">
-<meta property="og:type" content="website">
-<meta property="og:title" content="飙戈的博客">
-<meta property="og:url" content="http://yoursite.com/categories/Netty/index.html">
+<meta name="description" content="上一节我们介绍了 Netty 的通讯通道 Channel，这一节我们开始介绍 Netty 的数据容器 ByteBuf，包括 ByteBuf 的原理、内存管理和常用方法等。">
+<meta name="keywords" content="Netty">
+<meta property="og:type" content="article">
+<meta property="og:title" content="netty系列（七）：ByteBuf">
+<meta property="og:url" content="http://yoursite.com/2020/06/11/：/index.html">
 <meta property="og:site_name" content="飙戈的博客">
-<meta property="og:description" content="Constant dropping wears the stone">
+<meta property="og:description" content="上一节我们介绍了 Netty 的通讯通道 Channel，这一节我们开始介绍 Netty 的数据容器 ByteBuf，包括 ByteBuf 的原理、内存管理和常用方法等。">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/：/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161504609.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/：/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161522409.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/：/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161537757.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/：/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161559803.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/：/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161611487.png">
+<meta property="og:updated_time" content="2020-07-06T08:48:09.806Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="飙戈的博客">
-<meta name="twitter:description" content="Constant dropping wears the stone">
+<meta name="twitter:title" content="netty系列（七）：ByteBuf">
+<meta name="twitter:description" content="上一节我们介绍了 Netty 的通讯通道 Channel，这一节我们开始介绍 Netty 的数据容器 ByteBuf，包括 ByteBuf 的原理、内存管理和常用方法等。">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/11/：/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161504609.png">
 
 
 
@@ -118,13 +126,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/categories/Netty/"/>
+  <link rel="canonical" href="http://yoursite.com/2020/06/11/：/"/>
 
 
 
 
 
-  <title>分类: Netty | 飙戈的博客</title>
+  <title>netty系列（七）：ByteBuf | 飙戈的博客</title>
   
 
 
@@ -153,7 +161,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -281,251 +289,253 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block category">
-
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>Netty<small>分类</small>
-        </h1>
-      </div>
-
-      
-        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/11/：/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="mcb">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2020/06/11/：/" itemprop="url">
-              
-                <span itemprop="name">netty系列（七）：ByteBuf</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">netty系列（七）：ByteBuf</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2020-06-11T13:50:55+08:00"
-              content="2020-06-11" >
-          06-11
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-11T13:50:55+08:00">
+                2020-06-11
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Netty/" itemprop="url" rel="index">
+                    <span itemprop="name">Netty</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 本文阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2020/06/11/netty系列（七）：ByteBuf/" itemprop="url">
-              
-                <span itemprop="name">netty系列（七）：ByteBuf</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2020-06-11T13:50:55+08:00"
-              content="2020-06-11" >
-          06-11
-        </time>
-      </div>
-
-    </header>
-  </article>
-
+      
 
       
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2020/06/09/netty系列（六）：Channel/" itemprop="url">
-              
-                <span itemprop="name">netty系列（六）：Channel</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2020-06-09T11:50:55+08:00"
-              content="2020-06-09" >
-          06-09
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2020/05/28/netty系列（五）：EventLoop和EventLoopGroup/" itemprop="url">
-              
-                <span itemprop="name">netty系列（五）：EventLoop和EventLoopGroup</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2020-05-28T17:33:07+08:00"
-              content="2020-05-28" >
-          05-28
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2020/05/27/netty系列（四）：Bootstrap/" itemprop="url">
-              
-                <span itemprop="name">netty系列（四）：Bootstrap</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2020-05-27T17:33:07+08:00"
-              content="2020-05-27" >
-          05-27
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2020/01/20/netty系列（三）：netty原理和组件简介/" itemprop="url">
-              
-                <span itemprop="name">netty系列（三）：netty原理和组件简介</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2020-01-20T16:50:22+08:00"
-              content="2020-01-20" >
-          01-20
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2020/01/18/netty系列（二）：netty是什么/" itemprop="url">
-              
-                <span itemprop="name">netty系列（二）：netty是什么</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2020-01-18T16:50:22+08:00"
-              content="2020-01-18" >
-          01-18
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2020/01/17/netty系列（一）：IO模型/" itemprop="url">
-              
-                <span itemprop="name">netty系列（一）：IO模型</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2020-01-17T16:50:22+08:00"
-              content="2020-01-17" >
-          01-17
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
+        <blockquote>
+<p>上一节我们介绍了 Netty 的通讯通道 Channel，这一节我们开始介绍 Netty 的数据容器 ByteBuf，包括 ByteBuf 的原理、内存管理和常用方法等。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="ByteBuf是什么"><a href="#ByteBuf是什么" class="headerlink" title="ByteBuf是什么"></a>ByteBuf是什么</h2><p>ByteBuf 是 Netty 的数据容器，相比起 NIO 原生的数据容器 ByteBuffer，ByteBuf 做了许多优化和改进：</p>
+<ul>
+<li>Bytebuffer 只有一个 index，读写公用，写模式到读模式转换需要调用 flip()，设置 index 值；Bytebuf 有读写两个 index,模式转换不用调用 flip()。</li>
+<li>Bytebuffer 不能扩容，每次 put 操作时，都会对可用空间进行校检，如果剩余空间不足，需要重新创建一个新的 ByteBuffer，然后将旧的 ByteBuffer 复制到新的 ByteBuffer 中去；而 ByteBuf 支持自动扩容。</li>
+<li>ByteBuf 用其内置的复合缓冲区可实现透明的零拷贝。</li>
+<li>ByteBuf 支持方法链接调用。</li>
+<li>ByteBuf 支持引用计数。</li>
+<li>ByteBuf 支持池技术(比如：线程池、数据库连接池)。</li>
+</ul>
+<h2 id="ByteBuf的工作原理"><a href="#ByteBuf的工作原理" class="headerlink" title="ByteBuf的工作原理"></a>ByteBuf的工作原理</h2><h3 id="ByteBuf的结构"><a href="#ByteBuf的结构" class="headerlink" title="ByteBuf的结构"></a>ByteBuf的结构</h3><p><strong>ByteBuf 本质是一个由不同的索引分别控制读访问和写访问的字节数组</strong>。以下是官方提供的 ByteBuf 的结构图：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+-------------------+------------------+------------------+</span><br><span class="line">| discardable bytes |  readable bytes  |  writable bytes  |</span><br><span class="line">|                   |     (CONTENT)    |                  |</span><br><span class="line">+-------------------+------------------+------------------+</span><br><span class="line">|                   |                  |                  |</span><br><span class="line">0      &lt;=      readerIndex   &lt;=   writerIndex    &lt;=    capacity</span><br></pre></td></tr></table></figure>
+<p>ByteBuf 包含三个参数：</p>
+<ul>
+<li>readerIndex：读索引，不超过 writerIndex，调用 <code>readXXX()</code> 或 <code>skipBytes()</code> 方法会移动该索引，调用 <code>getXXX()</code> 方法则不会移动。</li>
+<li>writerIndex：写索引，不超过 capacity，调用 <code>writeXXX()</code> 方法会移动该索引，调用 <code>setXXX()</code> 则不会移动。</li>
+<li>capacity：容量，超过 capacity 后会自动扩容，最大容量不超过 Integer.MAX_VALUE。</li>
+</ul>
+<p>ByteBuf 被起始索引和这三个参数所在的索引分成三部分：</p>
+<ul>
+<li>discardable bytes：可丢弃字节，范围为 0 ~ readerIndex，这部分字节数据已经被读取完，空间等待回收。</li>
+<li>readable bytes：可读字节，范围为 readerIndex ~ writerIndex，这部分字节数据已经准备好，等待用户读取。</li>
+<li>writable bytes：可写字节，范围为 writerIndex ~ capacity，这部分空闲空间可写入字节。</li>
+</ul>
+<h3 id="ByteBuf的的工作过程"><a href="#ByteBuf的的工作过程" class="headerlink" title="ByteBuf的的工作过程"></a>ByteBuf的的工作过程</h3><h4 id="1、初始化"><a href="#1、初始化" class="headerlink" title="1、初始化"></a>1、初始化</h4><p><img src="/2020/06/11/：/Users/mochuangbiao/Library/Application Support/typora-user-images/image-20200706161504609.png" alt="image-20200706161504609"></p>
+<p>ByteBuf 初始化后 readerIndex 和 writeIndex 的取值一开始都是 0。</p>
+<h4 id="2、写入数据"><a href="#2、写入数据" class="headerlink" title="2、写入数据"></a>2、写入数据</h4><p><img src="/2020/06/11/：/Users/mochuangbiao/Library/Application Support/typora-user-images/image-20200706161522409.png" alt="image-20200706161522409"></p>
+<p>写入 N 个数据后（N &lt; capacity），writerIndex = N。</p>
+<h4 id="3、读取数据"><a href="#3、读取数据" class="headerlink" title="3、读取数据"></a>3、读取数据</h4><p><img src="/2020/06/11/：/Users/mochuangbiao/Library/Application Support/typora-user-images/image-20200706161537757.png" alt="image-20200706161537757"></p>
+<p>读取 M 个数据后（M &lt; writerIndex），readerIndex = M。</p>
+<h4 id="4、丢弃数据"><a href="#4、丢弃数据" class="headerlink" title="4、丢弃数据"></a>4、丢弃数据</h4><p><img src="/2020/06/11/：/Users/mochuangbiao/Library/Application Support/typora-user-images/image-20200706161559803.png" alt="image-20200706161559803"></p>
+<p>读取完数据后，我们调用 <code>discardReadBytes()</code> 丢弃 0 ~ readerIndex 间的数据，相当于 readerIndex 和 writerIndex 同时向前移动 M 个字节，最后 readerIndex = 0，writerIndex = N - M。</p>
+<h4 id="5、清空数据"><a href="#5、清空数据" class="headerlink" title="5、清空数据"></a>5、清空数据</h4><p><img src="/2020/06/11/：/Users/mochuangbiao/Library/Application Support/typora-user-images/image-20200706161611487.png" alt="image-20200706161611487"></p>
+<p>当我们已经读取完所有的数据后，可以调用 <code>clear()</code> 使 ByteBuf 恢复到初始状态，这时候 readerIndex = writerIndex = 0。</p>
+<h4 id="6、注意"><a href="#6、注意" class="headerlink" title="6、注意"></a>6、注意</h4><ul>
+<li>调用 <code>clear()</code>的开销没有 <code>discardReadBytes()</code>那么大，因为它不需要任何内存复制。</li>
+<li>readerIndex 和 writerIndex 超过边界值，会发生 IndexOutOfBoundException 异常。</li>
+</ul>
+<h2 id="ByteBuf的内存管理"><a href="#ByteBuf的内存管理" class="headerlink" title="ByteBuf的内存管理"></a>ByteBuf的内存管理</h2><h3 id="ByteBuf内存模式"><a href="#ByteBuf内存模式" class="headerlink" title="ByteBuf内存模式"></a>ByteBuf内存模式</h3><p>ByteBuf 可以选择内存的存放模式，</p>
+<h3 id="ByteBuf内存分配"><a href="#ByteBuf内存分配" class="headerlink" title="ByteBuf内存分配"></a>ByteBuf内存分配</h3><h2 id="ByteBuf的常用方法"><a href="#ByteBuf的常用方法" class="headerlink" title="ByteBuf的常用方法"></a>ByteBuf的常用方法</h2><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2>
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Netty/" rel="tag"># Netty</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/11/netty系列（七）：ByteBuf/" rel="next" title="netty系列（七）：ByteBuf">
+                <i class="fa fa-chevron-left"></i> netty系列（七）：ByteBuf
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
 
 
           </div>
@@ -533,6 +543,15 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNzIyNC8xMzc1OA=="></div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -553,8 +572,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -628,6 +656,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ByteBuf是什么"><span class="nav-number">1.</span> <span class="nav-text">ByteBuf是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ByteBuf的工作原理"><span class="nav-number">2.</span> <span class="nav-text">ByteBuf的工作原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf的结构"><span class="nav-number">2.1.</span> <span class="nav-text">ByteBuf的结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf的的工作过程"><span class="nav-number">2.2.</span> <span class="nav-text">ByteBuf的的工作过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、初始化"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、写入数据"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、写入数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、读取数据"><span class="nav-number">2.2.3.</span> <span class="nav-text">3、读取数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4、丢弃数据"><span class="nav-number">2.2.4.</span> <span class="nav-text">4、丢弃数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5、清空数据"><span class="nav-number">2.2.5.</span> <span class="nav-text">5、清空数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6、注意"><span class="nav-number">2.2.6.</span> <span class="nav-text">6、注意</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ByteBuf的内存管理"><span class="nav-number">3.</span> <span class="nav-text">ByteBuf的内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf内存模式"><span class="nav-number">3.1.</span> <span class="nav-text">ByteBuf内存模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuf内存分配"><span class="nav-number">3.2.</span> <span class="nav-text">ByteBuf内存分配</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ByteBuf的常用方法"><span class="nav-number">4.</span> <span class="nav-text">ByteBuf的常用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -795,6 +839,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
@@ -823,6 +871,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
