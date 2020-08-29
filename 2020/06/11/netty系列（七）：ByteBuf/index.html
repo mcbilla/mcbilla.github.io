@@ -87,17 +87,17 @@
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="上一节我们介绍了 Netty 的通讯通道 Channel，这一节我们开始介绍 Netty 的数据容器 ByteBuf，包括 ByteBuf 的原理、内存管理和常用方法等。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161504609.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161522409.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161537757.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161559803.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161611487.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/work1.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/work2.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/work3.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/work4.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/work5.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706211316006.png">
-<meta property="og:updated_time" content="2020-08-29T09:02:46.319Z">
+<meta property="og:updated_time" content="2020-08-29T09:15:14.835Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="netty系列（七）：ByteBuf">
 <meta name="twitter:description" content="上一节我们介绍了 Netty 的通讯通道 Channel，这一节我们开始介绍 Netty 的数据容器 ByteBuf，包括 ByteBuf 的原理、内存管理和常用方法等。">
-<meta name="twitter:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161504609.png">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/11/netty系列（七）：ByteBuf/work1.png">
 
 
 
@@ -425,15 +425,15 @@
 <li>readable bytes（可读字节）：范围为 readerIndex ~ writerIndex，这部分字节数据已经准备好，等待用户读取。</li>
 <li>writable bytes（可写字节）：范围为 writerIndex ~ capacity，这部分空闲空间可写入字节。</li>
 </ul>
-<h3 id="ByteBuf的的工作过程"><a href="#ByteBuf的的工作过程" class="headerlink" title="ByteBuf的的工作过程"></a>ByteBuf的的工作过程</h3><h4 id="1、初始化"><a href="#1、初始化" class="headerlink" title="1、初始化"></a>1、初始化</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161504609.png" alt="image-20200706161504609"></p>
+<h3 id="ByteBuf的的工作过程"><a href="#ByteBuf的的工作过程" class="headerlink" title="ByteBuf的的工作过程"></a>ByteBuf的的工作过程</h3><h4 id="1、初始化"><a href="#1、初始化" class="headerlink" title="1、初始化"></a>1、初始化</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/work1.png" alt="work1"></p>
 <p>ByteBuf 初始化后 readerIndex 和 writeIndex 的取值一开始都是 0。</p>
-<h4 id="2、写入数据"><a href="#2、写入数据" class="headerlink" title="2、写入数据"></a>2、写入数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161522409.png" alt="image-20200706161522409"></p>
+<h4 id="2、写入数据"><a href="#2、写入数据" class="headerlink" title="2、写入数据"></a>2、写入数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/work2.png" alt="work2"></p>
 <p>写入 N 个数据后（N &lt; capacity），writerIndex = N。</p>
-<h4 id="3、读取数据"><a href="#3、读取数据" class="headerlink" title="3、读取数据"></a>3、读取数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161537757.png" alt="image-20200706161537757"></p>
+<h4 id="3、读取数据"><a href="#3、读取数据" class="headerlink" title="3、读取数据"></a>3、读取数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/work3.png" alt="work3"></p>
 <p>读取 M 个数据后（M &lt; writerIndex），readerIndex = M。</p>
-<h4 id="4、丢弃数据"><a href="#4、丢弃数据" class="headerlink" title="4、丢弃数据"></a>4、丢弃数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161559803.png" alt="image-20200706161559803"></p>
+<h4 id="4、丢弃数据"><a href="#4、丢弃数据" class="headerlink" title="4、丢弃数据"></a>4、丢弃数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/work4.png" alt="work4"></p>
 <p>读取完数据后，我们调用 <code>discardReadBytes()</code> 丢弃 0 ~ readerIndex 间的数据，相当于 readerIndex 和 writerIndex 同时向前移动 M 个字节，最后 readerIndex = 0，writerIndex = N - M。</p>
-<h4 id="5、清空数据"><a href="#5、清空数据" class="headerlink" title="5、清空数据"></a>5、清空数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200706161611487.png" alt="image-20200706161611487"></p>
+<h4 id="5、清空数据"><a href="#5、清空数据" class="headerlink" title="5、清空数据"></a>5、清空数据</h4><p><img src="/2020/06/11/netty系列（七）：ByteBuf/work5.png" alt="work5"></p>
 <p>当我们已经读取完所有的数据后，可以调用 <code>clear()</code> 使 ByteBuf 恢复到初始状态，这时候 readerIndex = writerIndex = 0。</p>
 <h4 id="6、注意"><a href="#6、注意" class="headerlink" title="6、注意"></a>6、注意</h4><ul>
 <li>调用 <code>clear()</code>的开销没有 <code>discardReadBytes()</code>那么大，因为它不需要任何内存复制。</li>
@@ -555,10 +555,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/06/11/：/" rel="prev" title="netty系列（七）：ByteBuf">
-                netty系列（七）：ByteBuf <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -682,7 +678,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">29</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
