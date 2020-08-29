@@ -13,7 +13,7 @@ categories:
 
 ## Channel
 
-### 什么是Channel
+### Channel是什么
 
 Channel 是一个管道，用于连接字节缓冲区 Buf 和另一端的实体，这个实例可以是 Socket，也可以是 File，在 NIO 网络编程模型中，服务端和客户端进行 IO 数据交互(得到彼此推送的信息)的媒介就是 Channel。
 

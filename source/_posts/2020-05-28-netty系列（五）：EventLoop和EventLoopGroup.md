@@ -7,9 +7,11 @@ categories:
 date: 2020-05-28 17:33:07
 ---
 
-> 上一篇文章介绍了 Netty 的启动器 Bootstrap，这篇开始介绍 Netty 的线程机制 EventLoop 和 EventLoopGroup。本文会结合部分源码，对 EventLoop 和 EventLoopGroup 整体结构进行简单分析。
+> 上一篇文章介绍了 Netty 的启动器 Bootstrap，这篇开始介绍 Netty 的线程机制 EventLoop 和 EventLoopGroup，包括 EventLoop 和 EventLoopGroup 的简介、类继承结构和实例化过程。
 
 <!--more-->
+
+# EventLoop 和 EventLoopGroup 是什么
 
 Netty 的非阻塞线程模型的实现基于 NIO Reactor 模型，其中 EventLoop 和 EventLoopGroup 是该线程模型的核心组件。当然 Netty 也提供了阻塞线程模型的实现，在这里对阻塞模型不做介绍。
 
@@ -20,7 +22,6 @@ Netty 的非阻塞线程模型的实现基于 NIO Reactor 模型，其中 EventL
 EventLoop、EventLoopGroup 和 Channel 的整体关系图如下：
 
 <div style="width: 80%; margin: auto">![relation](relation.png)</div>
-
 # EventLoop
 
 EventLoop 是用来执行任务的单线程，任务包括周期性的 IO 任务（accept、read、write等）和用户自定义任务（decode、compute、encode）等。为了清晰了解 EventLoop 的内部结构，下面我们从 EventLoop 接口的继承结构开始介绍。
@@ -28,7 +29,6 @@ EventLoop 是用来执行任务的单线程，任务包括周期性的 IO 任务
 ## EventLoop 继承结构
 
 <div style="width: 50%; margin: auto">![Eventloop](Eventloop.png)</div>
-
 在这个类图里面，EventExecutorGroup 上层是  JDK 提供的并发包接口，下层是 Netty 提供的抽象类和实现。EventLoop 的继承结构这么复杂，有一部分原因是为了使用父接口或父类里面的部分特性或者方法而已，和父接口或父类的用途定位并没有太多的关联。下面我们按接口用途分组介绍：
 
 * Executor、ExecutorService、ScheduledExecutorService
@@ -56,7 +56,6 @@ ScheduledExecutorService 接口继承自 ExecutorService 接口，是一种用�
 EventExecutorGroup 是 Netty 自定义线程模型的基础接口，下面是接口方法定义
 
 <div style="width: 50%; margin: auto">![EventExecutorGroup](EventExecutorGroup.png)</div>
-
 我们可以看到 EventExecutorGroup 是对继承的接口的大部分方法进行 Override，并自定义了部分方法。EventExecutorGroup 提供的功能有：
 
 * 提供线程池的基础功能，例如 `submit` 提交任务功能，并废弃了原始的关闭线程池接口 `shutdown()`，自定义了关闭线程池接口 `shutdownGracefully()`。
@@ -68,7 +67,6 @@ EventExecutorGroup 是 Netty 自定义线程模型的基础接口，下面是接
 EventExecutor 相当于 EventExecutorGroup 的扩展，提供了 `next()`、`parent()` 等判断集合关系的方法。
 
 <div style="width: 50%; margin: auto">![EventExecutor](EventExecutor.png)</div>
-
 OrderedEventExecutor 是一个空接口，作用是为了说明继承这个接口就可以使用顺序执行任务等功能。
 
 ### EventLoopGroup、EventLoop
@@ -76,7 +74,6 @@ OrderedEventExecutor 是一个空接口，作用是为了说明继承这个接�
 EventLoopGroup 提供了把 Channel 注册到具体 EventLoop 的方法。
 
 <div style="width: 50%; margin: auto">![EventLoopGroup](EventLoopGroup.png)</div>
-
 EventLoop 只提供一个 `parent()` 方法，用于判断 EventLoop 所属的 EventLoopGroup。
 
 NioEventLoop 是 EventLoop 接口最常用的实现类。下面我们简单分析下 NioEventLoop 类。
@@ -84,7 +81,6 @@ NioEventLoop 是 EventLoop 接口最常用的实现类。下面我们简单分�
 ## NioEventLoop 继承结构
 
 <div style="width: 80%; margin: auto">![NioEventLoop](NioEventLoop.png)</div>
-
 我们可以看到 NioEventLoop 的继承结构更复杂，右侧是上面介绍 EventLoop 的接口的继承结构，左侧是抽象类的继承关系。下面我们简单介绍几个抽象类：
 
 * AbstractExecutorService
@@ -97,7 +93,6 @@ NioEventLoop 是 EventLoop 接口最常用的实现类。下面我们简单分�
 AbstractExecutorService 也是 java.util.concurrent 包里面的抽象类，实现了 ExecutorService 接口的部分方法。
 
 <div style="width: 50%; margin: auto">![AbstractExecutorService](AbstractExecutorService.png)</div>
-
 AbstractExecutorService 主要实现了执行任务的相关方法，例如 `submit`、`invokeAny` 等，把返回结果封装为 FutureTask 实例。
 
 ### AbstractEventExecutor
@@ -105,19 +100,16 @@ AbstractExecutorService 主要实现了执行任务的相关方法，例如 `sub
 AbstractEventExecutor 以下是 Netty 定义的类，继承了 AbstractExecutorService 类，增加了 group 的概念。
 
 <div style="width: 50%; margin: auto">![AbstractEventExecutor](AbstractEventExecutor.png)</div>
-
 ### AbstractScheduledEventExecutor
 
 AbstractScheduledEventExecutor 继承了 AbstractEventExecutor，增加了可以延时或周期执行的任务队列 scheduledTaskQueue，并实现了 `schedule` 延时执行以及 `scheduleAtFixedRate` 周期执行等方法。
 
 <div style="width: 50%; margin: auto">![AbstractScheduledEventExecutor](AbstractScheduledEventExecutor.png)</div>
-
 ### SingleThreadEventExecutor
 
 SingleThreadEventExecutor 继承了 AbstractScheduledEventExecutor，实现了 EventLoop 的大部分功能，基本上算是最终 EventLoop 的一个雏型了。这个类的功能非常丰富，我们看下最关键的几个属性和方法。
 
 <div style="width: 50%; margin: auto">![SingleThreadEventExecutor](SingleThreadEventExecutor.png)</div>
-
 **关键属性**
 
 * thread：每个 EventLoop 和一个死循环的线程进行绑定，这个线程就是在这里定义的。
@@ -262,7 +254,6 @@ protected boolean runAllTasks(long timeoutNanos) {
 SingleThreadEventLoop 继承了 SingleThreadEventExecutor 类，主要增加了 tailTasks 属性。
 
 <div style="width: 50%; margin: auto">![SingleThreadEventLoop](SingleThreadEventLoop.png)</div>
-
 tailTasks 中是用户自定义的一些列在本次事件循环遍历结束后会执行的任务，我们可以通过类似如下的方式来添加 tailTask。
 
 ```java
@@ -281,7 +272,6 @@ NioEventLoop 是最终实现类，这里定义了较多的方法和属性，其�
 * ioRatio：在事件循环中期待用于处理 I/O 操作时间的百分比。
 
 <div style="width: 50%; margin: auto">![NioEventLoop1](NioEventLoop1.png)</div>
-
 **selector**
 
 netty 的 selector 对 NIO 的 selector 进行进一步封装，解决了空轮询导致 cpu 100% 的问题。
@@ -451,7 +441,6 @@ EventLoopGroup 接口的继承结构已经包含在 EventLoop 的继承结构里
 ## NioEventLoopGroup 继承结构
 
 <div style="width: 50%; margin: auto">![NioEventLoopGroup](NioEventLoopGroup.png)</div>
-
 EventLoopGroup 接口及以上的继承结构在上面已经介绍过，下面我们简单介绍下几个抽象类：
 
 * AbstractEventExecutorGroup
@@ -463,7 +452,6 @@ EventLoopGroup 接口及以上的继承结构在上面已经介绍过，下面�
 AbstractEventExecutorGroup 对应 AbstractEventExecutor 的集合，我们看下具体的类方法
 
 <div style="width: 50%; margin: auto">![AbstractEventExecutorGroup](AbstractEventExecutorGroup.png)</div>
-
 可以看到和 AbstractEventExecutor 类里面实现的方法基本一致，实际上最终也是调用到 AbstractEventExecutor 类里面的方法。
 
 ```
@@ -478,7 +466,6 @@ public Future<?> submit(Runnable task) {
 MultithreadEventExecutorGroup 继承了 AbstractEventExecutorGroup，增加了 children 队列存储 EventExecutor 实例，以及选择器 chooser 负责从 children 里面选择 EventExecutor 实例来执行任务。
 
 <div style="width: 50%; margin: auto">![MultithreadEventExecutorGroup](MultithreadEventExecutorGroup.png)</div>
-
 MultithreadEventExecutorGroup 的构造方法会初始化包含 n 个 Executor 元素的 children 数组。
 
     protected MultithreadEventExecutorGroup(int nThreads, Executor executor, EventExecutorChooserFactory chooserFactory, Object... args) {
@@ -509,7 +496,6 @@ public Future<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit uni
 MultithreadEventLoopGroup 继承了 MultithreadEventExecutorGroup 类，增加了 DEFAULT_EVENT_LOOP_THREADS 属性，这个属性定义了 children 数组的初始化大小。
 
 <div style="width: 50%; margin: auto">![MultithreadEventLoopGroup](MultithreadEventLoopGroup.png)</div>
-
 MultithreadEventLoopGroup 包含一个 static 块，定义 DEFAULT_EVENT_LOOP_THREADS 的值为 CPU 逻辑核数的两倍。
 
 ```
