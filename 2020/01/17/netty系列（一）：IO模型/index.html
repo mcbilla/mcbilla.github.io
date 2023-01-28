@@ -1,393 +1,247 @@
 <!DOCTYPE html>
-
-
-
-  
-
-
-<html class="theme-next gemini use-motion" lang="zh-Hans">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
 
-
-
-
-
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
-
-
-
-
-
-
-
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
-
-<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
-
-
-
-
-
-  <meta name="keywords" content="Netty," />
-
-
-
-
-
-
-
-
-
-
-<meta name="description" content="Netty 是目前比较火的网络编程框架，是 java 进阶的必备知识点，特此记录 Netty 学习过程中的一些知识点用于日后翻阅。本章介绍 Netty 的一些入门准备知识，包括同步和异步、阻塞和非阻塞的区别，还有常见的 IO 模型。">
-<meta name="keywords" content="Netty">
+  <meta name="description" content="Netty 是目前比较火的网络编程框架，是 java 进阶的必备知识点，特此记录 Netty 学习过程中的一些知识点用于日后翻阅。本章介绍 Netty 的一些入门准备知识，包括同步和异步、阻塞和非阻塞的区别，还有常见的 IO 模型。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="netty系列（一）：IO模型">
-<meta property="og:url" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/index.html">
+<meta property="og:title" content="Netty系列（一）：IO模型">
+<meta property="og:url" content="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/index.html">
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="Netty 是目前比较火的网络编程框架，是 java 进阶的必备知识点，特此记录 Netty 学习过程中的一些知识点用于日后翻阅。本章介绍 Netty 的一些入门准备知识，包括同步和异步、阻塞和非阻塞的区别，还有常见的 IO 模型。">
-<meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/blockingIO.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/nonblockingIO.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/IOmultiplexing.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/asynchronousIO.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/signal-drivenIO.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/fiveIO.png">
-<meta property="og:updated_time" content="2020-05-25T12:52:22.116Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/.com//blockingIO.png">
+<meta property="og:image" content="http://yoursite.com/.com//nonblockingIO.png">
+<meta property="og:image" content="http://yoursite.com/.com//IOmultiplexing.png">
+<meta property="og:image" content="http://yoursite.com/.com//asynchronousIO.png">
+<meta property="og:image" content="http://yoursite.com/.com//signal-drivenIO.png">
+<meta property="og:image" content="http://yoursite.com/.com//fiveIO.png">
+<meta property="article:published_time" content="2020-01-17T08:50:22.000Z">
+<meta property="article:modified_time" content="2023-01-24T07:20:57.319Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Netty">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="netty系列（一）：IO模型">
-<meta name="twitter:description" content="Netty 是目前比较火的网络编程框架，是 java 进阶的必备知识点，特此记录 Netty 学习过程中的一些知识点用于日后翻阅。本章介绍 Netty 的一些入门准备知识，包括同步和异步、阻塞和非阻塞的区别，还有常见的 IO 模型。">
-<meta name="twitter:image" content="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/blockingIO.png">
+<meta name="twitter:image" content="http://yoursite.com/.com//blockingIO.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/">
 
 
-
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Gemini',
-    version: '5.1.4',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
-    fancybox: true,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    duoshuo: {
-      userId: '0',
-      author: '博主'
-    },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
   };
 </script>
 
-
-
-  <link rel="canonical" href="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/"/>
-
-
-
-
-
-  <title>netty系列（一）：IO模型 | 飙戈的博客</title>
+  <title>Netty系列（一）：IO模型 | 飙戈的博客</title>
   
 
 
 
 
 
-  <script type="text/javascript">
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?219a1c6fb7c1b9540f55e4c9f4259274";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
 
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
 
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
 
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
 
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-left page-post-detail">
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta ">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">飙戈的博客</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
-      
-        <p class="site-subtitle"></p>
-      
   </div>
 
-  <div class="site-nav-toggle">
-    <button>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
   </div>
 </div>
+
+
+
 
 <nav class="site-nav">
-  
-
-  
-    <ul id="menu" class="menu">
-      
-        
+  <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
-            首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
-            标签
-          </a>
-        </li>
-      
-        
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
         <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
         <li class="menu-item menu-item-archives">
-          <a href="/archives/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
-            
-            归档
-          </a>
-        </li>
-      
 
-      
-        <li class="menu-item menu-item-search">
-          
-            <a href="javascript:;" class="popup-trigger">
-          
-            
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
-            
-            搜索
-          </a>
-        </li>
-      
-    </ul>
-  
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
-  
-    <div class="site-search">
-      
-  <div class="popup search-popup local-search-popup">
-  <div class="local-search-header clearfix">
-    <span class="search-icon">
-      <i class="fa fa-search"></i>
-    </span>
-    <span class="popup-btn-close">
-      <i class="fa fa-times-circle"></i>
-    </span>
-    <div class="local-search-input-wrapper">
-      <input autocomplete="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
-    </div>
-  </div>
-  <div id="local-search-result"></div>
-</div>
-
-
-
-    </div>
-  
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
 </nav>
 
 
 
- </div>
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
     </header>
 
-    <main id="main" class="main">
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
       <div class="main-inner">
         <div class="content-wrap">
-          <div id="content" class="content">
+          
+
+          <div class="content post posts-expand">
             
 
-  <div id="posts" class="posts-expand">
     
-
-  
-
   
   
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/17/netty系列（一）：IO模型/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="mcb">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/head.jpeg">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="飙戈的博客">
     </span>
-
-    
       <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">netty系列（一）：IO模型</h1>
-        
+        <h1 class="post-title" itemprop="name headline">
+          Netty系列（一）：IO模型
+        </h1>
 
         <div class="post-meta">
-          <span class="post-time">
-            
+            <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
+                <i class="far fa-calendar"></i>
               </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-17T16:50:22+08:00">
-                2020-01-17
-              </time>
-            
+              <span class="post-meta-item-text">发表于</span>
 
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Netty/" itemprop="url" rel="index">
-                    <span itemprop="name">Netty</span>
-                  </a>
+              <time title="创建时间：2020-01-17 16:50:22" itemprop="dateCreated datePublished" datetime="2020-01-17T16:50:22+08:00">2020-01-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
                 </span>
-
-                
-                
-              
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-24 15:20:57" itemprop="dateModified" datetime="2023-01-24T15:20:57+08:00">2023-01-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Netty/" itemprop="url" rel="index"><span itemprop="name">Netty</span></a>
+                </span>
             </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-            <span class="post-meta-divider">|</span>
-            <span class="page-pv"><i class="fa fa-file-o"></i> 本文阅读量
-            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
-            </span>
-          
-
-          
 
           
 
         </div>
       </header>
-    
 
     
     
@@ -395,13 +249,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-      
-
-      
         <blockquote>
 <p>Netty 是目前比较火的网络编程框架，是 java 进阶的必备知识点，特此记录 Netty 学习过程中的一些知识点用于日后翻阅。本章介绍 Netty 的一些入门准备知识，包括同步和异步、阻塞和非阻塞的区别，还有常见的 IO 模型。</p>
 </blockquote>
-<a id="more"></a>
+<span id="more"></span>
+
 <h1 id="同步、异步、阻塞和非阻塞"><a href="#同步、异步、阻塞和非阻塞" class="headerlink" title="同步、异步、阻塞和非阻塞"></a>同步、异步、阻塞和非阻塞</h1><p>这四个概念都是针对一次调用发生的，我们可以这么理解，在一次调用里面存在<code>调用者</code>、<code>被调用者</code>和<code>调用结果</code>这三个概念。</p>
 <h2 id="一、同步和异步"><a href="#一、同步和异步" class="headerlink" title="一、同步和异步"></a>一、同步和异步</h2><p>同步和异步是从<code>调用结果通知机制</code>这个角度来区分的。</p>
 <ul>
@@ -412,13 +264,13 @@
 </ul>
 <h2 id="二、阻塞和非阻塞"><a href="#二、阻塞和非阻塞" class="headerlink" title="二、阻塞和非阻塞"></a>二、阻塞和非阻塞</h2><p>阻塞和非阻塞是从 <code>调用者在获取到调用结果前的行为</code> 这个角度进行区分的。</p>
 <ul>
-<li>阻塞：<code>调用者</code>在获取到 <code>调用结果</code> 前什么都不干，线程整个挂起一直等待 <code>调用结果</code>，这就是阻塞调用。</li>
-<li>非阻塞：<code>调用者</code> 在获取 <code>调用结果</code>前可以做自己的事情，这就是非阻塞调用。</li>
+<li>阻塞：<code>调用者 </code>在获取到 <code>调用结果</code> 前什么都不干，线程整个挂起一直等待 <code>调用结果</code>，这就是阻塞调用。</li>
+<li>非阻塞：<code>调用者</code> 在获取 <code>调用结果 </code>前可以做自己的事情，这就是非阻塞调用。</li>
 </ul>
 <h2 id="三、四种概念组合"><a href="#三、四种概念组合" class="headerlink" title="三、四种概念组合"></a>三、四种概念组合</h2><p>综上所述，同步和异步、阻塞和非阻塞是两套完全不同而且并不矛盾的概念，所以产生以下四种概念组合：</p>
 <ul>
 <li>同步阻塞：<code>调用者</code> 一直挂起什么都不做，主动去获取 <code>调用结果</code>。</li>
-<li>同步非阻塞：<code>调用者</code>拿到回执后继续做自己的事情，然后通过轮询机制，每隔一段时间去询问<code>调用结果</code>，直到最终获取 <code>调用结果</code>，调用才算完成。</li>
+<li>同步非阻塞：<code>调用者 </code>拿到回执后继续做自己的事情，然后通过轮询机制，每隔一段时间去询问<code>调用结果</code>，直到最终获取 <code>调用结果</code>，调用才算完成。</li>
 <li>异步阻塞：<code>调用者</code> 一直挂起什么都不做，直到 <code>被调用者</code> 通知 <code>调用结果</code>。</li>
 <li>异步非阻塞：调用者拿到回执后继续做自己的事情，等到 <code>被调用者</code> 通知<code>调用结果</code>后，调用才算完成。</li>
 </ul>
@@ -431,7 +283,7 @@
 <li>文件描述符</li>
 <li>缓存 IO</li>
 </ul>
-<h3 id="用户空间与内核空间"><a href="#用户空间与内核空间" class="headerlink" title="用户空间与内核空间"></a>用户空间与内核空间</h3><p>现在操作系统都是采用虚拟存储器，那么对32位操作系统而言，它的寻址空间（虚拟存储空间）为4G（2的32次方）。操作系统的核心是内核，独立于普通的应用程序，可以访问受保护的内存空间，也有访问底层硬件设备的所有权限。为了保证用户进程不能直接操作内核（kernel），保证内核的安全，操作系统将虚拟空间划分为两部分，一部分为内核空间，一部分为用户空间`。针对linux操作系统而言，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF），供内核使用，称为内核空间，而将较低的3G字节（从虚拟地址0x00000000到0xBFFFFFFF），供各个进程使用，称为用户空间。</p>
+<h3 id="用户空间与内核空间"><a href="#用户空间与内核空间" class="headerlink" title="用户空间与内核空间"></a>用户空间与内核空间</h3><p>现在操作系统都是采用虚拟存储器，那么对32位操作系统而言，它的寻址空间（虚拟存储空间）为4G（2的32次方）。操作系统的核心是内核，独立于普通的应用程序，可以访问受保护的内存空间，也有访问底层硬件设备的所有权限。为了保证用户进程不能直接操作内核（kernel），保证内核的安全，操作系统将虚拟空间划分为两部分，一部分为内核空间，一部分为用户空间&#96;。针对linux操作系统而言，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF），供内核使用，称为内核空间，而将较低的3G字节（从虚拟地址0x00000000到0xBFFFFFFF），供各个进程使用，称为用户空间。</p>
 <h3 id="进程切换"><a href="#进程切换" class="headerlink" title="进程切换"></a>进程切换</h3><p>为了控制进程的执行，内核必须有能力挂起正在CPU上运行的进程，并恢复以前挂起的某个进程的执行。这种行为被称为进程切换。因此可以说，任何进程都是在操作系统内核的支持下运行的，是与内核紧密相关的。</p>
 <p>从一个进程的运行转到另一个进程上运行，这个过程中经过下面这些变化：</p>
 <ol>
@@ -460,13 +312,14 @@
 <li>第二阶段：把数据从内核缓冲区复制到应用进程缓冲区。</li>
 </ul>
 <h2 id="二、五种常见IO模型"><a href="#二、五种常见IO模型" class="headerlink" title="二、五种常见IO模型"></a>二、五种常见IO模型</h2><p>根据以上基础知识，我们可以得到这样网络 IO 关系：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">网络数据 —&gt; 内核空间 —&gt; 拷贝到用户空间 —&gt; 应用程序收到结果</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">网络数据 —&gt; 内核空间 —&gt; 拷贝到用户空间 —&gt; 应用程序收到结果</span><br></pre></td></tr></table></figure>
+
 <p><code>阻塞/非阻塞</code> 概念可以发生在 <code>网络数据—&gt;内核空间</code> 和 <code>内核空间—&gt;拷贝到用户空间</code> 这两个阶段。如果应用程序什么事都不做直到本阶段完成就称作 <code>阻塞</code>，如果应用程序在阶段完成前可以做自己的事情就称作 <code>非阻塞</code>。</p>
 <p><code>同步/异步</code> 概念发生在 <code>应用程序怎么收到结果</code> 这个阶段。如果应用程序主动去获取结果就称作 <code>同步</code>，如果应用程序被动等待内核通知结果就称作 <code>异步</code>。</p>
 <p>这些概念是下面 IO 模型的基础。</p>
 <h3 id="1、同步阻塞-IO（blocking-IO）"><a href="#1、同步阻塞-IO（blocking-IO）" class="headerlink" title="1、同步阻塞 IO（blocking IO）"></a>1、同步阻塞 IO（blocking IO）</h3><h4 id="网络模型"><a href="#网络模型" class="headerlink" title="网络模型"></a>网络模型</h4><p>同步阻塞 IO 模型是最常用的一个模型，也是最简单的模型。在这个 IO 模型中，用户空间的应用程序执行一个系统调用（recvform），这会导致应用程序阻塞，什么也不干，直到数据准备好，并且将数据从内核复制到用户进程，最后进程再处理数据。</p>
 <p>在等待数据到处理数据的两个阶段，整个进程都被阻塞。不能处理别的网络 IO。调用应用程序处于一种不再消费 CPU 而只是简单等待响应的状态，因此从处理的角度来看，这是非常有效的。流程图如下：</p>
-<p><img src="/2020/01/17/netty系列（一）：IO模型/blockingIO.png" alt="blockingIO"></p>
+<p><img src="/.com//blockingIO.png" alt="blockingIO"></p>
 <h4 id="流程描述"><a href="#流程描述" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
 <li>第一个阶段：准备数据。当用户进程调用了 <code>recv()/recvfrom()</code> 这个系统调用之后，用户进程就开始阻塞等待数据。对于网络 IO 来说，很多时候数据在一开始还没有到达。比如，还没有收到一个完整的UDP包。这个时候 kernel 就要等待足够的数据到来。这个过程也需要等待。也就是说数据被拷贝到操作系统内核的缓冲区中是需要一个过程的。</li>
 <li>第二个阶段：当kernel 一直等到数据准备好了，它就会将数据从 kernel 中拷贝到用户内存。然后 kernel 返回结果，用户进程才解除 block 的状态，重新运行起来。</li>
@@ -481,7 +334,7 @@
 <p><strong>缺点</strong></p>
 <p>性能差，不能支持高并发的应用场景。</p>
 <h3 id="2、同步非阻塞-IO（nonblocking-IO）"><a href="#2、同步非阻塞-IO（nonblocking-IO）" class="headerlink" title="2、同步非阻塞 IO（nonblocking IO）"></a>2、同步非阻塞 IO（nonblocking IO）</h3><h4 id="网络模型-1"><a href="#网络模型-1" class="headerlink" title="网络模型"></a>网络模型</h4><p>同步非阻塞就是「每隔一会儿瞄一眼进度条」的轮询方式。在这种模型中，非阻塞也会调用 <code>recvform</code> 系统调用，不管数据是否准备好，内核都会马上返回给进程。如果数据还没准备好，就会返回一个错误代码（EAGAIN 或 EWOULDBLOCK），说明这个命令不能立即满足。进程在返回之后，可以干点别的事情，过一段时间再发起<code>recvform</code> 系统调用，重复上面的过程。这个过程通常被称之为轮询。直到数据准备好，再拷贝数据到进程，进行数据处理。需要注意，拷贝数据整个过程，进程仍然是属于阻塞的状态。流程如图所示：</p>
-<p><img src="/2020/01/17/netty系列（一）：IO模型/nonblockingIO.png" alt="nonblockingIO"></p>
+<p><img src="/.com//nonblockingIO.png" alt="nonblockingIO"></p>
 <h4 id="流程描述-1"><a href="#流程描述-1" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
 <li>用户进程发出 read 操作时，马上就得到了一个结果。<ul>
 <li>kernel中的数据还没有准备好，返回一个 error 信号。</li>
@@ -501,17 +354,17 @@
 <li>任务完成的响应延迟增大了，因为每过一段时间才去轮询一次 read 操作，而任务可能在两次轮询之间的任意时间完成。这会导致整体数据吞吐量的降低。</li>
 <li>由于同步非阻塞方式需要不断主动轮询，轮询占据了很大一部分过程，轮询会消耗大量的CPU时间</li>
 </ul>
-<h3 id="3、IO-多路复用（-IO-multiplexing）"><a href="#3、IO-多路复用（-IO-multiplexing）" class="headerlink" title="3、IO 多路复用（ IO multiplexing）"></a>3、IO 多路复用（ IO multiplexing）</h3><h4 id="网络模型-2"><a href="#网络模型-2" class="headerlink" title="网络模型"></a>网络模型</h4><p>IO 多路复用就是用一个单独的非用户态的进程去完成同步非阻塞的轮询工作。和同步非阻塞 IO 的区别是，同步非阻塞 IO使用用户态的进程去完成这个轮询工作，而 IO多路复用使用 UNIX/Linux 下的内核函数 <code>select、poll、epoll</code> 都可以完成这个轮询工作（epoll 比 poll、select 效率高，做的事情是一样的）。我们可以把这类函数的工作称为 select 轮询。</p>
-<p>select 轮询是内核级别的，可以监听多个 socket，能实现同时对多个IO端口进行监听，直到有数据可读或可写时（注意不是全部数据可读或可写），才真正调用 I/O 操作函数。然后进程再进行 recvform 系统调用，将数据由内核拷贝到用户进程，当然这个过程是阻塞的。流程图如下：</p>
-<p><img src="/2020/01/17/netty系列（一）：IO模型/IOmultiplexing.png" alt="IOmultiplexing"></p>
+<h3 id="3、IO-多路复用（-IO-multiplexing）"><a href="#3、IO-多路复用（-IO-multiplexing）" class="headerlink" title="3、IO 多路复用（ IO multiplexing）"></a>3、IO 多路复用（ IO multiplexing）</h3><h4 id="网络模型-2"><a href="#网络模型-2" class="headerlink" title="网络模型"></a>网络模型</h4><p>IO 多路复用就是用一个单独的非用户态的进程去完成同步非阻塞的轮询工作。和同步非阻塞 IO 的区别是，同步非阻塞 IO使用用户态的进程去完成这个轮询工作，而 IO多路复用使用 UNIX&#x2F;Linux 下的内核函数 <code>select、poll、epoll</code> 都可以完成这个轮询工作（epoll 比 poll、select 效率高，做的事情是一样的）。我们可以把这类函数的工作称为 select 轮询。</p>
+<p>select 轮询是内核级别的，可以监听多个 socket，能实现同时对多个IO端口进行监听，直到有数据可读或可写时（注意不是全部数据可读或可写），才真正调用 I&#x2F;O 操作函数。然后进程再进行 recvform 系统调用，将数据由内核拷贝到用户进程，当然这个过程是阻塞的。流程图如下：</p>
+<p><img src="/.com//IOmultiplexing.png" alt="IOmultiplexing"></p>
 <h4 id="流程描述-2"><a href="#流程描述-2" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
 <li>当用户进程调用了 select，整个进程会被 block，而同时，kernel 会监视所有 select 负责的 socket</li>
 <li>当任何一个 socket 中的数据准备好了，select 就会返回。</li>
 <li>用户进程开始阻塞，将数据从 kernel 拷贝到用户进程。</li>
 </ul>
 <p>上面的图和blocking IO的图其实并没有太大的不同，事实上，还更差一些。<code>因为这里需要使用两个system call (select 和 recvfrom)，而blocking IO只调用了一个system call (recvfrom)</code>。但是，<code>用select的优势在于它可以同时处理多个connection</code>。</p>
-<h4 id="分析-2"><a href="#分析-2" class="headerlink" title="分析"></a>分析</h4><p>如果处理的连接数不是很高的话，使用 select/epoll 不一定比使用 multi-threading + blocking IO 性能更好，可能延迟还更大。<strong>select/epoll的优势并不是对于单个连接能处理得更快，而是在于能处理更多的连接。</strong>I/O 多路复用技术通过把多个 I/O 的阻塞复用到同一个 select 的阻塞上，从而使得系统在单线程的情况下可以同时处理多个客户端请求，大大降低系统开销小，节省了系统资源。</p>
-<p>I/O多路复用的主要应用场景如下：</p>
+<h4 id="分析-2"><a href="#分析-2" class="headerlink" title="分析"></a>分析</h4><p>如果处理的连接数不是很高的话，使用 select&#x2F;epoll 不一定比使用 multi-threading + blocking IO 性能更好，可能延迟还更大。<strong>select&#x2F;epoll的优势并不是对于单个连接能处理得更快，而是在于能处理更多的连接。</strong>I&#x2F;O 多路复用技术通过把多个 I&#x2F;O 的阻塞复用到同一个 select 的阻塞上，从而使得系统在单线程的情况下可以同时处理多个客户端请求，大大降低系统开销小，节省了系统资源。</p>
+<p>I&#x2F;O多路复用的主要应用场景如下：</p>
 <ul>
 <li><p>服务器需要同时处理多个处于监听状态或者多个连接状态的套接字。</p>
 </li>
@@ -526,7 +379,7 @@
 <p><strong>从整个IO过程来看，他们都是同步模型，因为都属于应用程序主动等待且向内核检查状态。</strong></p>
 <h3 id="4、异步非阻塞-IO（asynchronous-IO）"><a href="#4、异步非阻塞-IO（asynchronous-IO）" class="headerlink" title="4、异步非阻塞 IO（asynchronous IO）"></a>4、异步非阻塞 IO（asynchronous IO）</h3><h4 id="网络模型-3"><a href="#网络模型-3" class="headerlink" title="网络模型"></a>网络模型</h4><p>相对于同步IO，异步IO不是顺序执行。用户进程进行 aio_read 系统调用之后，无论内核数据是否准备好，都会直接返回给用户进程，然后用户态进程可以去做别的事情。等到socket数据准备好了，内核直接复制数据给进程，然后从内核向进程发送通知。IO两个阶段，进程都是非阻塞的。</p>
 <p>Linux 提供了 AIO 库函数实现异步，但是用的很少。目前有很多开源的异步IO库，例如 libevent、libev、libuv。异步过程如下图所示：</p>
-<p><img src="/2020/01/17/netty系列（一）：IO模型/asynchronousIO.png" alt="asynchronousIO"></p>
+<p><img src="/.com//asynchronousIO.png" alt="asynchronousIO"></p>
 <h4 id="流程描述-3"><a href="#流程描述-3" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
 <li>用户进程发起 aio_read 操作之后，立刻就可以开始去做其它的事。从 kernel 的角度，当它受到一个asynchronous read 之后，首先它会立刻返回，所以不会对用户进程产生任何 block。</li>
 <li>kernel 会等待数据准备完成，然后将数据拷贝到用户内存。</li>
@@ -540,15 +393,15 @@
 <p>Linux 的异步 IO（AIO）支持是 2.6.22 才引入的，还有很多系统调用不支持异步 IO。Linux 的异步 IO 最初是为数据库设计的，因此通过异步 IO 的读写操作不会被缓存或缓冲，这就无法利用操作系统的缓存与缓冲机制。</p>
 <h4 id="分析-3"><a href="#分析-3" class="headerlink" title="分析"></a>分析</h4><p>IO 多路复用和 AIO 都适合高并发的应用场景，两者的区别是：</p>
 <ul>
-<li><p>IO多路复用：IO 多路复用是同步非阻塞模式。select 函数所提供的功能（异步阻塞 IO）与 AIO 类似。不过，它是对通知事件进行阻塞，而不是对 IO 调用进行阻塞。当内核数据在准备过程中，select 函数一直被阻塞，等到数据准备完成后会通知应用程序数据准备好了，然后 select 函数的任务就完成了，至于后面把数据从内核空间复制到用户空间（通过阻塞/非阻塞形式都可以）这部分工作由应用程序本身完成。</p>
+<li><p>IO多路复用：IO 多路复用是同步非阻塞模式。select 函数所提供的功能（异步阻塞 IO）与 AIO 类似。不过，它是对通知事件进行阻塞，而不是对 IO 调用进行阻塞。当内核数据在准备过程中，select 函数一直被阻塞，等到数据准备完成后会通知应用程序数据准备好了，然后 select 函数的任务就完成了，至于后面把数据从内核空间复制到用户空间（通过阻塞&#x2F;非阻塞形式都可以）这部分工作由应用程序本身完成。</p>
 </li>
 <li><p>AIO：AIO 是异步模式。内核准备数据和把数据从内核空间复制到用户空间这两部分工作都由系统完成，也就是 IO 过程全部由系统控制，当应用程序收到通知的时候用户空间已经准备好数据了。</p>
 </li>
 </ul>
-<h3 id="5、信号驱动式IO（signal-driven-IO）"><a href="#5、信号驱动式IO（signal-driven-IO）" class="headerlink" title="5、信号驱动式IO（signal-driven IO）"></a>5、信号驱动式IO（signal-driven IO）</h3><p>信号驱动式I/O：首先我们允许Socket进行信号驱动IO,并安装一个信号处理函数，进程继续运行并不阻塞。当数据准备好时，进程会收到一个SIGIO信号，可以在信号处理函数中调用I/O操作函数处理数据。过程如下图所示：</p>
-<p><img src="/2020/01/17/netty系列（一）：IO模型/signal-drivenIO.png" alt="signal-drivenIO"></p>
+<h3 id="5、信号驱动式IO（signal-driven-IO）"><a href="#5、信号驱动式IO（signal-driven-IO）" class="headerlink" title="5、信号驱动式IO（signal-driven IO）"></a>5、信号驱动式IO（signal-driven IO）</h3><p>信号驱动式I&#x2F;O：首先我们允许Socket进行信号驱动IO,并安装一个信号处理函数，进程继续运行并不阻塞。当数据准备好时，进程会收到一个SIGIO信号，可以在信号处理函数中调用I&#x2F;O操作函数处理数据。过程如下图所示：</p>
+<p><img src="/.com//signal-drivenIO.png" alt="signal-drivenIO"></p>
 <p>信号驱动IO实际使用得不多，所以在这里不做深入介绍。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本章介绍了同步/异步、阻塞/非阻塞的概念、linux IO的基础概念和五种常见的 IO 模型：</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本章介绍了同步&#x2F;异步、阻塞&#x2F;非阻塞的概念、linux IO的基础概念和五种常见的 IO 模型：</p>
 <ol>
 <li><p>同步和异步是从<code>调用结果通知机制</code>这个角度来区分的。同步调用是指调用发生后，<code>调用者</code>主动去获取<code>调用结果</code>；异步调用是指调用发生后，<code>调用者</code>被动等待<code>被调用者</code>通知<code>调用结果</code>。</p>
 </li>
@@ -571,340 +424,191 @@
 <li>信号驱动式IO（signal-driven IO）</li>
 </ul>
 <p>其中 IO 多路复用模型是 netty IO 模型的基础，必须要掌握，五种 IO 模型流程简单总结如下：</p>
-<p><img src="/2020/01/17/netty系列（一）：IO模型/fiveIO.png" alt="fiveIO"></p>
+<p><img src="/.com//fiveIO.png" alt="fiveIO"></p>
 </li>
 </ol>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.jianshu.com/p/486b0965c296" target="_blank" rel="noopener">聊聊Linux 五种IO模型</a></p>
-<p><a href="https://www.jianshu.com/p/aed6067eeac9" target="_blank" rel="noopener">聊聊同步、异步、阻塞与非阻塞</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/486b0965c296">聊聊Linux 五种IO模型</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/aed6067eeac9">聊聊同步、异步、阻塞与非阻塞</a></p>
 
-      
     </div>
+
     
     
     
 
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/Netty/" rel="tag"># Netty</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2020/01/14/Hexo部署到个人服务器/" rel="next" title="Hexo部署到个人服务器">
-                <i class="fa fa-chevron-left"></i> Hexo部署到个人服务器
-              </a>
-            
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Netty/" rel="tag"># Netty</a>
           </div>
 
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/01/18/netty系列（二）：netty是什么/" rel="prev" title="netty系列（二）：netty是什么">
-                netty系列（二）：netty是什么 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-
-    <div class="post-spread">
-      
         
-  <div class="bdsharebuttonbox">
-    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
-    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
-    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
-    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
-    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
-    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
-    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
-    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
-    <a href="#" class="bds_more" data-cmd="more"></a>
-    <a class="bds_count" data-cmd="count"></a>
-  </div>
-  <script>
-    window._bd_share_config = {
-      "common": {
-        "bdText": "",
-        "bdMini": "2",
-        "bdMiniList": false,
-        "bdPic": ""
-      },
-      "share": {
-        "bdSize": "16",
-        "bdStyle": "0"
-      },
-      "image": {
-        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
-        "viewText": "分享到：",
-        "viewSize": "16"
-      }
-    }
-  </script>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/14/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0%E4%B8%AA%E4%BA%BA%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="prev" title="Hexo部署到个人服务器">
+      <i class="fa fa-chevron-left"></i> Hexo部署到个人服务器
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/01/18/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9ANetty%E6%98%AF%E4%BB%80%E4%B9%88/" rel="next" title="Netty系列（二）：Netty是什么">
+      Netty系列（二）：Netty是什么 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
 
 <script>
-  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
-</script>
-
-      
-    </div>
-  </div>
-
-
-          </div>
-          
-
-
-          
-
-  
-    <div class="comments" id="comments">
-      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNzIyNC8xMzc1OA=="></div>
-    </div>
-
-  
-
-
-
-        </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
-
-  <aside id="sidebar" class="sidebar">
-    
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
-
-      <section class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <img class="site-author-image" itemprop="image"
-                src="/images/head.jpeg"
-                alt="mcb" />
-            
-              <p class="site-author-name" itemprop="name">mcb</p>
-              <p class="site-description motion-element" itemprop="description">Constant dropping wears the stone</p>
-          </div>
-
-          <nav class="site-state motion-element">
-
-            
-              <div class="site-state-item site-state-posts">
-              
-                <a href="/archives/">
-              
-                  <span class="site-state-item-count">29</span>
-                  <span class="site-state-item-name">日志</span>
-                </a>
-              </div>
-            
-
-            
-              
-              
-              <div class="site-state-item site-state-categories">
-                <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
-                  <span class="site-state-item-name">分类</span>
-                </a>
-              </div>
-            
-
-            
-              
-              
-              <div class="site-state-item site-state-tags">
-                <a href="/tags/index.html">
-                  <span class="site-state-item-count">21</span>
-                  <span class="site-state-item-name">标签</span>
-                </a>
-              </div>
-            
-
-          </nav>
-
-          
-
-          
-            <div class="links-of-author motion-element">
-                
-                  <span class="links-of-author-item">
-                    <a href="https://github.com/18814122746" target="_blank" title="GitHub">
-                      
-                        <i class="fa fa-fw fa-github"></i>GitHub</a>
-                  </span>
-                
-            </div>
-          
-
-          
-          
-
-          
-          
-
-          
-
-        </div>
-      </section>
-
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#同步、异步、阻塞和非阻塞"><span class="nav-number">1.</span> <span class="nav-text">同步、异步、阻塞和非阻塞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、同步和异步"><span class="nav-number">1.1.</span> <span class="nav-text">一、同步和异步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、阻塞和非阻塞"><span class="nav-number">1.2.</span> <span class="nav-text">二、阻塞和非阻塞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、四种概念组合"><span class="nav-number">1.3.</span> <span class="nav-text">三、四种概念组合</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IO模型"><span class="nav-number">2.</span> <span class="nav-text">IO模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、基础概念"><span class="nav-number">2.1.</span> <span class="nav-text">一、基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用户空间与内核空间"><span class="nav-number">2.1.1.</span> <span class="nav-text">用户空间与内核空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程切换"><span class="nav-number">2.1.2.</span> <span class="nav-text">进程切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程的阻塞"><span class="nav-number">2.1.3.</span> <span class="nav-text">进程的阻塞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件描述符fd"><span class="nav-number">2.1.4.</span> <span class="nav-text">文件描述符fd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存-IO"><span class="nav-number">2.1.5.</span> <span class="nav-text">缓存 IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-IO-的过程"><span class="nav-number">2.1.6.</span> <span class="nav-text">linux IO 的过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、五种常见IO模型"><span class="nav-number">2.2.</span> <span class="nav-text">二、五种常见IO模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、同步阻塞-IO（blocking-IO）"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、同步阻塞 IO（blocking IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、同步非阻塞-IO（nonblocking-IO）"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、同步非阻塞 IO（nonblocking IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型-1"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述-1"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析-1"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、IO-多路复用（-IO-multiplexing）"><span class="nav-number">2.2.3.</span> <span class="nav-text">3、IO 多路复用（ IO multiplexing）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型-2"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述-2"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析-2"><span class="nav-number">2.2.3.3.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注意"><span class="nav-number">2.2.3.4.</span> <span class="nav-text">注意</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、异步非阻塞-IO（asynchronous-IO）"><span class="nav-number">2.2.4.</span> <span class="nav-text">4、异步非阻塞 IO（asynchronous IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络模型-3"><span class="nav-number">2.2.4.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流程描述-3"><span class="nav-number">2.2.4.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析-3"><span class="nav-number">2.2.4.3.</span> <span class="nav-text">分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、信号驱动式IO（signal-driven-IO）"><span class="nav-number">2.2.5.</span> <span class="nav-text">5、信号驱动式IO（signal-driven IO）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
-      
-
-      
-
-    </div>
-  </aside>
-
-
-        
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">mcb</span>
-
-  
-</div>
-
-
-  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
-
-
-
-
-        
-<div class="busuanzi-count">
-  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-  
-    <span class="site-uv">
-      <i class="fa fa-user"></i> 总访问人数
-      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
-      人
-    </span>
-  
-
-  
-    <span class="site-pv">
-      <i class="fa fa-eye"></i> 总访问量
-      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
-      次
-    </span>
-  
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-
-    
-
-  </div>
-
-  
-
-<script type="text/javascript">
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
 </script>
 
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E3%80%81%E5%BC%82%E6%AD%A5%E3%80%81%E9%98%BB%E5%A1%9E%E5%92%8C%E9%9D%9E%E9%98%BB%E5%A1%9E"><span class="nav-number">1.</span> <span class="nav-text">同步、异步、阻塞和非阻塞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%90%8C%E6%AD%A5%E5%92%8C%E5%BC%82%E6%AD%A5"><span class="nav-number">1.1.</span> <span class="nav-text">一、同步和异步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E9%98%BB%E5%A1%9E%E5%92%8C%E9%9D%9E%E9%98%BB%E5%A1%9E"><span class="nav-number">1.2.</span> <span class="nav-text">二、阻塞和非阻塞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%9B%9B%E7%A7%8D%E6%A6%82%E5%BF%B5%E7%BB%84%E5%90%88"><span class="nav-number">1.3.</span> <span class="nav-text">三、四种概念组合</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IO%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">IO模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">一、基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E4%B8%8E%E5%86%85%E6%A0%B8%E7%A9%BA%E9%97%B4"><span class="nav-number">2.1.1.</span> <span class="nav-text">用户空间与内核空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E5%88%87%E6%8D%A2"><span class="nav-number">2.1.2.</span> <span class="nav-text">进程切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%98%BB%E5%A1%9E"><span class="nav-number">2.1.3.</span> <span class="nav-text">进程的阻塞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6fd"><span class="nav-number">2.1.4.</span> <span class="nav-text">文件描述符fd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98-IO"><span class="nav-number">2.1.5.</span> <span class="nav-text">缓存 IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-IO-%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="nav-number">2.1.6.</span> <span class="nav-text">linux IO 的过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%BA%94%E7%A7%8D%E5%B8%B8%E8%A7%81IO%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.2.</span> <span class="nav-text">二、五种常见IO模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9E-IO%EF%BC%88blocking-IO%EF%BC%89"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、同步阻塞 IO（blocking IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E6%8F%8F%E8%BF%B0"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E5%90%8C%E6%AD%A5%E9%9D%9E%E9%98%BB%E5%A1%9E-IO%EF%BC%88nonblocking-IO%EF%BC%89"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、同步非阻塞 IO（nonblocking IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B-1"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E6%8F%8F%E8%BF%B0-1"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E6%9E%90-1"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81IO-%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%EF%BC%88-IO-multiplexing%EF%BC%89"><span class="nav-number">2.2.3.</span> <span class="nav-text">3、IO 多路复用（ IO multiplexing）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B-2"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E6%8F%8F%E8%BF%B0-2"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E6%9E%90-2"><span class="nav-number">2.2.3.3.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">2.2.3.4.</span> <span class="nav-text">注意</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81%E5%BC%82%E6%AD%A5%E9%9D%9E%E9%98%BB%E5%A1%9E-IO%EF%BC%88asynchronous-IO%EF%BC%89"><span class="nav-number">2.2.4.</span> <span class="nav-text">4、异步非阻塞 IO（asynchronous IO）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B-3"><span class="nav-number">2.2.4.1.</span> <span class="nav-text">网络模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E6%8F%8F%E8%BF%B0-3"><span class="nav-number">2.2.4.2.</span> <span class="nav-text">流程描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E6%9E%90-3"><span class="nav-number">2.2.4.3.</span> <span class="nav-text">分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81%E4%BF%A1%E5%8F%B7%E9%A9%B1%E5%8A%A8%E5%BC%8FIO%EF%BC%88signal-driven-IO%EF%BC%89"><span class="nav-number">2.2.5.</span> <span class="nav-text">5、信号驱动式IO（signal-driven IO）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
 
 
 
 
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -912,463 +616,22 @@
   
 
 
-  
-
-
-
-
-
-
-
-
-
 
 
   
-  
-    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-  
+<script src="/js/local-search.js"></script>
 
-  
-  
-    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
-  
 
 
-  
 
 
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
 
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
 
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
-
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
-
-
-
-  
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  
-
-
-
-
-	
-
-
-
-
-
-  
-
-
-
-
-
-  
-    <script type="text/javascript">
-      (function(d, s) {
-        var j, e = d.getElementsByTagName(s)[0];
-        if (typeof LivereTower === 'function') { return; }
-        j = d.createElement(s);
-        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-        j.async = true;
-        e.parentNode.insertBefore(j, e);
-      })(document, 'script');
-    </script>
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  <script type="text/javascript">
-    // Popup Window;
-    var isfetched = false;
-    var isXml = true;
-    // Search DB path;
-    var search_path = "search.xml";
-    if (search_path.length === 0) {
-      search_path = "search.xml";
-    } else if (/json$/i.test(search_path)) {
-      isXml = false;
-    }
-    var path = "/" + search_path;
-    // monitor main search box;
-
-    var onPopupClose = function (e) {
-      $('.popup').hide();
-      $('#local-search-input').val('');
-      $('.search-result-list').remove();
-      $('#no-result').remove();
-      $(".local-search-pop-overlay").remove();
-      $('body').css('overflow', '');
-    }
-
-    function proceedsearch() {
-      $("body")
-        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
-        .css('overflow', 'hidden');
-      $('.search-popup-overlay').click(onPopupClose);
-      $('.popup').toggle();
-      var $localSearchInput = $('#local-search-input');
-      $localSearchInput.attr("autocapitalize", "none");
-      $localSearchInput.attr("autocorrect", "off");
-      $localSearchInput.focus();
-    }
-
-    // search function;
-    var searchFunc = function(path, search_id, content_id) {
-      'use strict';
-
-      // start loading animation
-      $("body")
-        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
-          '<div id="search-loading-icon">' +
-          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
-          '</div>' +
-          '</div>')
-        .css('overflow', 'hidden');
-      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
-
-      $.ajax({
-        url: path,
-        dataType: isXml ? "xml" : "json",
-        async: true,
-        success: function(res) {
-          // get the contents from search data
-          isfetched = true;
-          $('.popup').detach().appendTo('.header-inner');
-          var datas = isXml ? $("entry", res).map(function() {
-            return {
-              title: $("title", this).text(),
-              content: $("content",this).text(),
-              url: $("url" , this).text()
-            };
-          }).get() : res;
-          var input = document.getElementById(search_id);
-          var resultContent = document.getElementById(content_id);
-          var inputEventFunction = function() {
-            var searchText = input.value.trim().toLowerCase();
-            var keywords = searchText.split(/[\s\-]+/);
-            if (keywords.length > 1) {
-              keywords.push(searchText);
-            }
-            var resultItems = [];
-            if (searchText.length > 0) {
-              // perform local searching
-              datas.forEach(function(data) {
-                var isMatch = false;
-                var hitCount = 0;
-                var searchTextCount = 0;
-                var title = data.title.trim();
-                var titleInLowerCase = title.toLowerCase();
-                var content = data.content.trim().replace(/<[^>]+>/g,"");
-                var contentInLowerCase = content.toLowerCase();
-                var articleUrl = decodeURIComponent(data.url);
-                var indexOfTitle = [];
-                var indexOfContent = [];
-                // only match articles with not empty titles
-                if(title != '') {
-                  keywords.forEach(function(keyword) {
-                    function getIndexByWord(word, text, caseSensitive) {
-                      var wordLen = word.length;
-                      if (wordLen === 0) {
-                        return [];
-                      }
-                      var startPosition = 0, position = [], index = [];
-                      if (!caseSensitive) {
-                        text = text.toLowerCase();
-                        word = word.toLowerCase();
-                      }
-                      while ((position = text.indexOf(word, startPosition)) > -1) {
-                        index.push({position: position, word: word});
-                        startPosition = position + wordLen;
-                      }
-                      return index;
-                    }
-
-                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
-                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
-                  });
-                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
-                    isMatch = true;
-                    hitCount = indexOfTitle.length + indexOfContent.length;
-                  }
-                }
-
-                // show search results
-
-                if (isMatch) {
-                  // sort index by position of keyword
-
-                  [indexOfTitle, indexOfContent].forEach(function (index) {
-                    index.sort(function (itemLeft, itemRight) {
-                      if (itemRight.position !== itemLeft.position) {
-                        return itemRight.position - itemLeft.position;
-                      } else {
-                        return itemLeft.word.length - itemRight.word.length;
-                      }
-                    });
-                  });
-
-                  // merge hits into slices
-
-                  function mergeIntoSlice(text, start, end, index) {
-                    var item = index[index.length - 1];
-                    var position = item.position;
-                    var word = item.word;
-                    var hits = [];
-                    var searchTextCountInSlice = 0;
-                    while (position + word.length <= end && index.length != 0) {
-                      if (word === searchText) {
-                        searchTextCountInSlice++;
-                      }
-                      hits.push({position: position, length: word.length});
-                      var wordEnd = position + word.length;
-
-                      // move to next position of hit
-
-                      index.pop();
-                      while (index.length != 0) {
-                        item = index[index.length - 1];
-                        position = item.position;
-                        word = item.word;
-                        if (wordEnd > position) {
-                          index.pop();
-                        } else {
-                          break;
-                        }
-                      }
-                    }
-                    searchTextCount += searchTextCountInSlice;
-                    return {
-                      hits: hits,
-                      start: start,
-                      end: end,
-                      searchTextCount: searchTextCountInSlice
-                    };
-                  }
-
-                  var slicesOfTitle = [];
-                  if (indexOfTitle.length != 0) {
-                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
-                  }
-
-                  var slicesOfContent = [];
-                  while (indexOfContent.length != 0) {
-                    var item = indexOfContent[indexOfContent.length - 1];
-                    var position = item.position;
-                    var word = item.word;
-                    // cut out 100 characters
-                    var start = position - 20;
-                    var end = position + 80;
-                    if(start < 0){
-                      start = 0;
-                    }
-                    if (end < position + word.length) {
-                      end = position + word.length;
-                    }
-                    if(end > content.length){
-                      end = content.length;
-                    }
-                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
-                  }
-
-                  // sort slices in content by search text's count and hits' count
-
-                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
-                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
-                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
-                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
-                      return sliceRight.hits.length - sliceLeft.hits.length;
-                    } else {
-                      return sliceLeft.start - sliceRight.start;
-                    }
-                  });
-
-                  // select top N slices in content
-
-                  var upperBound = parseInt('1');
-                  if (upperBound >= 0) {
-                    slicesOfContent = slicesOfContent.slice(0, upperBound);
-                  }
-
-                  // highlight title and content
-
-                  function highlightKeyword(text, slice) {
-                    var result = '';
-                    var prevEnd = slice.start;
-                    slice.hits.forEach(function (hit) {
-                      result += text.substring(prevEnd, hit.position);
-                      var end = hit.position + hit.length;
-                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
-                      prevEnd = end;
-                    });
-                    result += text.substring(prevEnd, slice.end);
-                    return result;
-                  }
-
-                  var resultItem = '';
-
-                  if (slicesOfTitle.length != 0) {
-                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
-                  } else {
-                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
-                  }
-
-                  slicesOfContent.forEach(function (slice) {
-                    resultItem += "<a href='" + articleUrl + "'>" +
-                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
-                      "...</p>" + "</a>";
-                  });
-
-                  resultItem += "</li>";
-                  resultItems.push({
-                    item: resultItem,
-                    searchTextCount: searchTextCount,
-                    hitCount: hitCount,
-                    id: resultItems.length
-                  });
-                }
-              })
-            };
-            if (keywords.length === 1 && keywords[0] === "") {
-              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
-            } else if (resultItems.length === 0) {
-              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
-            } else {
-              resultItems.sort(function (resultLeft, resultRight) {
-                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
-                  return resultRight.searchTextCount - resultLeft.searchTextCount;
-                } else if (resultLeft.hitCount !== resultRight.hitCount) {
-                  return resultRight.hitCount - resultLeft.hitCount;
-                } else {
-                  return resultRight.id - resultLeft.id;
-                }
-              });
-              var searchResultList = '<ul class=\"search-result-list\">';
-              resultItems.forEach(function (result) {
-                searchResultList += result.item;
-              })
-              searchResultList += "</ul>";
-              resultContent.innerHTML = searchResultList;
-            }
-          }
-
-          if ('auto' === 'auto') {
-            input.addEventListener('input', inputEventFunction);
-          } else {
-            $('.search-icon').click(inputEventFunction);
-            input.addEventListener('keypress', function (event) {
-              if (event.keyCode === 13) {
-                inputEventFunction();
-              }
-            });
-          }
-
-          // remove loading animation
-          $(".local-search-pop-overlay").remove();
-          $('body').css('overflow', '');
-
-          proceedsearch();
-        }
-      });
-    }
-
-    // handle and trigger popup window;
-    $('.popup-trigger').click(function(e) {
-      e.stopPropagation();
-      if (isfetched === false) {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      } else {
-        proceedsearch();
-      };
-    });
-
-    $('.popup-btn-close').click(onPopupClose);
-    $('.popup').click(function(e){
-      e.stopPropagation();
-    });
-    $(document).on('keyup', function (event) {
-      var shouldDismissSearchPopup = event.which === 27 &&
-        $('.search-popup').is(':visible');
-      if (shouldDismissSearchPopup) {
-        onPopupClose();
-      }
-    });
-  </script>
-
-
-
-
-
-  
-
-  
-
-  
-
-  
-  
-
-  
 
   
 

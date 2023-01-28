@@ -1,388 +1,242 @@
 <!DOCTYPE html>
-
-
-
-  
-
-
-<html class="theme-next gemini use-motion" lang="zh-Hans">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
 
-
-
-
-
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
-
-
-
-
-
-
-
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
-
-<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
-
-
-
-
-
-  <meta name="keywords" content="Netty," />
-
-
-
-
-
-
-
-
-
-
-<meta name="description" content="上篇文章我们简单介绍了 Netty 的线程模型和基本组件，后面我们开始详细介绍 Netty 每个基本组件。本文先介绍 Netty 的启动器 Bootstrap，包括 Bootstrap 的简介、类分析和实战。">
-<meta name="keywords" content="Netty">
+  <meta name="description" content="上篇文章我们简单介绍了 Netty 的线程模型和基本组件，后面我们开始详细介绍 Netty 每个基本组件。本文先介绍 Netty 的启动器 Bootstrap，包括 Bootstrap 的简介、类分析和实战。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="netty系列（四）：Bootstrap">
-<meta property="og:url" content="http://yoursite.com/2020/05/27/netty系列（四）：Bootstrap/index.html">
+<meta property="og:title" content="Netty系列（四）：Bootstrap">
+<meta property="og:url" content="http://yoursite.com/2020/05/27/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9ABootstrap/index.html">
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="上篇文章我们简单介绍了 Netty 的线程模型和基本组件，后面我们开始详细介绍 Netty 每个基本组件。本文先介绍 Netty 的启动器 Bootstrap，包括 Bootstrap 的简介、类分析和实战。">
-<meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2020/05/27/netty系列（四）：Bootstrap/inherit.png">
-<meta property="og:updated_time" content="2020-07-05T10:25:36.653Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/.com//inherit.png">
+<meta property="article:published_time" content="2020-05-27T09:33:07.000Z">
+<meta property="article:modified_time" content="2023-01-24T07:21:20.339Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Netty">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="netty系列（四）：Bootstrap">
-<meta name="twitter:description" content="上篇文章我们简单介绍了 Netty 的线程模型和基本组件，后面我们开始详细介绍 Netty 每个基本组件。本文先介绍 Netty 的启动器 Bootstrap，包括 Bootstrap 的简介、类分析和实战。">
-<meta name="twitter:image" content="http://yoursite.com/2020/05/27/netty系列（四）：Bootstrap/inherit.png">
+<meta name="twitter:image" content="http://yoursite.com/.com//inherit.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/05/27/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9ABootstrap/">
 
 
-
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Gemini',
-    version: '5.1.4',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
-    fancybox: true,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    duoshuo: {
-      userId: '0',
-      author: '博主'
-    },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
   };
 </script>
 
-
-
-  <link rel="canonical" href="http://yoursite.com/2020/05/27/netty系列（四）：Bootstrap/"/>
-
-
-
-
-
-  <title>netty系列（四）：Bootstrap | 飙戈的博客</title>
+  <title>Netty系列（四）：Bootstrap | 飙戈的博客</title>
   
 
 
 
 
 
-  <script type="text/javascript">
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?219a1c6fb7c1b9540f55e4c9f4259274";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
 
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
 
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
 
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
 
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-left page-post-detail">
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta ">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">飙戈的博客</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
-      
-        <p class="site-subtitle"></p>
-      
   </div>
 
-  <div class="site-nav-toggle">
-    <button>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
   </div>
 </div>
+
+
+
 
 <nav class="site-nav">
-  
-
-  
-    <ul id="menu" class="menu">
-      
-        
+  <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
-            首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
-            标签
-          </a>
-        </li>
-      
-        
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
         <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
         <li class="menu-item menu-item-archives">
-          <a href="/archives/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
-            
-            归档
-          </a>
-        </li>
-      
 
-      
-        <li class="menu-item menu-item-search">
-          
-            <a href="javascript:;" class="popup-trigger">
-          
-            
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
-            
-            搜索
-          </a>
-        </li>
-      
-    </ul>
-  
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
-  
-    <div class="site-search">
-      
-  <div class="popup search-popup local-search-popup">
-  <div class="local-search-header clearfix">
-    <span class="search-icon">
-      <i class="fa fa-search"></i>
-    </span>
-    <span class="popup-btn-close">
-      <i class="fa fa-times-circle"></i>
-    </span>
-    <div class="local-search-input-wrapper">
-      <input autocomplete="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
-    </div>
-  </div>
-  <div id="local-search-result"></div>
-</div>
-
-
-
-    </div>
-  
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
 </nav>
 
 
 
- </div>
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
     </header>
 
-    <main id="main" class="main">
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
       <div class="main-inner">
         <div class="content-wrap">
-          <div id="content" class="content">
+          
+
+          <div class="content post posts-expand">
             
 
-  <div id="posts" class="posts-expand">
     
-
-  
-
   
   
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/27/netty系列（四）：Bootstrap/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/27/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9ABootstrap/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="mcb">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/head.jpeg">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="飙戈的博客">
     </span>
-
-    
       <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">netty系列（四）：Bootstrap</h1>
-        
+        <h1 class="post-title" itemprop="name headline">
+          Netty系列（四）：Bootstrap
+        </h1>
 
         <div class="post-meta">
-          <span class="post-time">
-            
+            <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
+                <i class="far fa-calendar"></i>
               </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-27T17:33:07+08:00">
-                2020-05-27
-              </time>
-            
+              <span class="post-meta-item-text">发表于</span>
 
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Netty/" itemprop="url" rel="index">
-                    <span itemprop="name">Netty</span>
-                  </a>
+              <time title="创建时间：2020-05-27 17:33:07" itemprop="dateCreated datePublished" datetime="2020-05-27T17:33:07+08:00">2020-05-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
                 </span>
-
-                
-                
-              
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-24 15:21:20" itemprop="dateModified" datetime="2023-01-24T15:21:20+08:00">2023-01-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Netty/" itemprop="url" rel="index"><span itemprop="name">Netty</span></a>
+                </span>
             </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-            <span class="post-meta-divider">|</span>
-            <span class="page-pv"><i class="fa fa-file-o"></i> 本文阅读量
-            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
-            </span>
-          
-
-          
 
           
 
         </div>
       </header>
-    
 
     
     
@@ -390,17 +244,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-      
-
-      
         <blockquote>
 <p>上篇文章我们简单介绍了 Netty 的线程模型和基本组件，后面我们开始详细介绍 Netty 每个基本组件。本文先介绍 Netty 的启动器 Bootstrap，包括 Bootstrap 的简介、类分析和实战。</p>
 </blockquote>
-<a id="more"></a>
+<span id="more"></span>
+
 <h1 id="Bootstrap是什么"><a href="#Bootstrap是什么" class="headerlink" title="Bootstrap是什么"></a>Bootstrap是什么</h1><p>Bootstrap 是 Netty 的启动器，负责把 Netty 的组件例如 EventLoopGroup 等组装起来，并配置系统属性，然后启动 Netty 服务。例如下面是 Bootstrap 的常用用法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">// 新建Bootstrap</span><br><span class="line">Bootstrap b = new Bootstrap();</span><br><span class="line"></span><br><span class="line">try &#123;   </span><br><span class="line">    //1 设置reactor 线程</span><br><span class="line">    b.group(bossLoopGroup, workerLoopGroup);</span><br><span class="line">    //2 设置nio类型的channel</span><br><span class="line">    b.channel(NioServerSocketChannel.class);</span><br><span class="line">    //3 设置监听端口</span><br><span class="line">    b.localAddress(new InetSocketAddress(port));</span><br><span class="line">    //4 设置通道选项</span><br><span class="line">    b.option(ChannelOption.SO_KEEPALIVE, true);</span><br><span class="line">    b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);</span><br><span class="line"></span><br><span class="line">    //5 装配流水线</span><br><span class="line">    b.childHandler(new ChannelInitializer&lt;SocketChannel&gt;()</span><br><span class="line">    &#123;</span><br><span class="line">        //有连接到达时会创建一个channel</span><br><span class="line">        protected void initChannel(SocketChannel ch) throws Exception</span><br><span class="line">        &#123;</span><br><span class="line">            ch.pipeline().addLast(new ProtobufDecoder());</span><br><span class="line">            ch.pipeline().addLast(new ProtobufEncoder());</span><br><span class="line">            // pipeline管理channel中的Handler</span><br><span class="line">            // 在channel队列中添加一个handler来处理业务</span><br><span class="line">            ch.pipeline().addLast(&quot;serverHandler&quot;, serverHandler);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    // 6 开始绑定server</span><br><span class="line">    // 通过调用sync同步方法阻塞直到绑定成功</span><br><span class="line"></span><br><span class="line">    ChannelFuture channelFuture = b.bind().sync();</span><br><span class="line">    LOGGER.info(ChatServer.class.getName() +</span><br><span class="line">            &quot; started and listen on &quot; +</span><br><span class="line">            channelFuture.channel().localAddress());</span><br><span class="line"></span><br><span class="line">    // 7 监听通道关闭事件</span><br><span class="line">    // 应用程序会一直等待，直到channel关闭</span><br><span class="line">    ChannelFuture closeFuture=  channelFuture.channel().closeFuture();</span><br><span class="line">    closeFuture.sync();</span><br><span class="line">&#125; catch (Exception e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">    // 8 优雅关闭EventLoopGroup，</span><br><span class="line">    // 释放掉所有资源包括创建的线程</span><br><span class="line">    workerLoopGroup.shutdownGracefully();</span><br><span class="line">    bossLoopGroup.shutdownGracefully();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">// 新建Bootstrap</span><br><span class="line">Bootstrap b = new Bootstrap();</span><br><span class="line"></span><br><span class="line">try &#123;   </span><br><span class="line">    //1 设置reactor 线程</span><br><span class="line">    b.group(bossLoopGroup, workerLoopGroup);</span><br><span class="line">    //2 设置nio类型的channel</span><br><span class="line">    b.channel(NioServerSocketChannel.class);</span><br><span class="line">    //3 设置监听端口</span><br><span class="line">    b.localAddress(new InetSocketAddress(port));</span><br><span class="line">    //4 设置通道选项</span><br><span class="line">    b.option(ChannelOption.SO_KEEPALIVE, true);</span><br><span class="line">    b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);</span><br><span class="line"></span><br><span class="line">    //5 装配流水线</span><br><span class="line">    b.childHandler(new ChannelInitializer&lt;SocketChannel&gt;()</span><br><span class="line">    &#123;</span><br><span class="line">        //有连接到达时会创建一个channel</span><br><span class="line">        protected void initChannel(SocketChannel ch) throws Exception</span><br><span class="line">        &#123;</span><br><span class="line">            ch.pipeline().addLast(new ProtobufDecoder());</span><br><span class="line">            ch.pipeline().addLast(new ProtobufEncoder());</span><br><span class="line">            // pipeline管理channel中的Handler</span><br><span class="line">            // 在channel队列中添加一个handler来处理业务</span><br><span class="line">            ch.pipeline().addLast(&quot;serverHandler&quot;, serverHandler);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    // 6 开始绑定server</span><br><span class="line">    // 通过调用sync同步方法阻塞直到绑定成功</span><br><span class="line"></span><br><span class="line">    ChannelFuture channelFuture = b.bind().sync();</span><br><span class="line">    LOGGER.info(ChatServer.class.getName() +</span><br><span class="line">            &quot; started and listen on &quot; +</span><br><span class="line">            channelFuture.channel().localAddress());</span><br><span class="line"></span><br><span class="line">    // 7 监听通道关闭事件</span><br><span class="line">    // 应用程序会一直等待，直到channel关闭</span><br><span class="line">    ChannelFuture closeFuture=  channelFuture.channel().closeFuture();</span><br><span class="line">    closeFuture.sync();</span><br><span class="line">&#125; catch (Exception e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">    // 8 优雅关闭EventLoopGroup，</span><br><span class="line">    // 释放掉所有资源包括创建的线程</span><br><span class="line">    workerLoopGroup.shutdownGracefully();</span><br><span class="line">    bossLoopGroup.shutdownGracefully();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>为了更清楚地了解 Bootstrap 的用法，我们先介绍  Bootstrap 的类继承关系。</p>
-<h1 id="Bootstrap-类分析"><a href="#Bootstrap-类分析" class="headerlink" title="Bootstrap 类分析"></a>Bootstrap 类分析</h1><h2 id="类分析"><a href="#类分析" class="headerlink" title="类分析"></a>类分析</h2><p><img src="/2020/05/27/netty系列（四）：Bootstrap/inherit.png" alt="inherit"></p>
+<h1 id="Bootstrap-类分析"><a href="#Bootstrap-类分析" class="headerlink" title="Bootstrap 类分析"></a>Bootstrap 类分析</h1><h2 id="类分析"><a href="#类分析" class="headerlink" title="类分析"></a>类分析</h2><p><img src="/.com//inherit.png" alt="inherit"></p>
 <p>AbstractBootstrap 中定义了一系列属性供子类使用，每个属性都有 setter 和 getter 方法，另外还有用于验证、启动等其他方法。</p>
 <p>ServerBootstrap 和 Bootstrap 都继承自抽象类 AbstractBootstrap，都能使用父类中的属性。其中 ServerBootstrap 是服务器端的启动类，Bootstrap 是客户端的系统类。两者在类方法上的区别有：</p>
 <ul>
@@ -414,46 +267,52 @@
 <li>ServerBootstrap 使用父类的 <code>bind</code> 方法进行启动，Bootstrap 使用自定义的 <code>connect</code> 方法进行启动。</li>
 </ul>
 <p>ServerBootstrap 和 Bootstrap 都使用 Builder 链式模式设置属性，例如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bootstrap.group(group)</span><br><span class="line">	.channel(NioSocketChannel.class)</span><br><span class="line">	.option(ChannelOption.TCP_NODELAY, true);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bootstrap.group(group)</span><br><span class="line">	.channel(NioSocketChannel.class)</span><br><span class="line">	.option(ChannelOption.TCP_NODELAY, true);</span><br></pre></td></tr></table></figure>
+
 <h2 id="属性介绍"><a href="#属性介绍" class="headerlink" title="属性介绍"></a>属性介绍</h2><h3 id="group-属性"><a href="#group-属性" class="headerlink" title="group 属性"></a>group 属性</h3><p>设置 EventLoopGroup。服务端使用 ServerBootstrap 的 group 的 setter 方法可以设置两个 eventLoopGroup：一个 bossLoopGroup 和一个 workerLoopGroup。</p>
 <ul>
 <li><strong>bossLoopGroup</strong>：用于监听连接，专门 accept 新的客户端连接。</li>
 <li><strong>workerLoopGroup</strong>：用于处理与客户端除了 accept 之外的其他交互。</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">EventLoopGroup bossGroup = new NioEventLoopGroup();</span><br><span class="line">EventLoopGroup workerGroup = new NioEventLoopGroup();</span><br><span class="line">serverBootstrap.group(bossGroup, workerGroup);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">EventLoopGroup bossGroup = new NioEventLoopGroup();</span><br><span class="line">EventLoopGroup workerGroup = new NioEventLoopGroup();</span><br><span class="line">serverBootstrap.group(bossGroup, workerGroup);</span><br></pre></td></tr></table></figure>
+
 <p>上面这种模型对应上篇介绍的主从 Reactor 多线程模型，也可以只设置一个 eventLoopGroup 同时完成 bossLoopGroup 和 workerLoopGroup 两个线程组的工作，对应单 Reactor 多线程模型。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">EventLoopGroup eventGroup = new NioEventLoopGroup();</span><br><span class="line">serverBootstrap.group(eventGroup);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">EventLoopGroup eventGroup = new NioEventLoopGroup();</span><br><span class="line">serverBootstrap.group(eventGroup);</span><br></pre></td></tr></table></figure>
+
 <p>客户端一般只需要设置一个 eventLoopGroup 就可以完成和服务端的所有交互。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">EventLoopGroup eventGroup = new NioEventLoopGroup();</span><br><span class="line">bootstrap.group(eventGroup);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">EventLoopGroup eventGroup = new NioEventLoopGroup();</span><br><span class="line">bootstrap.group(eventGroup);</span><br></pre></td></tr></table></figure>
+
 <h3 id="channelFactory-属性"><a href="#channelFactory-属性" class="headerlink" title="channelFactory 属性"></a>channelFactory 属性</h3><p>设置 Channel 属性，ServerBootstrap 和 Bootstrap 通用，例如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.channel(NioServerSocketChannel.class);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.channel(NioServerSocketChannel.class);</span><br></pre></td></tr></table></figure>
+
 <p>这里我们使用 NioServerSocketChannel.class，看似是直接创建了 ServerSocketChannel 实例，但实际上是调用工厂类 BootstrapChannelFactory 来创建实例，这就是属性名称 channelFactory 的由来。从源码可以看到：</p>
-<pre><code>public B channel(Class&lt;? extends C&gt; channelClass) {
-    if (channelClass == null) {
+<pre><code>public B channel(Class&lt;? extends C&gt; channelClass) &#123;
+    if (channelClass == null) &#123;
         throw new NullPointerException(&quot;channelClass&quot;);
-    }
+    &#125;
     // 调用 BootstrapChannelFactory 获取 Channel 实例
     return channelFactory(new BootstrapChannelFactory&lt;C&gt;(channelClass));
-}
+&#125;
 
-private static final class BootstrapChannelFactory&lt;T extends Channel&gt; implements ChannelFactory&lt;T&gt; {
+private static final class BootstrapChannelFactory&lt;T extends Channel&gt; implements ChannelFactory&lt;T&gt; &#123;
     private final Class&lt;? extends T&gt; clazz;
 
-    BootstrapChannelFactory(Class&lt;? extends T&gt; clazz) {
+    BootstrapChannelFactory(Class&lt;? extends T&gt; clazz) &#123;
         this.clazz = clazz;
-    }
-
+    &#125;
+    
     // 通过 newInstance 创建实例
     @Override
-    public T newChannel() {
-        try {
+    public T newChannel() &#123;
+        try &#123;
             return clazz.newInstance();
-        } catch (Throwable t) {
+        &#125; catch (Throwable t) &#123;
             throw new ChannelException(&quot;Unable to create Channel from class &quot; + clazz, t);
-        }
-    }
-} 
-</code></pre><p>serverBootstrap.channel() 方法可配置的常用类有：</p>
+        &#125;
+    &#125;
+&#125; 
+</code></pre>
+<p>serverBootstrap.channel() 方法可配置的常用类有：</p>
 <ul>
 <li><strong>NioDatagramChannel</strong>：基于 NIO，服务端和客户端通用</li>
 <li><strong>NioServerSocketChannel</strong>：基于 NIO，服务端 channel() 方法使用</li>
@@ -464,15 +323,20 @@ private static final class BootstrapChannelFactory&lt;T extends Channel&gt; impl
 </ul>
 <p>我们看到除了可以使用 NIO 的相关 Channel 外，还可以使用 OIO（BIO）的相关 Channel，只需要修改一下类名称即可在 NIO 和 OIO 之间进行切换，对开发非常友好。一般情况下我们只使用 NIO 的相关 Channel。</p>
 <h3 id="localAddress、remoteAddress-属性"><a href="#localAddress、remoteAddress-属性" class="headerlink" title="localAddress、remoteAddress 属性"></a>localAddress、remoteAddress 属性</h3><p>localAddress 用于设置本地端口，一般用于服务端。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 直接使用端口</span><br><span class="line">serverBootstrap.localAddress(8000);</span><br><span class="line"></span><br><span class="line">// 或者使用 InetSocketAddress 对象</span><br><span class="line">serverBootstrap.localAddress(new InetSocketAddress(8000));</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 直接使用端口</span><br><span class="line">serverBootstrap.localAddress(8000);</span><br><span class="line"></span><br><span class="line">// 或者使用 InetSocketAddress 对象</span><br><span class="line">serverBootstrap.localAddress(new InetSocketAddress(8000));</span><br></pre></td></tr></table></figure>
+
 <p>也可以不通过 localAddress 来设置端口，在服务端调用 <code>bind</code> 方法的时候再设置端口，两者效果一致。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.bind(8000).sync();</span><br><span class="line">// 或</span><br><span class="line">serverBootstrap.bind(new InetSocketAddress(8000)).sync();</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.bind(8000).sync();</span><br><span class="line">// 或</span><br><span class="line">serverBootstrap.bind(new InetSocketAddress(8000)).sync();</span><br></pre></td></tr></table></figure>
+
 <p>remoteAddress 用于设置远程主机地址和端口，一般用于客户端。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 直接使用地址端口</span><br><span class="line">bootstrap.remoteAddress(&quot;192.168.10.1&quot;, 8000);</span><br><span class="line"></span><br><span class="line">// 或者使用 InetSocketAddress 对象</span><br><span class="line">bootstrap.remoteAddress(new InetSocketAddress(&quot;192.168.10.1&quot;, 8000));</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 直接使用地址端口</span><br><span class="line">bootstrap.remoteAddress(&quot;192.168.10.1&quot;, 8000);</span><br><span class="line"></span><br><span class="line">// 或者使用 InetSocketAddress 对象</span><br><span class="line">bootstrap.remoteAddress(new InetSocketAddress(&quot;192.168.10.1&quot;, 8000));</span><br></pre></td></tr></table></figure>
+
 <p>也可以不通过 remoteAddress 来设置远程主机地址和端口，在客户点调用 <code>connect</code> 方法的时候再设置，两者效果一致。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bootstrap.connect(&quot;192.168.10.1&quot;, 8000).sync();</span><br><span class="line">// 或</span><br><span class="line">bootstrap.connect(new InetSocketAddress(&quot;192.168.10.1&quot;, 8000)).sync();</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bootstrap.connect(&quot;192.168.10.1&quot;, 8000).sync();</span><br><span class="line">// 或</span><br><span class="line">bootstrap.connect(new InetSocketAddress(&quot;192.168.10.1&quot;, 8000)).sync();</span><br></pre></td></tr></table></figure>
+
 <h3 id="options-属性"><a href="#options-属性" class="headerlink" title="options 属性"></a>options 属性</h3><p>设置 Channel 的 options 属性，ServerBootstrap 和 Bootstrap 通用，options 对服务端而言是设置 ServerSocketChannel 的属性，对客户端而言是设置 SocketChannel 的属性。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.option(ChannelOption.TCP_NODELAY, true);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.option(ChannelOption.TCP_NODELAY, true);</span><br></pre></td></tr></table></figure>
+
 <p>options 可设置的属性有：</p>
 <p><strong>通用参数</strong></p>
 <ul>
@@ -481,7 +345,7 @@ private static final class BootstrapChannelFactory&lt;T extends Channel&gt; impl
 <li><strong>WRITE_SPIN_COUNT</strong>：Netty 参数，一个 Loop 写操作执行的最大次数，默认值为16。也就是说，对于大数据量的写操作至多进行16次，如果16次仍没有全部写完数据，此时会提交一个新的写任务给 EventLoop，任务将在下次调度继续执行。这样，其他的写请求才能被响应不会因为单个大数据量写请求而耽误。</li>
 <li><strong>ALLOCATOR</strong>：Netty 参数，ByteBuf 的分配器，默认值为 ByteBufAllocator.DEFAULT，4.0版本为 UnpooledByteBufAllocator，4.1版本为 PooledByteBufAllocator。该值也可以使用系统参数io.netty.allocator.type 配置，使用字符串值：”unpooled”，”pooled”。</li>
 <li><strong>RCVBUF_ALLOCATOR</strong>：Netty 参数，用于 Channel 分配接受 Buffer 的分配器，默认值为 AdaptiveRecvByteBufAllocator.DEFAULT，是一个自适应的接受缓冲区分配器，能根据接受到的数据自动调节大小。可选值为 FixedRecvByteBufAllocator，固定大小的接受缓冲区分配器。</li>
-<li><strong>AUTO_READ</strong>：Netty 参数，自动读取，默认值为 True。Netty 只在必要的时候才设置关心相应的I/O事件。对于读操作，需要调用 channel.read() 设置关心的 I/O 事件为 OP_READ，这样若有数据到达才能读取以供用户处理。该值为 True 时，每次读操作完毕后会自动调用 channel.read()，从而有数据到达便能读取；否则，需要用户手动调用 channel.read()。需要注意的是：当调用 config.setAutoRead(boolean) 方法时，如果状态由 false 变为 true，将会调用 channel.read() 方法读取数据；由 true 变为 false，将调用 config.autoReadCleared()方法终止数据读取。</li>
+<li><strong>AUTO_READ</strong>：Netty 参数，自动读取，默认值为 True。Netty 只在必要的时候才设置关心相应的I&#x2F;O事件。对于读操作，需要调用 channel.read() 设置关心的 I&#x2F;O 事件为 OP_READ，这样若有数据到达才能读取以供用户处理。该值为 True 时，每次读操作完毕后会自动调用 channel.read()，从而有数据到达便能读取；否则，需要用户手动调用 channel.read()。需要注意的是：当调用 config.setAutoRead(boolean) 方法时，如果状态由 false 变为 true，将会调用 channel.read() 方法读取数据；由 true 变为 false，将调用 config.autoReadCleared()方法终止数据读取。</li>
 <li><strong>WRITE_BUFFER_HIGH_WATER_MARK</strong>：Netty 参数，写高水位标记，默认值 64KB。如果Netty的写缓冲区中的字节超过该值，Channel的isWritable() 返回False。</li>
 <li><strong>WRITE_BUFFER_LOW_WATER_MARK</strong>：Netty 参数，写低水位标记，默认值 32KB。当 Netty 的写缓冲区中的字节超过高水位之后若下降到低水位，则 Channel 的isWritable()返回True。写高低水位标记使用户可以控制写入数据速度，从而实现流量控制。推荐做法是：每次调用 channl.write(msg) 方法首先调用 channel.isWritable() 判断是否可写。</li>
 <li><strong>MESSAGE_SIZE_ESTIMATOR</strong>：Netty 参数，消息大小估算器，默认为 DefaultMessageSizeEstimator.DEFAULT。估算 ByteBuf、ByteBufHolder 和 FileRegion 的大小，其中 ByteBuf和ByteBufHolder 为实际大小，FileRegion 估算值为0。该值估算的字节数在计算水位时使用，FileRegion 为 0 可知 FileRegion 不影响高低水位。</li>
@@ -489,8 +353,8 @@ private static final class BootstrapChannelFactory&lt;T extends Channel&gt; impl
 </ul>
 <p><strong>SocketChannel 参数</strong></p>
 <ul>
-<li><strong>SO_RCVBUF</strong>：Socket 参数，TCP 数据接收缓冲区大小。该缓冲区即 TCP 接收滑动窗口，linux 操作系统可使用命令：cat /proc/sys/net/ipv4/tcp_rmem 查询其大小。一般情况下，该值可由用户在任意时刻设置，但当设置值超过 64KB 时，需要在连接到远端之前设置。</li>
-<li><strong>SO_SNDBUF</strong>：Socket 参数，TCP 数据发送缓冲区大小。该缓冲区即 TCP 发送滑动窗口，linux 操作系统可使用命令：cat /proc/sys/net/ipv4/tcp_smem 查询其大小。</li>
+<li><strong>SO_RCVBUF</strong>：Socket 参数，TCP 数据接收缓冲区大小。该缓冲区即 TCP 接收滑动窗口，linux 操作系统可使用命令：cat &#x2F;proc&#x2F;sys&#x2F;net&#x2F;ipv4&#x2F;tcp_rmem 查询其大小。一般情况下，该值可由用户在任意时刻设置，但当设置值超过 64KB 时，需要在连接到远端之前设置。</li>
+<li><strong>SO_SNDBUF</strong>：Socket 参数，TCP 数据发送缓冲区大小。该缓冲区即 TCP 发送滑动窗口，linux 操作系统可使用命令：cat &#x2F;proc&#x2F;sys&#x2F;net&#x2F;ipv4&#x2F;tcp_smem 查询其大小。</li>
 <li><strong>TCP_NODELAY</strong>：TCP 参数，立即发送数据，默认值为 Ture（Netty 默认为 True 而操作系统默认为 False）。该值设置 Nagle 算法的启用，改算法将小的碎片数据连接成更大的报文来最小化所发送的报文的数量，如果需要发送一些较小的报文，则需要禁用该算法。Netty 默认禁用该算法，从而最小化报文传输延时。注意这个参数与是否开启 Nagle 算法是反着来的，true 表示关闭，false 表示开启。通俗地说，如果要求高实时性，有数据发送时就马上发送，就设置为 true；如果需要减少发送次数减少网络交互，就设置为 false。</li>
 <li><strong>SO_KEEPALIVE</strong>：Socket 参数，连接保活，默认值为 False。启用该功能时，TCP 会主动探测空闲连接的有效性。可以将此功能视为 TCP 的心跳机制，需要注意的是：默认的心跳间隔是 7200s 即 2 小时。Netty 默认关闭该功能。</li>
 <li><strong>SO_REUSEADDR</strong>：Socket 参数，地址复用，默认值 False。有四种情况可以使用<ul>
@@ -528,43 +392,48 @@ private static final class BootstrapChannelFactory&lt;T extends Channel&gt; impl
 <p>Bootstrap 在启动过程中会调用 initAndRegister() 方法创建 Channel，然后把 options 和 attrs 属性设置到 Channel 上。</p>
 </blockquote>
 <p>使用 Bootstrap 的 attrs 属性添加的自定义 key-value 作为全局变量，被和该 Bootstrap 关联的所有 Channel 共用。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.attr(AttributeKey.valueOf(&quot;key&quot;), &quot;value&quot;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.attr(AttributeKey.valueOf(&quot;key&quot;), &quot;value&quot;);</span><br></pre></td></tr></table></figure>
+
 <h3 id="handler-属性"><a href="#handler-属性" class="headerlink" title="handler 属性"></a>handler 属性</h3><p>把 handler 添加到 Channel 上，ServerBootstrap 和 Bootstrap 通用，对服务端而言会把 handler 添加到 ServerSocketChannel，对客户端而言会把 handler 添加到 SocketChannel。</p>
 <p>如果只有单个 handler，可以直接添加</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.handler(new PacketDecoder());</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.handler(new PacketDecoder());</span><br></pre></td></tr></table></figure>
+
 <p>如果有多个 handler，可以借助 NettyClientInitializer 类</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.handler(new ChannelInitializer&lt;ServerSocketChannel&gt;() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void initChannel(ServerSocketChannel ch) throws Exception &#123;</span><br><span class="line">        // 解密</span><br><span class="line">        ch.pipeline().addLast(&quot;packetDecoder&quot;, new PacketDecoder());</span><br><span class="line">        // 子命令解码器</span><br><span class="line">        ch.pipeline().addLast(&quot;subPacketDecoder&quot;, new SubPacketDecoder());</span><br><span class="line">        // 返回封包</span><br><span class="line">        ch.pipeline().addLast(&quot;packetEncoder&quot;, new PacketEncoder());</span><br><span class="line">        // 子命令封包</span><br><span class="line">        ch.pipeline().addLast(&quot;subPacketEncoder&quot;, new SubPacketEncoder());</span><br><span class="line">        // 登陆</span><br><span class="line">        ch.pipeline().addLast(&quot;loginSendHandler&quot;, new LoginSenderhandler());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">serverBootstrap.handler(new ChannelInitializer&lt;ServerSocketChannel&gt;() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void initChannel(ServerSocketChannel ch) throws Exception &#123;</span><br><span class="line">        // 解密</span><br><span class="line">        ch.pipeline().addLast(&quot;packetDecoder&quot;, new PacketDecoder());</span><br><span class="line">        // 子命令解码器</span><br><span class="line">        ch.pipeline().addLast(&quot;subPacketDecoder&quot;, new SubPacketDecoder());</span><br><span class="line">        // 返回封包</span><br><span class="line">        ch.pipeline().addLast(&quot;packetEncoder&quot;, new PacketEncoder());</span><br><span class="line">        // 子命令封包</span><br><span class="line">        ch.pipeline().addLast(&quot;subPacketEncoder&quot;, new SubPacketEncoder());</span><br><span class="line">        // 登陆</span><br><span class="line">        ch.pipeline().addLast(&quot;loginSendHandler&quot;, new LoginSenderhandler());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
 <p>ChannelInitializer 是一种特殊的 ChannelHandler，负责把多个 Handler 和自己添加到 Channel 对应的 pipeline 中，最后把自己移除，这部分看源码可以看出来</p>
-<pre><code>private boolean initChannel(ChannelHandlerContext ctx) throws Exception {
-    if (initMap.putIfAbsent(ctx, Boolean.TRUE) == null) { // Guard against re-entrance.
-        try {
+<pre><code>private boolean initChannel(ChannelHandlerContext ctx) throws Exception &#123;
+    if (initMap.putIfAbsent(ctx, Boolean.TRUE) == null) &#123; // Guard against re-entrance.
+        try &#123;
             // 这个是抽象方法，我们在实例化 ChannelInitializer 类时必须实现的就是这个方法
             initChannel((C) ctx.channel());
-        } catch (Throwable cause) {
+        &#125; catch (Throwable cause) &#123;
             exceptionCaught(ctx, cause);
-        } finally {
+        &#125; finally &#123;
             // 移除多余的 ChannelHandler，具体见下
             remove(ctx);
-        }
+        &#125;
         return true;
-    }
+    &#125;
     return false;
-}
+&#125;
 
-private void remove(ChannelHandlerContext ctx) {
-    try {
+private void remove(ChannelHandlerContext ctx) &#123;
+    try &#123;
         ChannelPipeline pipeline = ctx.pipeline();
-        if (pipeline.context(this) != null) {
+        if (pipeline.context(this) != null) &#123;
             // 把本实例也就是 ChannelInitializer 实例从 pipeline 中移除
             pipeline.remove(this);
-        }
-    } finally {
+        &#125;
+    &#125; finally &#123;
         initMap.remove(ctx);
-    }
-}
-</code></pre><h3 id="childOptions、childAttrs、childHandler-属性"><a href="#childOptions、childAttrs、childHandler-属性" class="headerlink" title="childOptions、childAttrs、childHandler 属性"></a>childOptions、childAttrs、childHandler 属性</h3><p>这四个属性是用来设置服务端的 workerLoopGroup 的属性，具体设置方法和没有带 child 前缀的属性基本相同，两者的区别是：不带 child 前缀的属性在程序初始化时就会执行，带 child 前缀的属性在客户端 connect 成功后才会执行。</p>
+    &#125;
+&#125;
+</code></pre>
+<h3 id="childOptions、childAttrs、childHandler-属性"><a href="#childOptions、childAttrs、childHandler-属性" class="headerlink" title="childOptions、childAttrs、childHandler 属性"></a>childOptions、childAttrs、childHandler 属性</h3><p>这四个属性是用来设置服务端的 workerLoopGroup 的属性，具体设置方法和没有带 child 前缀的属性基本相同，两者的区别是：不带 child 前缀的属性在程序初始化时就会执行，带 child 前缀的属性在客户端 connect 成功后才会执行。</p>
 <h1 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h1><p>下面我们开始使用上面介绍的属性创建一个 Bootstrap 对象，示例化方式分为服务端 ServerBootstrap 和客户端 Bootstrap。</p>
-<h2 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">NioEventLoopGroup bossGroup = new NioEventLoopGroup();</span><br><span class="line">NioEventLoopGroup workerGroup = new NioEventLoopGroup();</span><br><span class="line">// 服务端启动类使用ServerBootstrap</span><br><span class="line">ServerBootstrap bootstrap = new ServerBootstrap();</span><br><span class="line">try &#123;</span><br><span class="line">   // 设置eventLoopGroup，服务端一般情况下会使用bossGroup和workerGroup两组NioEventLoopGroup</span><br><span class="line">   bootstrap.group(bossGroup, workerGroup)</span><br><span class="line">         // 设置channelFactory，服务端设置NioServerSocketChannel，表示这是NIO模式的TCP连接</span><br><span class="line">         .channel(NioServerSocketChannel.class)</span><br><span class="line">         // 设置localAddress，也可以不在这里设置，在下面的bind方法里面设置</span><br><span class="line">         .localAddress(8000)</span><br><span class="line">         // 设置option，SO_BACKLOG表示服务端接受连接的队列长度为100，如果队列已满，客户端连接将被拒绝。</span><br><span class="line">         .option(ChannelOption.SO_BACKLOG, 100)</span><br><span class="line">         // 设置attr</span><br><span class="line">         .attr(AttributeKey.valueOf(&quot;key&quot;), &quot;value&quot;)</span><br><span class="line">         // 设置handler，使用Netty自带的LoggingHandler作为acceptor</span><br><span class="line">         .handler(new LoggingHandler())</span><br><span class="line">         // 设置childOption，TCP_NODELAY表示不管数据大小有数据就发送，SO_KEEPALIVE表示开启心跳探测</span><br><span class="line">         .childOption(ChannelOption.TCP_NODELAY, true)</span><br><span class="line">         .childOption(ChannelOption.SO_KEEPALIVE, true)</span><br><span class="line">         // 设置childAttr</span><br><span class="line">         .childAttr(AttributeKey.valueOf(&quot;childKey&quot;), &quot;childValue&quot;)</span><br><span class="line">         // 设置childHandler，因为有多个ChannelHandler，所以使用ChannelInitializer</span><br><span class="line">         .childHandler(new ChannelInitializer&lt;ServerSocketChannel&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void initChannel(ServerSocketChannel ch) throws Exception &#123;</span><br><span class="line">               // 解密</span><br><span class="line">               ch.pipeline().addLast(&quot;packetDecoder&quot;, new PacketDecoder());</span><br><span class="line">               // 子命令解码器</span><br><span class="line">               ch.pipeline().addLast(&quot;subPacketDecoder&quot;, new SubPacketDecoder());</span><br><span class="line">               // 返回封包</span><br><span class="line">               ch.pipeline().addLast(&quot;packetEncoder&quot;, new PacketEncoder());</span><br><span class="line">               // 子命令封包</span><br><span class="line">               ch.pipeline().addLast(&quot;subPacketEncoder&quot;, new SubPacketEncoder());</span><br><span class="line">               // 登陆</span><br><span class="line">               ch.pipeline().addLast(&quot;loginSendHandler&quot;, new LoginSenderhandler());</span><br><span class="line">            &#125;</span><br><span class="line">         &#125;);</span><br><span class="line"></span><br><span class="line">   // 调用bind()启动服务器，并对启动结果增加回调监听</span><br><span class="line">   ChannelFuture future = bootstrap.bind().sync().addListener(f -&gt; &#123;</span><br><span class="line">      if(f.isSuccess()) &#123;</span><br><span class="line">         log.info(&quot;服务端启动成功&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;);</span><br><span class="line"></span><br><span class="line">   // 对服务端关闭增加回调监听</span><br><span class="line">   future.channel().closeFuture().sync().addListener(f -&gt; &#123;</span><br><span class="line">      if(f.isSuccess()) &#123;</span><br><span class="line">         log.info(&quot;服务端关闭服务&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;);</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">   // 销毁资源</span><br><span class="line">   bossGroup.shutdownGracefully();</span><br><span class="line">   workerGroup.shutdownGracefully();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">NioEventLoopGroup bossGroup = new NioEventLoopGroup();</span><br><span class="line">NioEventLoopGroup workerGroup = new NioEventLoopGroup();</span><br><span class="line">// 服务端启动类使用ServerBootstrap</span><br><span class="line">ServerBootstrap bootstrap = new ServerBootstrap();</span><br><span class="line">try &#123;</span><br><span class="line">   // 设置eventLoopGroup，服务端一般情况下会使用bossGroup和workerGroup两组NioEventLoopGroup</span><br><span class="line">   bootstrap.group(bossGroup, workerGroup)</span><br><span class="line">         // 设置channelFactory，服务端设置NioServerSocketChannel，表示这是NIO模式的TCP连接</span><br><span class="line">         .channel(NioServerSocketChannel.class)</span><br><span class="line">         // 设置localAddress，也可以不在这里设置，在下面的bind方法里面设置</span><br><span class="line">         .localAddress(8000)</span><br><span class="line">         // 设置option，SO_BACKLOG表示服务端接受连接的队列长度为100，如果队列已满，客户端连接将被拒绝。</span><br><span class="line">         .option(ChannelOption.SO_BACKLOG, 100)</span><br><span class="line">         // 设置attr</span><br><span class="line">         .attr(AttributeKey.valueOf(&quot;key&quot;), &quot;value&quot;)</span><br><span class="line">         // 设置handler，使用Netty自带的LoggingHandler作为acceptor</span><br><span class="line">         .handler(new LoggingHandler())</span><br><span class="line">         // 设置childOption，TCP_NODELAY表示不管数据大小有数据就发送，SO_KEEPALIVE表示开启心跳探测</span><br><span class="line">         .childOption(ChannelOption.TCP_NODELAY, true)</span><br><span class="line">         .childOption(ChannelOption.SO_KEEPALIVE, true)</span><br><span class="line">         // 设置childAttr</span><br><span class="line">         .childAttr(AttributeKey.valueOf(&quot;childKey&quot;), &quot;childValue&quot;)</span><br><span class="line">         // 设置childHandler，因为有多个ChannelHandler，所以使用ChannelInitializer</span><br><span class="line">         .childHandler(new ChannelInitializer&lt;ServerSocketChannel&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void initChannel(ServerSocketChannel ch) throws Exception &#123;</span><br><span class="line">               // 解密</span><br><span class="line">               ch.pipeline().addLast(&quot;packetDecoder&quot;, new PacketDecoder());</span><br><span class="line">               // 子命令解码器</span><br><span class="line">               ch.pipeline().addLast(&quot;subPacketDecoder&quot;, new SubPacketDecoder());</span><br><span class="line">               // 返回封包</span><br><span class="line">               ch.pipeline().addLast(&quot;packetEncoder&quot;, new PacketEncoder());</span><br><span class="line">               // 子命令封包</span><br><span class="line">               ch.pipeline().addLast(&quot;subPacketEncoder&quot;, new SubPacketEncoder());</span><br><span class="line">               // 登陆</span><br><span class="line">               ch.pipeline().addLast(&quot;loginSendHandler&quot;, new LoginSenderhandler());</span><br><span class="line">            &#125;</span><br><span class="line">         &#125;);</span><br><span class="line"></span><br><span class="line">   // 调用bind()启动服务器，并对启动结果增加回调监听</span><br><span class="line">   ChannelFuture future = bootstrap.bind().sync().addListener(f -&gt; &#123;</span><br><span class="line">      if(f.isSuccess()) &#123;</span><br><span class="line">         log.info(&quot;服务端启动成功&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;);</span><br><span class="line"></span><br><span class="line">   // 对服务端关闭增加回调监听</span><br><span class="line">   future.channel().closeFuture().sync().addListener(f -&gt; &#123;</span><br><span class="line">      if(f.isSuccess()) &#123;</span><br><span class="line">         log.info(&quot;服务端关闭服务&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;);</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">   // 销毁资源</span><br><span class="line">   bossGroup.shutdownGracefully();</span><br><span class="line">   workerGroup.shutdownGracefully();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p><strong>服务端启动流程代码解析</strong></p>
 <ol>
 <li>创建两组 NioEventLoopGroup 实例：bossGroup 和 workerGroup。</li>
@@ -582,7 +451,8 @@ private void remove(ChannelHandlerContext ctx) {
 <li>对服务端关闭增加回调监听</li>
 <li>服务端关闭后销毁资源</li>
 </ol>
-<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">NioEventLoopGroup group = new NioEventLoopGroup();</span><br><span class="line">// 客户端启动类使用Bootstrap</span><br><span class="line">Bootstrap bootstrap = new Bootstrap();</span><br><span class="line">try &#123;</span><br><span class="line">   // 设置eventLoopGroup，客户端只需要设置一组</span><br><span class="line">   bootstrap.group(group)</span><br><span class="line">         // 设置channelFactory，客户端设置NioSocketChannel，表示这是NIO模式的TCP连接</span><br><span class="line">         .channel(NioSocketChannel.class)</span><br><span class="line">         // 设置remoteAddress，也可以不在这里设置，在下面的connect方法里面设置</span><br><span class="line">         .remoteAddress(&quot;192.168.10.1&quot;, 8000)</span><br><span class="line">         // 设置option，TCP_NODELAY 表示不管数据大小有数据就发送，SO_KEEPALIVE表示开启心跳探测</span><br><span class="line">         .option(ChannelOption.TCP_NODELAY, true)</span><br><span class="line">         .option(ChannelOption.SO_KEEPALIVE, true)</span><br><span class="line">         // 设置attr</span><br><span class="line">         .attr(AttributeKey.valueOf(&quot;key&quot;), &quot;value&quot;)</span><br><span class="line">         // 设置handler，因为有多个ChannelHandler，所以使用ChannelInitializer</span><br><span class="line">         .handler(new ChannelInitializer&lt;ServerSocketChannel&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void initChannel(ServerSocketChannel ch) throws Exception &#123;</span><br><span class="line">               // 解密</span><br><span class="line">               ch.pipeline().addLast(&quot;packetDecoder&quot;, new PacketDecoder());</span><br><span class="line">               // 子命令解码器</span><br><span class="line">               ch.pipeline().addLast(&quot;subPacketDecoder&quot;, new SubPacketDecoder());</span><br><span class="line">               // 返回封包</span><br><span class="line">               ch.pipeline().addLast(&quot;packetEncoder&quot;, new PacketEncoder());</span><br><span class="line">               // 子命令封包</span><br><span class="line">               ch.pipeline().addLast(&quot;subPacketEncoder&quot;, new SubPacketEncoder());</span><br><span class="line">               // 登陆</span><br><span class="line">               ch.pipeline().addLast(&quot;loginSendHandler&quot;, new LoginSenderhandler());</span><br><span class="line">            &#125;</span><br><span class="line">         &#125;);</span><br><span class="line"></span><br><span class="line">   // 客户端调用connect()开始连接服务器，并增加回调监听</span><br><span class="line">   ChannelFuture future = bootstrap.connect().sync().addListener(f -&gt; &#123;</span><br><span class="line">      if(f.isSuccess()) &#123;</span><br><span class="line">         log.info(&quot;客户端连接成功&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;);</span><br><span class="line"></span><br><span class="line">   // 断开服务器增加回调监听</span><br><span class="line">   future.channel().closeFuture().sync().addListener(f -&gt; &#123;</span><br><span class="line">      if(f.isSuccess()) &#123;</span><br><span class="line">         log.info(&quot;客户端连接断开&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;);</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">   // 销毁资源</span><br><span class="line">   group.shutdownGracefully();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">NioEventLoopGroup group = new NioEventLoopGroup();</span><br><span class="line">// 客户端启动类使用Bootstrap</span><br><span class="line">Bootstrap bootstrap = new Bootstrap();</span><br><span class="line">try &#123;</span><br><span class="line">   // 设置eventLoopGroup，客户端只需要设置一组</span><br><span class="line">   bootstrap.group(group)</span><br><span class="line">         // 设置channelFactory，客户端设置NioSocketChannel，表示这是NIO模式的TCP连接</span><br><span class="line">         .channel(NioSocketChannel.class)</span><br><span class="line">         // 设置remoteAddress，也可以不在这里设置，在下面的connect方法里面设置</span><br><span class="line">         .remoteAddress(&quot;192.168.10.1&quot;, 8000)</span><br><span class="line">         // 设置option，TCP_NODELAY 表示不管数据大小有数据就发送，SO_KEEPALIVE表示开启心跳探测</span><br><span class="line">         .option(ChannelOption.TCP_NODELAY, true)</span><br><span class="line">         .option(ChannelOption.SO_KEEPALIVE, true)</span><br><span class="line">         // 设置attr</span><br><span class="line">         .attr(AttributeKey.valueOf(&quot;key&quot;), &quot;value&quot;)</span><br><span class="line">         // 设置handler，因为有多个ChannelHandler，所以使用ChannelInitializer</span><br><span class="line">         .handler(new ChannelInitializer&lt;ServerSocketChannel&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void initChannel(ServerSocketChannel ch) throws Exception &#123;</span><br><span class="line">               // 解密</span><br><span class="line">               ch.pipeline().addLast(&quot;packetDecoder&quot;, new PacketDecoder());</span><br><span class="line">               // 子命令解码器</span><br><span class="line">               ch.pipeline().addLast(&quot;subPacketDecoder&quot;, new SubPacketDecoder());</span><br><span class="line">               // 返回封包</span><br><span class="line">               ch.pipeline().addLast(&quot;packetEncoder&quot;, new PacketEncoder());</span><br><span class="line">               // 子命令封包</span><br><span class="line">               ch.pipeline().addLast(&quot;subPacketEncoder&quot;, new SubPacketEncoder());</span><br><span class="line">               // 登陆</span><br><span class="line">               ch.pipeline().addLast(&quot;loginSendHandler&quot;, new LoginSenderhandler());</span><br><span class="line">            &#125;</span><br><span class="line">         &#125;);</span><br><span class="line"></span><br><span class="line">   // 客户端调用connect()开始连接服务器，并增加回调监听</span><br><span class="line">   ChannelFuture future = bootstrap.connect().sync().addListener(f -&gt; &#123;</span><br><span class="line">      if(f.isSuccess()) &#123;</span><br><span class="line">         log.info(&quot;客户端连接成功&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;);</span><br><span class="line"></span><br><span class="line">   // 断开服务器增加回调监听</span><br><span class="line">   future.channel().closeFuture().sync().addListener(f -&gt; &#123;</span><br><span class="line">      if(f.isSuccess()) &#123;</span><br><span class="line">         log.info(&quot;客户端连接断开&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;);</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">   // 销毁资源</span><br><span class="line">   group.shutdownGracefully();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p><strong>客户端启动流程代码解析</strong></p>
 <p>客户端的启动代码相对于服务端就简单很多</p>
 <ol>
@@ -609,337 +479,188 @@ private void remove(ChannelHandlerContext ctx) {
 <li>childOptions、childAttrs、childHandler</li>
 </ul>
 <p>其中 localAddress、childOptions、childAttrs 和 childHandler是服务端属性，remoteAddress 是客户端属性，其他两者通用。最后通过实战例子分别分析 ServerBootstrap 和 Bootstrap 的具体启动过程。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="">《Netty In Action》</a></p>
-<p><a href="http://www.kancloud.cn:8080/ssj234/netty-source/433213" target="_blank" rel="noopener"> Netty服务器启动过程</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href>《Netty In Action》</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.kancloud.cn:8080/ssj234/netty-source/433213"> Netty服务器启动过程</a></p>
 
-      
     </div>
+
     
     
     
 
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/Netty/" rel="tag"># Netty</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2020/01/20/netty系列（三）：netty原理和组件简介/" rel="next" title="netty系列（三）：netty原理和组件简介">
-                <i class="fa fa-chevron-left"></i> netty系列（三）：netty原理和组件简介
-              </a>
-            
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Netty/" rel="tag"># Netty</a>
           </div>
 
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/05/28/netty系列（五）：EventLoop和EventLoopGroup/" rel="prev" title="netty系列（五）：EventLoop和EventLoopGroup">
-                netty系列（五）：EventLoop和EventLoopGroup <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-
-    <div class="post-spread">
-      
         
-  <div class="bdsharebuttonbox">
-    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
-    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
-    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
-    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
-    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
-    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
-    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
-    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
-    <a href="#" class="bds_more" data-cmd="more"></a>
-    <a class="bds_count" data-cmd="count"></a>
-  </div>
-  <script>
-    window._bd_share_config = {
-      "common": {
-        "bdText": "",
-        "bdMini": "2",
-        "bdMiniList": false,
-        "bdPic": ""
-      },
-      "share": {
-        "bdSize": "16",
-        "bdStyle": "0"
-      },
-      "image": {
-        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
-        "viewText": "分享到：",
-        "viewSize": "16"
-      }
-    }
-  </script>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/20/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9ANetty%E5%8E%9F%E7%90%86%E5%92%8C%E7%BB%84%E4%BB%B6%E7%AE%80%E4%BB%8B/" rel="prev" title="Netty系列（三）：Netty原理和组件简介">
+      <i class="fa fa-chevron-left"></i> Netty系列（三）：Netty原理和组件简介
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/28/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9AEventLoop%E5%92%8CEventLoopGroup/" rel="next" title="Netty系列（五）：EventLoop和EventLoopGroup">
+      Netty系列（五）：EventLoop和EventLoopGroup <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
 
 <script>
-  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
-</script>
-
-      
-    </div>
-  </div>
-
-
-          </div>
-          
-
-
-          
-
-  
-    <div class="comments" id="comments">
-      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNzIyNC8xMzc1OA=="></div>
-    </div>
-
-  
-
-
-
-        </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
-
-  <aside id="sidebar" class="sidebar">
-    
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
-
-      <section class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <img class="site-author-image" itemprop="image"
-                src="/images/head.jpeg"
-                alt="mcb" />
-            
-              <p class="site-author-name" itemprop="name">mcb</p>
-              <p class="site-description motion-element" itemprop="description">Constant dropping wears the stone</p>
-          </div>
-
-          <nav class="site-state motion-element">
-
-            
-              <div class="site-state-item site-state-posts">
-              
-                <a href="/archives/">
-              
-                  <span class="site-state-item-count">29</span>
-                  <span class="site-state-item-name">日志</span>
-                </a>
-              </div>
-            
-
-            
-              
-              
-              <div class="site-state-item site-state-categories">
-                <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
-                  <span class="site-state-item-name">分类</span>
-                </a>
-              </div>
-            
-
-            
-              
-              
-              <div class="site-state-item site-state-tags">
-                <a href="/tags/index.html">
-                  <span class="site-state-item-count">21</span>
-                  <span class="site-state-item-name">标签</span>
-                </a>
-              </div>
-            
-
-          </nav>
-
-          
-
-          
-            <div class="links-of-author motion-element">
-                
-                  <span class="links-of-author-item">
-                    <a href="https://github.com/18814122746" target="_blank" title="GitHub">
-                      
-                        <i class="fa fa-fw fa-github"></i>GitHub</a>
-                  </span>
-                
-            </div>
-          
-
-          
-          
-
-          
-          
-
-          
-
-        </div>
-      </section>
-
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Bootstrap是什么"><span class="nav-number">1.</span> <span class="nav-text">Bootstrap是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Bootstrap-类分析"><span class="nav-number">2.</span> <span class="nav-text">Bootstrap 类分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#类分析"><span class="nav-number">2.1.</span> <span class="nav-text">类分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#属性介绍"><span class="nav-number">2.2.</span> <span class="nav-text">属性介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#group-属性"><span class="nav-number">2.2.1.</span> <span class="nav-text">group 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#channelFactory-属性"><span class="nav-number">2.2.2.</span> <span class="nav-text">channelFactory 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#localAddress、remoteAddress-属性"><span class="nav-number">2.2.3.</span> <span class="nav-text">localAddress、remoteAddress 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#options-属性"><span class="nav-number">2.2.4.</span> <span class="nav-text">options 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#attrs-属性"><span class="nav-number">2.2.5.</span> <span class="nav-text">attrs 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#handler-属性"><span class="nav-number">2.2.6.</span> <span class="nav-text">handler 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#childOptions、childAttrs、childHandler-属性"><span class="nav-number">2.2.7.</span> <span class="nav-text">childOptions、childAttrs、childHandler 属性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实战"><span class="nav-number">3.</span> <span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端"><span class="nav-number">3.1.</span> <span class="nav-text">服务端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端"><span class="nav-number">3.2.</span> <span class="nav-text">客户端</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
-      
-
-      
-
-    </div>
-  </aside>
-
-
-        
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">mcb</span>
-
-  
-</div>
-
-
-  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
-
-
-
-
-        
-<div class="busuanzi-count">
-  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-  
-    <span class="site-uv">
-      <i class="fa fa-user"></i> 总访问人数
-      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
-      人
-    </span>
-  
-
-  
-    <span class="site-pv">
-      <i class="fa fa-eye"></i> 总访问量
-      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
-      次
-    </span>
-  
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-
-    
-
-  </div>
-
-  
-
-<script type="text/javascript">
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
 </script>
 
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Bootstrap%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">Bootstrap是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Bootstrap-%E7%B1%BB%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">Bootstrap 类分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E5%88%86%E6%9E%90"><span class="nav-number">2.1.</span> <span class="nav-text">类分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%9E%E6%80%A7%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.2.</span> <span class="nav-text">属性介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#group-%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.1.</span> <span class="nav-text">group 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#channelFactory-%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.2.</span> <span class="nav-text">channelFactory 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#localAddress%E3%80%81remoteAddress-%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.3.</span> <span class="nav-text">localAddress、remoteAddress 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#options-%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.4.</span> <span class="nav-text">options 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#attrs-%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.5.</span> <span class="nav-text">attrs 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#handler-%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.6.</span> <span class="nav-text">handler 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#childOptions%E3%80%81childAttrs%E3%80%81childHandler-%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.7.</span> <span class="nav-text">childOptions、childAttrs、childHandler 属性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E6%88%98"><span class="nav-number">3.</span> <span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF"><span class="nav-number">3.1.</span> <span class="nav-text">服务端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">3.2.</span> <span class="nav-text">客户端</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
 
 
 
 
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -947,463 +668,22 @@ private void remove(ChannelHandlerContext ctx) {
   
 
 
-  
-
-
-
-
-
-
-
-
-
 
 
   
-  
-    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-  
+<script src="/js/local-search.js"></script>
 
-  
-  
-    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
-  
 
 
-  
 
 
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
 
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
 
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
-
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
-
-
-
-  
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  
-
-
-
-
-	
-
-
-
-
-
-  
-
-
-
-
-
-  
-    <script type="text/javascript">
-      (function(d, s) {
-        var j, e = d.getElementsByTagName(s)[0];
-        if (typeof LivereTower === 'function') { return; }
-        j = d.createElement(s);
-        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-        j.async = true;
-        e.parentNode.insertBefore(j, e);
-      })(document, 'script');
-    </script>
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  <script type="text/javascript">
-    // Popup Window;
-    var isfetched = false;
-    var isXml = true;
-    // Search DB path;
-    var search_path = "search.xml";
-    if (search_path.length === 0) {
-      search_path = "search.xml";
-    } else if (/json$/i.test(search_path)) {
-      isXml = false;
-    }
-    var path = "/" + search_path;
-    // monitor main search box;
-
-    var onPopupClose = function (e) {
-      $('.popup').hide();
-      $('#local-search-input').val('');
-      $('.search-result-list').remove();
-      $('#no-result').remove();
-      $(".local-search-pop-overlay").remove();
-      $('body').css('overflow', '');
-    }
-
-    function proceedsearch() {
-      $("body")
-        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
-        .css('overflow', 'hidden');
-      $('.search-popup-overlay').click(onPopupClose);
-      $('.popup').toggle();
-      var $localSearchInput = $('#local-search-input');
-      $localSearchInput.attr("autocapitalize", "none");
-      $localSearchInput.attr("autocorrect", "off");
-      $localSearchInput.focus();
-    }
-
-    // search function;
-    var searchFunc = function(path, search_id, content_id) {
-      'use strict';
-
-      // start loading animation
-      $("body")
-        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
-          '<div id="search-loading-icon">' +
-          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
-          '</div>' +
-          '</div>')
-        .css('overflow', 'hidden');
-      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
-
-      $.ajax({
-        url: path,
-        dataType: isXml ? "xml" : "json",
-        async: true,
-        success: function(res) {
-          // get the contents from search data
-          isfetched = true;
-          $('.popup').detach().appendTo('.header-inner');
-          var datas = isXml ? $("entry", res).map(function() {
-            return {
-              title: $("title", this).text(),
-              content: $("content",this).text(),
-              url: $("url" , this).text()
-            };
-          }).get() : res;
-          var input = document.getElementById(search_id);
-          var resultContent = document.getElementById(content_id);
-          var inputEventFunction = function() {
-            var searchText = input.value.trim().toLowerCase();
-            var keywords = searchText.split(/[\s\-]+/);
-            if (keywords.length > 1) {
-              keywords.push(searchText);
-            }
-            var resultItems = [];
-            if (searchText.length > 0) {
-              // perform local searching
-              datas.forEach(function(data) {
-                var isMatch = false;
-                var hitCount = 0;
-                var searchTextCount = 0;
-                var title = data.title.trim();
-                var titleInLowerCase = title.toLowerCase();
-                var content = data.content.trim().replace(/<[^>]+>/g,"");
-                var contentInLowerCase = content.toLowerCase();
-                var articleUrl = decodeURIComponent(data.url);
-                var indexOfTitle = [];
-                var indexOfContent = [];
-                // only match articles with not empty titles
-                if(title != '') {
-                  keywords.forEach(function(keyword) {
-                    function getIndexByWord(word, text, caseSensitive) {
-                      var wordLen = word.length;
-                      if (wordLen === 0) {
-                        return [];
-                      }
-                      var startPosition = 0, position = [], index = [];
-                      if (!caseSensitive) {
-                        text = text.toLowerCase();
-                        word = word.toLowerCase();
-                      }
-                      while ((position = text.indexOf(word, startPosition)) > -1) {
-                        index.push({position: position, word: word});
-                        startPosition = position + wordLen;
-                      }
-                      return index;
-                    }
-
-                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
-                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
-                  });
-                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
-                    isMatch = true;
-                    hitCount = indexOfTitle.length + indexOfContent.length;
-                  }
-                }
-
-                // show search results
-
-                if (isMatch) {
-                  // sort index by position of keyword
-
-                  [indexOfTitle, indexOfContent].forEach(function (index) {
-                    index.sort(function (itemLeft, itemRight) {
-                      if (itemRight.position !== itemLeft.position) {
-                        return itemRight.position - itemLeft.position;
-                      } else {
-                        return itemLeft.word.length - itemRight.word.length;
-                      }
-                    });
-                  });
-
-                  // merge hits into slices
-
-                  function mergeIntoSlice(text, start, end, index) {
-                    var item = index[index.length - 1];
-                    var position = item.position;
-                    var word = item.word;
-                    var hits = [];
-                    var searchTextCountInSlice = 0;
-                    while (position + word.length <= end && index.length != 0) {
-                      if (word === searchText) {
-                        searchTextCountInSlice++;
-                      }
-                      hits.push({position: position, length: word.length});
-                      var wordEnd = position + word.length;
-
-                      // move to next position of hit
-
-                      index.pop();
-                      while (index.length != 0) {
-                        item = index[index.length - 1];
-                        position = item.position;
-                        word = item.word;
-                        if (wordEnd > position) {
-                          index.pop();
-                        } else {
-                          break;
-                        }
-                      }
-                    }
-                    searchTextCount += searchTextCountInSlice;
-                    return {
-                      hits: hits,
-                      start: start,
-                      end: end,
-                      searchTextCount: searchTextCountInSlice
-                    };
-                  }
-
-                  var slicesOfTitle = [];
-                  if (indexOfTitle.length != 0) {
-                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
-                  }
-
-                  var slicesOfContent = [];
-                  while (indexOfContent.length != 0) {
-                    var item = indexOfContent[indexOfContent.length - 1];
-                    var position = item.position;
-                    var word = item.word;
-                    // cut out 100 characters
-                    var start = position - 20;
-                    var end = position + 80;
-                    if(start < 0){
-                      start = 0;
-                    }
-                    if (end < position + word.length) {
-                      end = position + word.length;
-                    }
-                    if(end > content.length){
-                      end = content.length;
-                    }
-                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
-                  }
-
-                  // sort slices in content by search text's count and hits' count
-
-                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
-                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
-                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
-                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
-                      return sliceRight.hits.length - sliceLeft.hits.length;
-                    } else {
-                      return sliceLeft.start - sliceRight.start;
-                    }
-                  });
-
-                  // select top N slices in content
-
-                  var upperBound = parseInt('1');
-                  if (upperBound >= 0) {
-                    slicesOfContent = slicesOfContent.slice(0, upperBound);
-                  }
-
-                  // highlight title and content
-
-                  function highlightKeyword(text, slice) {
-                    var result = '';
-                    var prevEnd = slice.start;
-                    slice.hits.forEach(function (hit) {
-                      result += text.substring(prevEnd, hit.position);
-                      var end = hit.position + hit.length;
-                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
-                      prevEnd = end;
-                    });
-                    result += text.substring(prevEnd, slice.end);
-                    return result;
-                  }
-
-                  var resultItem = '';
-
-                  if (slicesOfTitle.length != 0) {
-                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
-                  } else {
-                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
-                  }
-
-                  slicesOfContent.forEach(function (slice) {
-                    resultItem += "<a href='" + articleUrl + "'>" +
-                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
-                      "...</p>" + "</a>";
-                  });
-
-                  resultItem += "</li>";
-                  resultItems.push({
-                    item: resultItem,
-                    searchTextCount: searchTextCount,
-                    hitCount: hitCount,
-                    id: resultItems.length
-                  });
-                }
-              })
-            };
-            if (keywords.length === 1 && keywords[0] === "") {
-              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
-            } else if (resultItems.length === 0) {
-              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
-            } else {
-              resultItems.sort(function (resultLeft, resultRight) {
-                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
-                  return resultRight.searchTextCount - resultLeft.searchTextCount;
-                } else if (resultLeft.hitCount !== resultRight.hitCount) {
-                  return resultRight.hitCount - resultLeft.hitCount;
-                } else {
-                  return resultRight.id - resultLeft.id;
-                }
-              });
-              var searchResultList = '<ul class=\"search-result-list\">';
-              resultItems.forEach(function (result) {
-                searchResultList += result.item;
-              })
-              searchResultList += "</ul>";
-              resultContent.innerHTML = searchResultList;
-            }
-          }
-
-          if ('auto' === 'auto') {
-            input.addEventListener('input', inputEventFunction);
-          } else {
-            $('.search-icon').click(inputEventFunction);
-            input.addEventListener('keypress', function (event) {
-              if (event.keyCode === 13) {
-                inputEventFunction();
-              }
-            });
-          }
-
-          // remove loading animation
-          $(".local-search-pop-overlay").remove();
-          $('body').css('overflow', '');
-
-          proceedsearch();
-        }
-      });
-    }
-
-    // handle and trigger popup window;
-    $('.popup-trigger').click(function(e) {
-      e.stopPropagation();
-      if (isfetched === false) {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      } else {
-        proceedsearch();
-      };
-    });
-
-    $('.popup-btn-close').click(onPopupClose);
-    $('.popup').click(function(e){
-      e.stopPropagation();
-    });
-    $(document).on('keyup', function (event) {
-      var shouldDismissSearchPopup = event.which === 27 &&
-        $('.search-popup').is(':visible');
-      if (shouldDismissSearchPopup) {
-        onPopupClose();
-      }
-    });
-  </script>
-
-
-
-
-
-  
-
-  
-
-  
-
-  
-  
-
-  
 
   
 

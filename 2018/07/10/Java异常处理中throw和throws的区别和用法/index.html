@@ -1,130 +1,51 @@
 <!DOCTYPE html>
-
-
-
-  
-
-
-<html class="theme-next gemini use-motion" lang="zh-Hans">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
 
-
-
-
-
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
-
-
-
-
-
-
-
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
-
-<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
-
-
-
-
-
-  <meta name="keywords" content="Java,异常处理," />
-
-
-
-
-
-
-
-
-
-
-<meta name="description" content="前一篇文章已经详细介绍了 Java 的异常处理机制，在这里做一些补充，探讨异常处理关键字 throw 和 throws 的区别和用法。转载请说明出处。">
-<meta name="keywords" content="Java,异常处理">
+  <meta name="description" content="前一篇文章已经详细介绍了 Java 的异常处理机制，在这里做一些补充，探讨异常处理关键字 throw 和 throws 的区别和用法。转载请说明出处。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java异常处理中throw和throws的区别和用法">
-<meta property="og:url" content="http://yoursite.com/2018/07/10/Java异常处理中throw和throws的区别和用法/index.html">
+<meta property="og:url" content="http://yoursite.com/2018/07/10/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E4%B8%ADthrow%E5%92%8Cthrows%E7%9A%84%E5%8C%BA%E5%88%AB%E5%92%8C%E7%94%A8%E6%B3%95/index.html">
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="前一篇文章已经详细介绍了 Java 的异常处理机制，在这里做一些补充，探讨异常处理关键字 throw 和 throws 的区别和用法。转载请说明出处。">
-<meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-12T10:39:43.063Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-07-10T09:41:56.000Z">
+<meta property="article:modified_time" content="2023-01-24T07:08:59.437Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="异常处理">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Java异常处理中throw和throws的区别和用法">
-<meta name="twitter:description" content="前一篇文章已经详细介绍了 Java 的异常处理机制，在这里做一些补充，探讨异常处理关键字 throw 和 throws 的区别和用法。转载请说明出处。">
+
+<link rel="canonical" href="http://yoursite.com/2018/07/10/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E4%B8%ADthrow%E5%92%8Cthrows%E7%9A%84%E5%8C%BA%E5%88%AB%E5%92%8C%E7%94%A8%E6%B3%95/">
 
 
-
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Gemini',
-    version: '5.1.4',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
-    fancybox: true,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    duoshuo: {
-      userId: '0',
-      author: '博主'
-    },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
   };
 </script>
-
-
-
-  <link rel="canonical" href="http://yoursite.com/2018/07/10/Java异常处理中throw和throws的区别和用法/"/>
-
-
-
-
 
   <title>Java异常处理中throw和throws的区别和用法 | 飙戈的博客</title>
   
@@ -133,254 +54,192 @@
 
 
 
-  <script type="text/javascript">
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?219a1c6fb7c1b9540f55e4c9f4259274";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
 
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
 
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
 
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
 
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-left page-post-detail">
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta ">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">飙戈的博客</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
-      
-        <p class="site-subtitle"></p>
-      
   </div>
 
-  <div class="site-nav-toggle">
-    <button>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
   </div>
 </div>
+
+
+
 
 <nav class="site-nav">
-  
-
-  
-    <ul id="menu" class="menu">
-      
-        
+  <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
-            首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
-            标签
-          </a>
-        </li>
-      
-        
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
         <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
         <li class="menu-item menu-item-archives">
-          <a href="/archives/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
-            
-            归档
-          </a>
-        </li>
-      
 
-      
-        <li class="menu-item menu-item-search">
-          
-            <a href="javascript:;" class="popup-trigger">
-          
-            
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
-            
-            搜索
-          </a>
-        </li>
-      
-    </ul>
-  
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
-  
-    <div class="site-search">
-      
-  <div class="popup search-popup local-search-popup">
-  <div class="local-search-header clearfix">
-    <span class="search-icon">
-      <i class="fa fa-search"></i>
-    </span>
-    <span class="popup-btn-close">
-      <i class="fa fa-times-circle"></i>
-    </span>
-    <div class="local-search-input-wrapper">
-      <input autocomplete="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
-    </div>
-  </div>
-  <div id="local-search-result"></div>
-</div>
-
-
-
-    </div>
-  
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
 </nav>
 
 
 
- </div>
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
     </header>
 
-    <main id="main" class="main">
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
       <div class="main-inner">
         <div class="content-wrap">
-          <div id="content" class="content">
+          
+
+          <div class="content post posts-expand">
             
 
-  <div id="posts" class="posts-expand">
     
-
-  
-
   
   
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/10/Java异常处理中throw和throws的区别和用法/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/10/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E4%B8%ADthrow%E5%92%8Cthrows%E7%9A%84%E5%8C%BA%E5%88%AB%E5%92%8C%E7%94%A8%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="mcb">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/head.jpeg">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="飙戈的博客">
     </span>
-
-    
       <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">Java异常处理中throw和throws的区别和用法</h1>
-        
+        <h1 class="post-title" itemprop="name headline">
+          Java异常处理中throw和throws的区别和用法
+        </h1>
 
         <div class="post-meta">
-          <span class="post-time">
-            
+            <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
+                <i class="far fa-calendar"></i>
               </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-10T17:41:56+08:00">
-                2018-07-10
-              </time>
-            
+              <span class="post-meta-item-text">发表于</span>
 
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
+              <time title="创建时间：2018-07-10 17:41:56" itemprop="dateCreated datePublished" datetime="2018-07-10T17:41:56+08:00">2018-07-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
                 </span>
-
-                
-                
-              
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-24 15:08:59" itemprop="dateModified" datetime="2023-01-24T15:08:59+08:00">2023-01-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Java%E5%BC%82%E5%B8%B8/" itemprop="url" rel="index"><span itemprop="name">Java异常</span></a>
+                </span>
             </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-            <span class="post-meta-divider">|</span>
-            <span class="page-pv"><i class="fa fa-file-o"></i> 本文阅读量
-            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
-            </span>
-          
-
-          
 
           
 
         </div>
       </header>
-    
 
     
     
@@ -388,13 +247,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-      
-
-      
         <blockquote>
 <p>前一篇文章已经详细介绍了 Java 的异常处理机制，在这里做一些补充，探讨异常处理关键字 throw 和 throws 的区别和用法。转载请说明出处。</p>
 </blockquote>
-<a id="more"></a>
+<span id="more"></span>
+
 <h2 id="抛出异常的三种形式"><a href="#抛出异常的三种形式" class="headerlink" title="抛出异常的三种形式"></a>抛出异常的三种形式</h2><p>Java 抛出异常有三种形式：</p>
 <ul>
 <li>系统自动抛出异常</li>
@@ -402,22 +259,30 @@
 <li>方法体通过 throw 抛出异常</li>
 </ul>
 <h3 id="系统自动抛出异常"><a href="#系统自动抛出异常" class="headerlink" title="系统自动抛出异常"></a>系统自动抛出异常</h3><p>当程序语句出现一些逻辑错误、主义错误或类型转换错误时，系统会自动抛出异常。发生异常后线程停止运行，后面的语句执行不到，会在包含它的所有 try 块中（可能在上层调用函数中）从里向外寻找含有与其匹配的 catch 子句的 try 块。如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	int a = 5, b =0;</span><br><span class="line">	System.out.println(5/b);</span><br><span class="line">	//function();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	int a = 5, b =0;</span><br><span class="line">	System.out.println(5/b);</span><br><span class="line">	//function();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>系统会自动抛出ArithmeticException异常：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.ArithmeticException: / by zero</span><br><span class="line"></span><br><span class="line">at test.ExceptionTest.main(ExceptionTest.java:62)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.ArithmeticException: / by zero</span><br><span class="line"></span><br><span class="line">at test.ExceptionTest.main(ExceptionTest.java:62)</span><br></pre></td></tr></table></figure>
+
 <p>再如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	String s = &quot;abc&quot;;</span><br><span class="line">	System.out.println(Double.parseDouble(s));</span><br><span class="line">	//function();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	String s = &quot;abc&quot;;</span><br><span class="line">	System.out.println(Double.parseDouble(s));</span><br><span class="line">	//function();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>系统会自动抛出NumberFormatException异常：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.NumberFormatException: For input string: &quot;abc&quot;</span><br><span class="line"></span><br><span class="line">at sun.misc.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:1224)</span><br><span class="line"></span><br><span class="line">at java.lang.Double.parseDouble(Double.java:510)</span><br><span class="line"></span><br><span class="line">at test.ExceptionTest.main(ExceptionTest.java:62)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.NumberFormatException: For input string: &quot;abc&quot;</span><br><span class="line"></span><br><span class="line">at sun.misc.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:1224)</span><br><span class="line"></span><br><span class="line">at java.lang.Double.parseDouble(Double.java:510)</span><br><span class="line"></span><br><span class="line">at test.ExceptionTest.main(ExceptionTest.java:62)</span><br></pre></td></tr></table></figure>
+
 <h3 id="throw-抛出异常"><a href="#throw-抛出异常" class="headerlink" title="throw 抛出异常"></a>throw 抛出异常</h3><p>throw 出现在方法体中，用于程序员主动抛出某种特定类型的异常。通过 throw 抛出的异常和系统自动抛出的异常有相同的效果。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	String s = &quot;abc&quot;;</span><br><span class="line">	if(s.equals(&quot;abc&quot;)) &#123;</span><br><span class="line">		throw new NumberFormatException();</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		System.out.println(s);</span><br><span class="line">	&#125;</span><br><span class="line">	//function();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	String s = &quot;abc&quot;;</span><br><span class="line">	if(s.equals(&quot;abc&quot;)) &#123;</span><br><span class="line">		throw new NumberFormatException();</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		System.out.println(s);</span><br><span class="line">	&#125;</span><br><span class="line">	//function();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>会抛出异常：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.NumberFormatException</span><br><span class="line"></span><br><span class="line">at test.ExceptionTest.main(ExceptionTest.java:67)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.NumberFormatException</span><br><span class="line"></span><br><span class="line">at test.ExceptionTest.main(ExceptionTest.java:67)</span><br></pre></td></tr></table></figure>
+
 <h3 id="throws-抛出异常"><a href="#throws-抛出异常" class="headerlink" title="throws 抛出异常"></a>throws 抛出异常</h3><p>throws 出现方法头中，用来声明该方法可能抛出的异常类型，然后把异常交给调用它的上级程序来处理。</p>
 <p>对于 Error 和 RuntimeException 类型的及其子类的异常，不需要在方法头通过 throws 明确声明，因为这是不期待出现的异常。对于其他类型的异常 Java 编译器强制要求在方法头 通过 throws 明确声明，否则编译不通过。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public static void function() throws NumberFormatException&#123;</span><br><span class="line">	String s = &quot;abc&quot;;</span><br><span class="line">	System.out.println(Double.parseDouble(s));</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	try &#123;</span><br><span class="line">		function();</span><br><span class="line">	&#125; catch (NumberFormatException e) &#123;</span><br><span class="line">		System.err.println(&quot;非数据类型不能转换。&quot;);</span><br><span class="line">		//e.printStackTrace();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public static void function() throws NumberFormatException&#123;</span><br><span class="line">	String s = &quot;abc&quot;;</span><br><span class="line">	System.out.println(Double.parseDouble(s));</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	try &#123;</span><br><span class="line">		function();</span><br><span class="line">	&#125; catch (NumberFormatException e) &#123;</span><br><span class="line">		System.err.println(&quot;非数据类型不能转换。&quot;);</span><br><span class="line">		//e.printStackTrace();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>输出结果如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">非数据类型不能转换。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">非数据类型不能转换。</span><br></pre></td></tr></table></figure>
+
 <h2 id="throw-和-throws-的区别和用法"><a href="#throw-和-throws-的区别和用法" class="headerlink" title="throw 和 throws 的区别和用法"></a>throw 和 throws 的区别和用法</h2><h3 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h3><ul>
 <li>throws 用于方法头，throw 用于方法内部</li>
 <li>throws 后跟异常类型，表示可能会出现这些类型的异常，但是不一定抛出；throw 后跟异常对象，如果执行到 throw 就一定会抛出这种类型的异常。</li>
@@ -426,349 +291,202 @@
 <h3 id="使用场合"><a href="#使用场合" class="headerlink" title="使用场合"></a>使用场合</h3><p>Java 将派生于 Error 类和 RuntimeException 类的异常称为 <strong>非检查异常</strong> (unchecked exception)，将其他异常称为 <strong>检查异常</strong> (checked exception)。</p>
 <p>一般来说，系统在编译阶段检查的是检查异常和 throws 声明的异常，在运行阶段自动抛出的是非检查异常。</p>
 <p>对于检查异常，如果通过 throw 主动抛出，或者调用了可能会产生异常的方法但是又没有进行处理，必须在方法头上用 throws 显式声明该异常类型，否则编译器会报错。如下面 IOException 为检查异常</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//通过throw主动抛出</span><br><span class="line">public void throwEx1() throws IOException &#123; //正常编译</span><br><span class="line">    throw new IOException(&quot;.&quot;); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void throwEx2() &#123; //编译报错 unhandled exception java.io.ioexeption</span><br><span class="line">    throw new IOException(&quot;.&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//调用可能会产生异常的方法但是没有进行处理</span><br><span class="line">public void throwEx3() throws IOException&#123; //正常编译</span><br><span class="line">    FileInputStream input = new FileInputStream(&quot;xxx&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void throwEx4() &#123; //编译报错 unhandled exception java.io.ioexeption</span><br><span class="line">    FileInputStream input = new FileInputStream(&quot;xxx&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//通过throw主动抛出</span><br><span class="line">public void throwEx1() throws IOException &#123; //正常编译</span><br><span class="line">    throw new IOException(&quot;.&quot;); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void throwEx2() &#123; //编译报错 unhandled exception java.io.ioexeption</span><br><span class="line">    throw new IOException(&quot;.&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//调用可能会产生异常的方法但是没有进行处理</span><br><span class="line">public void throwEx3() throws IOException&#123; //正常编译</span><br><span class="line">    FileInputStream input = new FileInputStream(&quot;xxx&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void throwEx4() &#123; //编译报错 unhandled exception java.io.ioexeption</span><br><span class="line">    FileInputStream input = new FileInputStream(&quot;xxx&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>对于非检查异常，如果通过 throw 主动抛出，可自行选择是否在方法头用 throws 显式声明，不声明编译也不会报错。如下面 SQLException 为非检查异常</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public void throwEx5() throws SQLException&#123; //正常编译</span><br><span class="line">    throw new IllegalStateException(&quot;.&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void throwEx6() &#123; //正常编译</span><br><span class="line">    throw new IllegalStateException(&quot;.&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public void throwEx5() throws SQLException&#123; //正常编译</span><br><span class="line">    throw new IllegalStateException(&quot;.&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void throwEx6() &#123; //正常编译</span><br><span class="line">    throw new IllegalStateException(&quot;.&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>如果调用方法名包含 throws 异常类型的方法，必须<em>在方法内通过 <code>try...catch</code> 捕获，或者继续在方法名上用 throws 声明继续往上抛</em>。例如调用上面的方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public void throwEx7() &#123;</span><br><span class="line">    throwEx1(); //编译报错 unhandled exception java.io.ioexeption</span><br><span class="line">    throwEx5(); //编译报错 unhandled exception java.sql.sqlexeption</span><br><span class="line">    throwEx6(); //正常编译</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void throwEx8() throws IOException, SQLException&#123;</span><br><span class="line">    throwEx1(); //正常编译</span><br><span class="line">    throwEx5(); //正常编译</span><br><span class="line">    throwEx6(); //正常编译</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public void throwEx7() &#123;</span><br><span class="line">    throwEx1(); //编译报错 unhandled exception java.io.ioexeption</span><br><span class="line">    throwEx5(); //编译报错 unhandled exception java.sql.sqlexeption</span><br><span class="line">    throwEx6(); //正常编译</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void throwEx8() throws IOException, SQLException&#123;</span><br><span class="line">    throwEx1(); //正常编译</span><br><span class="line">    throwEx5(); //正常编译</span><br><span class="line">    throwEx6(); //正常编译</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <h3 id="编程总结"><a href="#编程总结" class="headerlink" title="编程总结"></a>编程总结</h3><ol>
-<li>在写程序时，对可能会出现异常的部分通常要用 <code>try{...}catch{...}</code> 去捕捉它并对它进行处理</li>
-<li>用 <code>try{...}catch{...}</code> 捕捉了异常之后一定要对在 <code>catch{...}</code> 中对其进行处理，那怕是最简单的一句输出语句，或栈输入 <code>e.printStackTrace()</code></li>
-<li>如果是捕捉 IO 输入输出流中的异常，一定要在 <code>try{...}catch{...}</code> 后加 <code>finally{...}</code> 把输入输出流关闭；</li>
+<li>在写程序时，对可能会出现异常的部分通常要用 <code>try&#123;...&#125;catch&#123;...&#125;</code> 去捕捉它并对它进行处理</li>
+<li>用 <code>try&#123;...&#125;catch&#123;...&#125;</code> 捕捉了异常之后一定要对在 <code>catch&#123;...&#125;</code> 中对其进行处理，那怕是最简单的一句输出语句，或栈输入 <code>e.printStackTrace()</code></li>
+<li>如果是捕捉 IO 输入输出流中的异常，一定要在 <code>try&#123;...&#125;catch&#123;...&#125;</code> 后加 <code>finally&#123;...&#125;</code> 把输入输出流关闭；</li>
 <li>如果在函数体内用 throw 抛出了某种异常，最好要在函数名中加 throws 抛异常声明，然后交给调用它的上层函数进行处理。</li>
 </ol>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/luoweifu/article/details/10721543" target="_blank" rel="noopener">再探java基础——throw与throws</a><br><a href="https://zhidao.baidu.com/question/519014936.html?si=2&amp;qbpn=1_2&amp;tx=&amp;wtp=wk&amp;word=Java%EF%BC%9Athrow%E5%92%8Cthrows%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%8C%E6%97%B6%E4%BD%BF%E7%94%A8%E5%90%97%EF%BC%9F&amp;fr=solved&amp;from=qb&amp;ssid=&amp;uid=bd_1492636518_230&amp;pu=sz%40224_240%2Cos%40&amp;step=2&amp;bd_page_type=1&amp;init=middle" target="_blank" rel="noopener">百度问答</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/luoweifu/article/details/10721543">再探java基础——throw与throws</a><br><a target="_blank" rel="noopener" href="https://zhidao.baidu.com/question/519014936.html?si=2&qbpn=1_2&tx=&wtp=wk&word=Java%EF%BC%9Athrow%E5%92%8Cthrows%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%8C%E6%97%B6%E4%BD%BF%E7%94%A8%E5%90%97%EF%BC%9F&fr=solved&from=qb&ssid=&uid=bd_1492636518_230&pu=sz@224_240,os@&step=2&bd_page_type=1&init=middle">百度问答</a></p>
 
-      
     </div>
+
     
     
     
 
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/Java/" rel="tag"># Java</a>
-          
-            <a href="/tags/异常处理/" rel="tag"># 异常处理</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2018/07/10/Java中的异常和处理详解/" rel="next" title="Java异常处理详解">
-                <i class="fa fa-chevron-left"></i> Java异常处理详解
-              </a>
-            
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" rel="tag"># 异常处理</a>
           </div>
 
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/07/12/Java集合框架总结/" rel="prev" title="Java集合框架总结">
-                Java集合框架总结 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-
-    <div class="post-spread">
-      
         
-  <div class="bdsharebuttonbox">
-    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
-    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
-    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
-    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
-    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
-    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
-    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
-    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
-    <a href="#" class="bds_more" data-cmd="more"></a>
-    <a class="bds_count" data-cmd="count"></a>
-  </div>
-  <script>
-    window._bd_share_config = {
-      "common": {
-        "bdText": "",
-        "bdMini": "2",
-        "bdMiniList": false,
-        "bdPic": ""
-      },
-      "share": {
-        "bdSize": "16",
-        "bdStyle": "0"
-      },
-      "image": {
-        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
-        "viewText": "分享到：",
-        "viewSize": "16"
-      }
-    }
-  </script>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/10/Java%E4%B8%AD%E7%9A%84%E5%BC%82%E5%B8%B8%E5%92%8C%E5%A4%84%E7%90%86%E8%AF%A6%E8%A7%A3/" rel="prev" title="Java异常处理详解">
+      <i class="fa fa-chevron-left"></i> Java异常处理详解
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/" rel="next" title="Java集合框架总结">
+      Java集合框架总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
 
 <script>
-  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
-</script>
-
-      
-    </div>
-  </div>
-
-
-          </div>
-          
-
-
-          
-
-  
-    <div class="comments" id="comments">
-      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNzIyNC8xMzc1OA=="></div>
-    </div>
-
-  
-
-
-
-        </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
-
-  <aside id="sidebar" class="sidebar">
-    
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
-
-      <section class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <img class="site-author-image" itemprop="image"
-                src="/images/head.jpeg"
-                alt="mcb" />
-            
-              <p class="site-author-name" itemprop="name">mcb</p>
-              <p class="site-description motion-element" itemprop="description">Constant dropping wears the stone</p>
-          </div>
-
-          <nav class="site-state motion-element">
-
-            
-              <div class="site-state-item site-state-posts">
-              
-                <a href="/archives/">
-              
-                  <span class="site-state-item-count">29</span>
-                  <span class="site-state-item-name">日志</span>
-                </a>
-              </div>
-            
-
-            
-              
-              
-              <div class="site-state-item site-state-categories">
-                <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
-                  <span class="site-state-item-name">分类</span>
-                </a>
-              </div>
-            
-
-            
-              
-              
-              <div class="site-state-item site-state-tags">
-                <a href="/tags/index.html">
-                  <span class="site-state-item-count">21</span>
-                  <span class="site-state-item-name">标签</span>
-                </a>
-              </div>
-            
-
-          </nav>
-
-          
-
-          
-            <div class="links-of-author motion-element">
-                
-                  <span class="links-of-author-item">
-                    <a href="https://github.com/18814122746" target="_blank" title="GitHub">
-                      
-                        <i class="fa fa-fw fa-github"></i>GitHub</a>
-                  </span>
-                
-            </div>
-          
-
-          
-          
-
-          
-          
-
-          
-
-        </div>
-      </section>
-
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#抛出异常的三种形式"><span class="nav-number">1.</span> <span class="nav-text">抛出异常的三种形式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#系统自动抛出异常"><span class="nav-number">1.1.</span> <span class="nav-text">系统自动抛出异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#throw-抛出异常"><span class="nav-number">1.2.</span> <span class="nav-text">throw 抛出异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#throws-抛出异常"><span class="nav-number">1.3.</span> <span class="nav-text">throws 抛出异常</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#throw-和-throws-的区别和用法"><span class="nav-number">2.</span> <span class="nav-text">throw 和 throws 的区别和用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#区别"><span class="nav-number">2.1.</span> <span class="nav-text">区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用场合"><span class="nav-number">2.2.</span> <span class="nav-text">使用场合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程总结"><span class="nav-number">2.3.</span> <span class="nav-text">编程总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
-      
-
-      
-
-    </div>
-  </aside>
-
-
-        
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">mcb</span>
-
-  
-</div>
-
-
-  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
-
-
-
-
-        
-<div class="busuanzi-count">
-  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-  
-    <span class="site-uv">
-      <i class="fa fa-user"></i> 总访问人数
-      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
-      人
-    </span>
-  
-
-  
-    <span class="site-pv">
-      <i class="fa fa-eye"></i> 总访问量
-      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
-      次
-    </span>
-  
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-
-    
-
-  </div>
-
-  
-
-<script type="text/javascript">
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
 </script>
 
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%9B%E5%87%BA%E5%BC%82%E5%B8%B8%E7%9A%84%E4%B8%89%E7%A7%8D%E5%BD%A2%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">抛出异常的三种形式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%87%AA%E5%8A%A8%E6%8A%9B%E5%87%BA%E5%BC%82%E5%B8%B8"><span class="nav-number">1.1.</span> <span class="nav-text">系统自动抛出异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#throw-%E6%8A%9B%E5%87%BA%E5%BC%82%E5%B8%B8"><span class="nav-number">1.2.</span> <span class="nav-text">throw 抛出异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#throws-%E6%8A%9B%E5%87%BA%E5%BC%82%E5%B8%B8"><span class="nav-number">1.3.</span> <span class="nav-text">throws 抛出异常</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#throw-%E5%92%8C-throws-%E7%9A%84%E5%8C%BA%E5%88%AB%E5%92%8C%E7%94%A8%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">throw 和 throws 的区别和用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%BA%E5%88%AB"><span class="nav-number">2.1.</span> <span class="nav-text">区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E5%90%88"><span class="nav-number">2.2.</span> <span class="nav-text">使用场合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="nav-number">2.3.</span> <span class="nav-text">编程总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
 
 
 
 
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -776,463 +494,22 @@
   
 
 
-  
-
-
-
-
-
-
-
-
-
 
 
   
-  
-    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-  
+<script src="/js/local-search.js"></script>
 
-  
-  
-    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-  
 
-  
-  
-    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
-  
 
 
-  
 
 
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
 
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
 
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
-
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
-
-
-
-  
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  
-
-
-
-
-	
-
-
-
-
-
-  
-
-
-
-
-
-  
-    <script type="text/javascript">
-      (function(d, s) {
-        var j, e = d.getElementsByTagName(s)[0];
-        if (typeof LivereTower === 'function') { return; }
-        j = d.createElement(s);
-        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-        j.async = true;
-        e.parentNode.insertBefore(j, e);
-      })(document, 'script');
-    </script>
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  <script type="text/javascript">
-    // Popup Window;
-    var isfetched = false;
-    var isXml = true;
-    // Search DB path;
-    var search_path = "search.xml";
-    if (search_path.length === 0) {
-      search_path = "search.xml";
-    } else if (/json$/i.test(search_path)) {
-      isXml = false;
-    }
-    var path = "/" + search_path;
-    // monitor main search box;
-
-    var onPopupClose = function (e) {
-      $('.popup').hide();
-      $('#local-search-input').val('');
-      $('.search-result-list').remove();
-      $('#no-result').remove();
-      $(".local-search-pop-overlay").remove();
-      $('body').css('overflow', '');
-    }
-
-    function proceedsearch() {
-      $("body")
-        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
-        .css('overflow', 'hidden');
-      $('.search-popup-overlay').click(onPopupClose);
-      $('.popup').toggle();
-      var $localSearchInput = $('#local-search-input');
-      $localSearchInput.attr("autocapitalize", "none");
-      $localSearchInput.attr("autocorrect", "off");
-      $localSearchInput.focus();
-    }
-
-    // search function;
-    var searchFunc = function(path, search_id, content_id) {
-      'use strict';
-
-      // start loading animation
-      $("body")
-        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
-          '<div id="search-loading-icon">' +
-          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
-          '</div>' +
-          '</div>')
-        .css('overflow', 'hidden');
-      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
-
-      $.ajax({
-        url: path,
-        dataType: isXml ? "xml" : "json",
-        async: true,
-        success: function(res) {
-          // get the contents from search data
-          isfetched = true;
-          $('.popup').detach().appendTo('.header-inner');
-          var datas = isXml ? $("entry", res).map(function() {
-            return {
-              title: $("title", this).text(),
-              content: $("content",this).text(),
-              url: $("url" , this).text()
-            };
-          }).get() : res;
-          var input = document.getElementById(search_id);
-          var resultContent = document.getElementById(content_id);
-          var inputEventFunction = function() {
-            var searchText = input.value.trim().toLowerCase();
-            var keywords = searchText.split(/[\s\-]+/);
-            if (keywords.length > 1) {
-              keywords.push(searchText);
-            }
-            var resultItems = [];
-            if (searchText.length > 0) {
-              // perform local searching
-              datas.forEach(function(data) {
-                var isMatch = false;
-                var hitCount = 0;
-                var searchTextCount = 0;
-                var title = data.title.trim();
-                var titleInLowerCase = title.toLowerCase();
-                var content = data.content.trim().replace(/<[^>]+>/g,"");
-                var contentInLowerCase = content.toLowerCase();
-                var articleUrl = decodeURIComponent(data.url);
-                var indexOfTitle = [];
-                var indexOfContent = [];
-                // only match articles with not empty titles
-                if(title != '') {
-                  keywords.forEach(function(keyword) {
-                    function getIndexByWord(word, text, caseSensitive) {
-                      var wordLen = word.length;
-                      if (wordLen === 0) {
-                        return [];
-                      }
-                      var startPosition = 0, position = [], index = [];
-                      if (!caseSensitive) {
-                        text = text.toLowerCase();
-                        word = word.toLowerCase();
-                      }
-                      while ((position = text.indexOf(word, startPosition)) > -1) {
-                        index.push({position: position, word: word});
-                        startPosition = position + wordLen;
-                      }
-                      return index;
-                    }
-
-                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
-                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
-                  });
-                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
-                    isMatch = true;
-                    hitCount = indexOfTitle.length + indexOfContent.length;
-                  }
-                }
-
-                // show search results
-
-                if (isMatch) {
-                  // sort index by position of keyword
-
-                  [indexOfTitle, indexOfContent].forEach(function (index) {
-                    index.sort(function (itemLeft, itemRight) {
-                      if (itemRight.position !== itemLeft.position) {
-                        return itemRight.position - itemLeft.position;
-                      } else {
-                        return itemLeft.word.length - itemRight.word.length;
-                      }
-                    });
-                  });
-
-                  // merge hits into slices
-
-                  function mergeIntoSlice(text, start, end, index) {
-                    var item = index[index.length - 1];
-                    var position = item.position;
-                    var word = item.word;
-                    var hits = [];
-                    var searchTextCountInSlice = 0;
-                    while (position + word.length <= end && index.length != 0) {
-                      if (word === searchText) {
-                        searchTextCountInSlice++;
-                      }
-                      hits.push({position: position, length: word.length});
-                      var wordEnd = position + word.length;
-
-                      // move to next position of hit
-
-                      index.pop();
-                      while (index.length != 0) {
-                        item = index[index.length - 1];
-                        position = item.position;
-                        word = item.word;
-                        if (wordEnd > position) {
-                          index.pop();
-                        } else {
-                          break;
-                        }
-                      }
-                    }
-                    searchTextCount += searchTextCountInSlice;
-                    return {
-                      hits: hits,
-                      start: start,
-                      end: end,
-                      searchTextCount: searchTextCountInSlice
-                    };
-                  }
-
-                  var slicesOfTitle = [];
-                  if (indexOfTitle.length != 0) {
-                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
-                  }
-
-                  var slicesOfContent = [];
-                  while (indexOfContent.length != 0) {
-                    var item = indexOfContent[indexOfContent.length - 1];
-                    var position = item.position;
-                    var word = item.word;
-                    // cut out 100 characters
-                    var start = position - 20;
-                    var end = position + 80;
-                    if(start < 0){
-                      start = 0;
-                    }
-                    if (end < position + word.length) {
-                      end = position + word.length;
-                    }
-                    if(end > content.length){
-                      end = content.length;
-                    }
-                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
-                  }
-
-                  // sort slices in content by search text's count and hits' count
-
-                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
-                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
-                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
-                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
-                      return sliceRight.hits.length - sliceLeft.hits.length;
-                    } else {
-                      return sliceLeft.start - sliceRight.start;
-                    }
-                  });
-
-                  // select top N slices in content
-
-                  var upperBound = parseInt('1');
-                  if (upperBound >= 0) {
-                    slicesOfContent = slicesOfContent.slice(0, upperBound);
-                  }
-
-                  // highlight title and content
-
-                  function highlightKeyword(text, slice) {
-                    var result = '';
-                    var prevEnd = slice.start;
-                    slice.hits.forEach(function (hit) {
-                      result += text.substring(prevEnd, hit.position);
-                      var end = hit.position + hit.length;
-                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
-                      prevEnd = end;
-                    });
-                    result += text.substring(prevEnd, slice.end);
-                    return result;
-                  }
-
-                  var resultItem = '';
-
-                  if (slicesOfTitle.length != 0) {
-                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
-                  } else {
-                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
-                  }
-
-                  slicesOfContent.forEach(function (slice) {
-                    resultItem += "<a href='" + articleUrl + "'>" +
-                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
-                      "...</p>" + "</a>";
-                  });
-
-                  resultItem += "</li>";
-                  resultItems.push({
-                    item: resultItem,
-                    searchTextCount: searchTextCount,
-                    hitCount: hitCount,
-                    id: resultItems.length
-                  });
-                }
-              })
-            };
-            if (keywords.length === 1 && keywords[0] === "") {
-              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
-            } else if (resultItems.length === 0) {
-              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
-            } else {
-              resultItems.sort(function (resultLeft, resultRight) {
-                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
-                  return resultRight.searchTextCount - resultLeft.searchTextCount;
-                } else if (resultLeft.hitCount !== resultRight.hitCount) {
-                  return resultRight.hitCount - resultLeft.hitCount;
-                } else {
-                  return resultRight.id - resultLeft.id;
-                }
-              });
-              var searchResultList = '<ul class=\"search-result-list\">';
-              resultItems.forEach(function (result) {
-                searchResultList += result.item;
-              })
-              searchResultList += "</ul>";
-              resultContent.innerHTML = searchResultList;
-            }
-          }
-
-          if ('auto' === 'auto') {
-            input.addEventListener('input', inputEventFunction);
-          } else {
-            $('.search-icon').click(inputEventFunction);
-            input.addEventListener('keypress', function (event) {
-              if (event.keyCode === 13) {
-                inputEventFunction();
-              }
-            });
-          }
-
-          // remove loading animation
-          $(".local-search-pop-overlay").remove();
-          $('body').css('overflow', '');
-
-          proceedsearch();
-        }
-      });
-    }
-
-    // handle and trigger popup window;
-    $('.popup-trigger').click(function(e) {
-      e.stopPropagation();
-      if (isfetched === false) {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      } else {
-        proceedsearch();
-      };
-    });
-
-    $('.popup-btn-close').click(onPopupClose);
-    $('.popup').click(function(e){
-      e.stopPropagation();
-    });
-    $(document).on('keyup', function (event) {
-      var shouldDismissSearchPopup = event.which === 27 &&
-        $('.search-popup').is(':visible');
-      if (shouldDismissSearchPopup) {
-        onPopupClose();
-      }
-    });
-  </script>
-
-
-
-
-
-  
-
-  
-
-  
-
-  
-  
-
-  
 
   
 
