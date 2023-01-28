@@ -1,5 +1,5 @@
 ---
-title: netty系列（二）：netty是什么
+title: Netty系列（二）：Netty是什么
 tags:
   - Netty
 categories:
@@ -104,15 +104,12 @@ BIO 编程模型在客户端较少的情况下运行良好，但是对于客户�
 在传统的 BIO 模型中一个连接对应一个 while 死循环，死循环的目的就是不断监测这条连接上是否有数据可以读，大多数情况下，1w个连接里面同一时刻只有少量的连接有数据可读，因此，很多个while死循环都白白浪费掉了，因为读不出啥数据。
 
 <div style="width: 80%; margin: auto">![bio](bio.png)</div>
-
 而在NIO模型中，他把这么多 while 死循环变成一个死循环，这个死循环由一个线程控制。这个线程就是 NIO 模型中的 selector。一条连接来了直接把这条连接注册到 selector 上，通过检查这个selector，就可以批量监测出有数据可读的连接，进而读取数据。这样导致线程数量大大减少。
 
 <div style="width: 80%; margin: auto">![nio](nio.png)</div>
-
 NIO 提供了 Channel、Buffer 和 Selector 三个核心组件。BIO 基于字节流和字符流进行操作，而 NIO 基于Channel 和 Buffer 进行操作，数据总是从通道读取到缓冲区中，或者从缓冲区写入到通道中。Selector 用于监听多个通道的事件（比如：连接打开，数据到达）。因此，单个线程可以监听多个数据通道。整体流程大致如下：
 
 <div style="width: 80%; margin: auto">![component](component.png)</div>
-
 ### Channel
 
 Channel 类似于 BIO 中的 Stream。只不过 Stream 是单向的，譬如：InputStream, OutputStream.而 Channel 是双向的，既可以用来进行读操作，又可以用来进行写操作。
@@ -145,15 +142,12 @@ Buffer 中有三个很重要的变量：
 1. 通过 `ByteBuffer.allocate(11)` 方法创建了一个 11 个 byte 的数组的缓冲区，初始状态如上图，position 的位置为 0，capacity 和 limit 默认都是数组长度。这个时候 ByteBuffer 处于写模式，等待 Channel 数据写入。
 
 <div style="width: 50%; margin: auto">![buffer1](buffer1.png)</div>
-
 2. 写入 5 个字节，postion 移动了 5 个位置，limit 和 capacity 保持不变。
 
 <div style="width: 50%; margin: auto">![buffer2](buffer2.png)</div>
-
 3. 调用 `ByteBuffer.flip()` 方法，将写模式改成读模式，position 设回 0，并将 limit 设成之前的 position 的值。这时 position 到 limit 这个区间内的就是可读数据。
 
 <div style="width: 50%; margin: auto">![buffer3](buffer3.png)</div>
-
 4. 在下一次写数据之前我们调用 `ByteBuffer.clear()` 方法，将读模式改成写模式。缓冲区的索引位置又回到了初始位置。注意这个时候 Buffer 中的数据并未被清除，只是这些标记告诉我们可以从哪里开始往 Buffer 里写数据。
 5. 如果 Buffer 中仍有未读的数据，且后续还需要这些数据，但是此时想要先写些数据，那么使用 `ByteBuffer.compact()` 方法。将所有未读的数据拷贝到 Buffer 起始处，然后将 position 设到最后一个未读元素正后面。limit 属性依然像 clear() 方法一样，设置成 capacity。现在 Buffer 准备好写数据了，但是不会覆盖未读的数据。
 6. 如果你有一部分数据需要重复读写，调用 `ByteBuffer.mark()` 方法，可以标记 Buffer 中的一个特定的 position，之后可以通过调用 `ByteBuffer.reset()` 方法恢复到这个position。

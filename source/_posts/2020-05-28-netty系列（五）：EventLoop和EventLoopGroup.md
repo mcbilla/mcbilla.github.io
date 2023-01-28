@@ -1,5 +1,5 @@
 ---
-title: netty系列（五）：EventLoop和EventLoopGroup
+title: Netty系列（五）：EventLoop和EventLoopGroup
 tags:
   - Netty
 categories:

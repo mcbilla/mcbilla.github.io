@@ -1,6 +1,6 @@
 ---
 
-title: netty系列（三）：netty原理和组件简介
+title: Netty系列（三）：Netty原理和组件简介
 tags:
   - Netty
 categories:
@@ -32,11 +32,9 @@ Reactor 模型是一个 IO 设计模式，Java 中的 NIO 就对  Reactor 模式
 基本流程图如下：
 
 <div style="width: 80%; margin: auto">![base](base.png)</div>
-
 对流程图进行进一步抽象，得到 Reactor 模型的 OMT 类图如下：
 
 <div style="width: 80%; margin: auto">![omt](omt.png)</div>
-
 五种类解释如下：
 
 * Handle(描述符)：表示触发事件，是触发所有操作的发源地。在 Linux 中 Handle 就是文件描述符 fd。
@@ -58,7 +56,6 @@ Reactor 模型是一个 IO 设计模式，Java 中的 NIO 就对  Reactor 模式
 ## Reactor 单线程模型
 
 <div style="width: 80%; margin: auto">![reactor1](reactor1.png)</div>
-
 **处理流程**
 
 1. Reactor 对象通过 select 监控连接事件，收到事件后通过 dispatch 进行分发
@@ -74,7 +71,6 @@ Reactor 模型是一个 IO 设计模式，Java 中的 NIO 就对  Reactor 模式
 ## Reactor 多线程模型
 
 <div style="width: 80%; margin: auto">![reactor2](reactor2.png)</div>
-
 **处理流程**
 
 1. 主线程中，Reactor 对象通过 select  监听连接事件，收到事件后通过 dispatch 进行分发。
@@ -92,7 +88,6 @@ Reactor 模型是一个 IO 设计模式，Java 中的 NIO 就对  Reactor 模式
 ## 主从 Reactor 多线程模型
 
 <div style="width: 80%; margin: auto">![reactor3](reactor3.png)</div>
-
 **处理流程**
 
 1. 主进程中 mainReactor 对象通过 select 监控连接建立事件，收到事件后通过 Acceptor 接收，将新的连接分配给子进程 subReactor（可以有多个）。
@@ -141,7 +136,6 @@ Channel 是 Netty 网络操作的基础组件，可以把他理解为 BIO 的 So
 Channel 涉及的组件有 ChannelHandler、ChannelHandlerContext、ChannelPipline 和 ChannelFuture。这些组件的关系如下：
 
 <div style="width: 80%; margin: auto">![channel](channel.png)</div>
-
 ### ChannelHandler
 
 ChannelHandler 是 Netty 的核心组件，用来处理各种事件，例如连接、接收、数据转换、异常处理以及我们的业务逻辑逻辑。ChannelHandler 包括两个核心子类：
@@ -187,7 +181,6 @@ ByteBuf 是 Netty 的数据容器，本质是一个由不同索引分别控制�
 根据 Reactor 模型和 Netty 的基本组件，我们可以得到 Netty Server 端的线程模型如下：
 
 <div style="width: 80%; margin: auto">![netty](netty.png)</div>
-
 **线程模型分析**
 
 * Server 端包含 1 个 Boss NioEventLoopGroup 和 1 个 Worker NioEventLoopGroup。

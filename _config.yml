@@ -7,8 +7,8 @@ title: 飙戈的博客
 subtitle:
 description: Constant dropping wears the stone
 keywords:
-author: mcb
-language: zh-Hans
+author: mcbilla
+language: zh-CN
 timezone:
 
 # URL
@@ -73,7 +73,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: next
+theme: next-reloaded
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
@@ -84,7 +84,7 @@ deploy:
 
 # 本地搜索
 search:
-  path: search.xml
+  path: search.json
   field: post
   format: html
   limit: 10000

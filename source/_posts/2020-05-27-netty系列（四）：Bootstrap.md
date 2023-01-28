@@ -1,5 +1,5 @@
 ---
-title: netty系列（四）：Bootstrap
+title: Netty系列（四）：Bootstrap
 date: 2020-05-27 17:33:07
 tags:
   - Netty

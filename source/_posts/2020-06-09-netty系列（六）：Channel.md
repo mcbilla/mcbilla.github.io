@@ -1,5 +1,5 @@
 ---
-title: netty系列（六）：Channel
+title: Netty系列（六）：Channel
 date: 2020-06-09 11:50:55
 tags:
   - Netty
