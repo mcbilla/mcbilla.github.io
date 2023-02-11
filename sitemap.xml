@@ -101,15 +101,6 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/2020/01/14/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0%E4%B8%AA%E4%BA%BA%E6%9C%8D%E5%8A%A1%E5%99%A8/</loc>
-    
-    <lastmod>2023-02-11</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>http://yoursite.com/2019/08/02/log4j%E8%AF%A6%E8%A7%A3/</loc>
     
     <lastmod>2023-02-11</lastmod>
@@ -119,7 +110,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/2018/07/25/Java%E6%B3%9B%E5%BD%A2%E7%90%86%E8%A7%A3/</loc>
+    <loc>http://yoursite.com/2020/01/14/Hexo%E9%83%A8%E7%BD%B2%E5%88%B0%E4%B8%AA%E4%BA%BA%E6%9C%8D%E5%8A%A1%E5%99%A8/</loc>
     
     <lastmod>2023-02-11</lastmod>
     
@@ -129,6 +120,15 @@
   
   <url>
     <loc>http://yoursite.com/2018/07/23/js%E6%97%B6%E9%97%B4%E6%93%8D%E4%BD%9C/</loc>
+    
+    <lastmod>2023-02-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2018/07/25/Java%E6%B3%9B%E5%BD%A2%E7%90%86%E8%A7%A3/</loc>
     
     <lastmod>2023-02-11</lastmod>
     
@@ -458,14 +458,14 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/Java/Java%E5%9F%BA%E7%A1%80/</loc>
+    <loc>http://yoursite.com/categories/%E5%89%8D%E7%AB%AF/javascript/</loc>
     <lastmod>2023-02-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E5%89%8D%E7%AB%AF/javascript/</loc>
+    <loc>http://yoursite.com/categories/Java/Java%E5%9F%BA%E7%A1%80/</loc>
     <lastmod>2023-02-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
