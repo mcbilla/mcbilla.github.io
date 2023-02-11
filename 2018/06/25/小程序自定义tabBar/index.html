@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="tabBar 是指小程序底部的导航栏，微信小程序官方提供了 多 tabBar 设置，但是官方提供的 tabBar 最多支持 5 个 tab，而且是全局共用的，这意味着并不支持 有时候我们想跳到不同的页面显示不同的 tabBar 导航栏 这样的功能。所以本人尝试着手实现自定义的 tabBar 导航栏。转载请说明出处。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小程序自定义tabBar">
+<meta property="og:url" content="http://yoursite.com/2018/06/25/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%87%AA%E5%AE%9A%E4%B9%89tabBar/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="tabBar 是指小程序底部的导航栏，微信小程序官方提供了 多 tabBar 设置，但是官方提供的 tabBar 最多支持 5 个 tab，而且是全局共用的，这意味着并不支持 有时候我们想跳到不同的页面显示不同的 tabBar 导航栏 这样的功能。所以本人尝试着手实现自定义的 tabBar 导航栏。转载请说明出处。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-06-25T01:15:41.000Z">
+<meta property="article:modified_time" content="2023-02-11T15:52:47.967Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="微信小程序">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2018/06/25/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%87%AA%E5%AE%9A%E4%B9%89tabBar/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>小程序自定义tabBar | 飙戈的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%87%AA%E5%AE%9A%E4%B9%89tabBar/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          小程序自定义tabBar
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-06-25 09:15:41" itemprop="dateCreated datePublished" datetime="2018-06-25T09:15:41+08:00">2018-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-02-11 23:52:47" itemprop="dateModified" datetime="2023-02-11T23:52:47+08:00">2023-02-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">平台开发</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/" itemprop="url" rel="index"><span itemprop="name">微信小程序</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>tabBar 是指小程序底部的导航栏，微信小程序官方提供了 <a target="_blank" rel="noopener" href="https://developers.weixin.qq.com/miniprogram/dev/framework/config.html?search-key=tabbar">多 tabBar 设置</a>，但是官方提供的 tabBar 最多支持 5 个 tab，而且是全局共用的，这意味着并不支持 <em>有时候我们想跳到不同的页面显示不同的 tabBar 导航栏</em> 这样的功能。所以本人尝试着手实现自定义的 tabBar 导航栏。转载请说明出处。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><p>参考过网上自定义 tabBar 的一些资料，例如这位仁兄的 <a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_29729735/article/details/78933721">微信小程序自定义tabBar组件开发</a>，发现大部分资料都是 <em>通过 <code>navigateTo</code> 的方式进行 tab 切换</em>。这种实现方式有一个很明显的缺点：在 tab 切换的时候整个页面都会刷新一次，这意味着页面底下的 tabBar 导航栏也会跟着刷新，这样会很影响用户体验。官网的 tabBar 导航栏是在底层实现，所以不会出现这种刷新情况。</p>
+<p>因为没有办法解决这种通过 <code>navigateTo </code> 实现 tabBar 的刷新问题，本人转换了一种思路。<em>这种办法适合于每个 tab 页面数据量不是很大的情况</em>，如果你每个页面的数据量都非常大而且需要实时刷新的话可能不太适合这种方法。</p>
+<ol>
+<li>所有的 tab 页面和底下 tabBar 导航栏都写在同一个 wxml 页面里面，每个 tab 页面跟导航栏的一个按钮对应。</li>
+<li>在打开页面时所有 tab 页面的数据通过一个路由取回，然后渲染到各个 tab 页面里面。然后只把第一个 tab 页面的内容显示出来，其他 tab 页面都隐藏。</li>
+<li>每次点击下面的 tabBar 导航栏，只把点击按钮对应的 tab 页面显示出来，其他的 tab 页面都隐藏。</li>
+</ol>
+<p>这样实现的好处是 tab 切换时底部导航栏不会刷新，而且切换非常流畅，缺点是切换时 tab 页面不能实现实时刷新。如果你觉得这种实现方法能满足你的需求，请继续往下看。</p>
+<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><p>下面显示每部分的核心代码。</p>
+<h3 id="wxml"><a href="#wxml" class="headerlink" title="wxml"></a>wxml</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;view class=&#x27;container&#x27;&gt;</span><br><span class="line">  &lt;view class=&#x27;del-list&#x27;&gt;</span><br><span class="line">    &lt;view class=&quot;page__bd&quot;&gt;</span><br><span class="line">      &lt;block wx:if=&#x27;&#123;&#123;tabbarIndex == 0&#125;&#125;&#x27;&gt;</span><br><span class="line">      // tab 页面1代码</span><br><span class="line">      &lt;/block&gt;</span><br><span class="line"></span><br><span class="line">      &lt;block wx:if=&#x27;&#123;&#123;tabbarIndex == 1&#125;&#125;&#x27;&gt;</span><br><span class="line">      // tab 页面2代码</span><br><span class="line">      &lt;/block&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/view&gt;</span><br><span class="line">  &lt;/view&gt;</span><br><span class="line">  &lt;!--自定义导航栏--&gt;</span><br><span class="line">  &lt;view class=&#x27;tabbar&#x27;&gt;</span><br><span class="line">    &lt;view class=&#x27;tabbar-box&#x27;&gt;</span><br><span class="line">      &lt;view class=&#x27;tabbar-item&#x27; wx:for=&quot;&#123;&#123;tabbarList&#125;&#125;&quot; bindtap=&#x27;tapTabbar&#x27; id=&quot;&#123;&#123;item.index&#125;&#125;&quot;&gt;</span><br><span class="line">        &lt;view class=&#x27;tabbar-item-icon&#x27;&gt;</span><br><span class="line">          &lt;image src=&#x27;&#123;&#123;item.icon&#125;&#125;&#x27;&gt;&lt;/image&gt;</span><br><span class="line">        &lt;/view&gt;</span><br><span class="line">        &lt;view class=&#x27;tabbar-item-text&#x27;&gt;&#123;&#123;item.text&#125;&#125;&lt;/view&gt;</span><br><span class="line">      &lt;/view&gt;</span><br><span class="line">    &lt;/view&gt;</span><br><span class="line">  &lt;/view&gt;</span><br><span class="line">&lt;/view&gt;</span><br></pre></td></tr></table></figure>
+<p><em>底部导航栏为 <code>tabbarList </code> 的一个 list 数组，每个 tab 页面的 <code>tabbarIndex</code> 跟 list 数组的 <code>index</code> 对应</em>。这样就可以根据 <code>index</code> 来显示对应的 tab 页面。</p>
+<h3 id="js"><a href="#js" class="headerlink" title="js"></a>js</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">Page(&#123;</span><br><span class="line">  data: &#123;</span><br><span class="line">  ......</span><br><span class="line">	</span><br><span class="line">  tabbarList: [&#123;</span><br><span class="line">    index: 0,</span><br><span class="line">    icon: &#x27;/images/driver/deliver-select.png&#x27;,</span><br><span class="line">    text: &#x27;发货单&#x27;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    index: 1,</span><br><span class="line">    icon: &#x27;/images/driver/my.png&#x27;,</span><br><span class="line">    text: &#x27;我的&#x27;</span><br><span class="line">  &#125;],</span><br><span class="line">    tabbarIndex: 0,</span><br><span class="line">  &#125;,</span><br><span class="line">	</span><br><span class="line">  /**</span><br><span class="line">   * 点击tabbar导航栏</span><br><span class="line">   */</span><br><span class="line">  tapTabbar: function(e) &#123;</span><br><span class="line">    var index = e.currentTarget.id</span><br><span class="line">    var tabbarList = this.data.tabbarList</span><br><span class="line">    for (var item in tabbarList) &#123;</span><br><span class="line">      if (tabbarList[item].index == index) &#123;</span><br><span class="line">        var icon = tabbarList[item].icon</span><br><span class="line">        var iconList = icon.split(&#x27;.&#x27;)</span><br><span class="line">        if(iconList[0].indexOf(&#x27;select&#x27;) &lt; 0) &#123;</span><br><span class="line">          tabbarList[item].icon = iconList[0] + &#x27;-select.&#x27; + iconList[1]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;else &#123;</span><br><span class="line">        var icon = tabbarList[item].icon</span><br><span class="line">        var iconList = icon.split(&#x27;.&#x27;)</span><br><span class="line">        if (iconList[0].indexOf(&#x27;select&#x27;) &gt; 0) &#123;</span><br><span class="line">          var temp = iconList[0].replace(/-select/g, &#x27;&#x27;)</span><br><span class="line">          tabbarList[item].icon = temp + &#x27;.&#x27; + iconList[1]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    this.setData(&#123;</span><br><span class="line">      tabbarList: tabbarList,</span><br><span class="line">      tabbarIndex: index</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br><span class="line">  </span><br><span class="line">  ......</span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>点击 tabBar 导航栏时，把当前点击按钮的图片更新为带 <code>-select</code> 后缀表示选中的图片，其他的按钮图片更新为无后缀图片，然后重新渲染 <code>tabbarList</code> 和 <code>tabbarIndex </code>。</p>
+<h3 id="wxss"><a href="#wxss" class="headerlink" title="wxss"></a>wxss</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">......</span><br><span class="line"></span><br><span class="line">.tabbar &#123;</span><br><span class="line">  position: fixed;</span><br><span class="line">  z-index: 999;</span><br><span class="line">  bottom: 0;</span><br><span class="line">  width: 100%;</span><br><span class="line">  height: 120rpx;</span><br><span class="line">  background-color: #f8f8f8;</span><br><span class="line">  border-top: 1rpx solid #d9d9d9</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.tabbar-box &#123;</span><br><span class="line">  display: flex;</span><br><span class="line">  align-items: center;</span><br><span class="line">  justify-content: center</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.tabbar-item &#123;</span><br><span class="line">  display: flex;</span><br><span class="line">  flex-direction: column;</span><br><span class="line">  text-align: center;</span><br><span class="line">  justify-content: center;</span><br><span class="line">  margin-top: 10rpx;</span><br><span class="line">  width: 50%</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.tabbar-item image &#123;</span><br><span class="line">  width: 65rpx;</span><br><span class="line">  height: 65rpx;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.tabbar-item-icon &#123;</span><br><span class="line">  height: 65rpx</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.tabbar-item-text &#123;</span><br><span class="line">  font-size: 28rpx;</span><br><span class="line">  color: #999</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.del-list-logout &#123;</span><br><span class="line">  width: 90%;</span><br><span class="line">  margin: 50rpx auto 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="tabBar-图片"><a href="#tabBar-图片" class="headerlink" title="tabBar 图片"></a>tabBar 图片</h3><div style="width: 50%">![tabbar](tabbar.jpeg)</div>
+## 实现效果
+
+<div style="width: 45%; display: inline-block; margin-right: 5%">![rs1](rs1.jpeg)</div>
+<div style="width: 45%; display: inline-block">![rs2](rs2.jpeg)</div>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/" rel="tag"># 微信小程序</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/06/24/Hexo%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E7%BB%91%E5%AE%9A%E5%9F%9F%E5%90%8D/" rel="prev" title="Hexo个人博客绑定域名">
+      <i class="fa fa-chevron-left"></i> Hexo个人博客绑定域名
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/" rel="next" title="Hexo问题及解决办法汇总">
+      Hexo问题及解决办法汇总 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="nav-number">1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">实现过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#wxml"><span class="nav-number">2.1.</span> <span class="nav-text">wxml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#js"><span class="nav-number">2.2.</span> <span class="nav-text">js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wxss"><span class="nav-number">2.3.</span> <span class="nav-text">wxss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tabBar-%E5%9B%BE%E7%89%87"><span class="nav-number">2.4.</span> <span class="nav-text">tabBar 图片</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

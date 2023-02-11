@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="当我们需要从 TB 甚至 PB 级别以上的数据中分析获取我们需要的信息时，如果使用传统的系统架构进行处理速度将会非常慢并且对服务器造成巨大压力。Hadoop 就是用来存储并处理这种巨大数据量的分布式架构平台。用户在该平台上可以在不需要了解底层实现细节的情况下开发高效处理大数据的程序。下面介绍 Hadoop 的一些入门知识和安装配置。转载请说明出处。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop入门及安装">
+<meta property="og:url" content="http://yoursite.com/2018/07/01/Hadoop%E5%85%A5%E9%97%A8%E5%8F%8A%E5%AE%89%E8%A3%85/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="当我们需要从 TB 甚至 PB 级别以上的数据中分析获取我们需要的信息时，如果使用传统的系统架构进行处理速度将会非常慢并且对服务器造成巨大压力。Hadoop 就是用来存储并处理这种巨大数据量的分布式架构平台。用户在该平台上可以在不需要了解底层实现细节的情况下开发高效处理大数据的程序。下面介绍 Hadoop 的一些入门知识和安装配置。转载请说明出处。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/.com//shengtai.png">
+<meta property="og:image" content="http://yoursite.com/.com//hdfs.jpeg">
+<meta property="og:image" content="http://yoursite.com/.com//yarn.jpeg">
+<meta property="article:published_time" content="2018-07-01T15:36:59.000Z">
+<meta property="article:modified_time" content="2023-02-11T15:52:47.974Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Hadoop">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/.com//shengtai.png">
+
+<link rel="canonical" href="http://yoursite.com/2018/07/01/Hadoop%E5%85%A5%E9%97%A8%E5%8F%8A%E5%AE%89%E8%A3%85/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Hadoop入门及安装 | 飙戈的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/01/Hadoop%E5%85%A5%E9%97%A8%E5%8F%8A%E5%AE%89%E8%A3%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Hadoop入门及安装
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-01 23:36:59" itemprop="dateCreated datePublished" datetime="2018-07-01T23:36:59+08:00">2018-07-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-02-11 23:52:47" itemprop="dateModified" datetime="2023-02-11T23:52:47+08:00">2023-02-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/" itemprop="url" rel="index"><span itemprop="name">大数据</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop/" itemprop="url" rel="index"><span itemprop="name">Hadoop</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>当我们需要从 TB 甚至 PB 级别以上的数据中分析获取我们需要的信息时，如果使用传统的系统架构进行处理速度将会非常慢并且对服务器造成巨大压力。Hadoop 就是用来存储并处理这种巨大数据量的分布式架构平台。用户在该平台上可以在不需要了解底层实现细节的情况下开发高效处理大数据的程序。下面介绍 Hadoop 的一些入门知识和安装配置。转载请说明出处。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="入门知识"><a href="#入门知识" class="headerlink" title="入门知识"></a>入门知识</h2><h3 id="Hadoop-是什么"><a href="#Hadoop-是什么" class="headerlink" title="Hadoop 是什么"></a>Hadoop 是什么</h3><p>Hadoop 是一个用来处理大数据的分布式存储和计算平台。简单来说这个平台最重要的两个作用是 <strong>存储</strong> 和 <strong>计算</strong>：</p>
+<ul>
+<li>存储：分布式存储，数据被分散到多台机器上存储，由至少一台机器进行分配管理。该过程对开发人员是透明，也就是说开发人员对数据的存取过程感受不到数据是分散存储的。</li>
+<li>计算：分布式计算，用户请求被分解成多个任务在多台机器上运行，运行结果集汇总成最终结果再返回给用户。该过程对开发人员同样是透明的。</li>
+</ul>
+<p>基于以上分布式的特点 Hadoop 可以在大量廉价的机器上搭建一个分布式集群系统架构。开发人员只要先把巨大数据存储在 Hadoop 平台上，然后根据统计分析需求编写简单的处理程序。<em>Hadoop 平台会自动把数据进行分割存储，把处理程序分解映射成多个任务分配到多台机器上进行并行计算，然后把结果集汇总返回给用户</em>。</p>
+<h3 id="Hadoop-生态系统"><a href="#Hadoop-生态系统" class="headerlink" title="Hadoop 生态系统"></a>Hadoop 生态系统</h3><p>Hadoop 平台和基于该平台的相关模块框架形成一套完善的 <strong>Hadoop生态系统</strong>。该生态系统包含的组件大概如下：</p>
+<p><img src="/.com//shengtai.png" alt="shengtai"></p>
+<p>在该系统中最核心的两大组件是 <strong>HDFS</strong> 和 <strong>MapReduce</strong>，这两个组件是 Hadoop 平台最早推出的体现分布式处理数据思想的组件。此外还有 <strong>YARN</strong> 资源组件。</p>
+<ul>
+<li><strong>HDFS</strong>：Hadoop Distributed File System，分布式文件存储系统。该系统把数据分割成多个部分分别存储到多台机器 (DataNode) 上，然后由一台机器 (NameNode) 进行统一组织管理。该系统只是用来管理数据的存储方式，并不存储数据。详细可参考 <a target="_blank" rel="noopener" href="http://www.cnblogs.com/edisonchou/p/3485135.html">基本介绍</a></li>
+</ul>
+<blockquote>
+<p>HDFS 架构采用主从架构（master&#x2F;slave）。一个典型的 HDFS 集群包含一个 NameNode 节点和多个 DataNode 节点。NameNode 节点负责整个 HDFS 文件系统中的文件的元数据保管和管理，集群中通常只有一台机器上运行 NameNode 实例，DataNode 节点保存文件中的数据，集群中的机器分别运行一个 DataNode 实例。在 HDFS 中，NameNode 节点被称为名称节点，DataNode 节点被称为数据节点。DataNode 节点通过心跳机制与 NameNode 节点进行定时的通信。</p>
+</blockquote>
+<ul>
+<li><strong>MapReduce</strong>：一种用于大规模数据集并行计算的编程模型，包含两项重要函数：Map 和 Reduce。简单来说就是先通过 Map 计算把任务分发到集群多个节点上，并行计算，然后再通过 Reduce 计算把计算结果合并，从而得到最终计算结果。详细可参考 <a target="_blank" rel="noopener" href="http://www.cnblogs.com/edisonchou/p/3485135.html">基本介绍</a> 和 <a target="_blank" rel="noopener" href="https://blog.csdn.net/q739404976/article/details/73188645">MapReduce详解</a></li>
+</ul>
+<blockquote>
+<p>MapReduce由以下四个部分组成：</p>
+<ol>
+<li>Client：面向用户的接口。</li>
+</ol>
+<ul>
+<li>用户编写的 MapReduce 程序通过 Client 提交到 JobTracker 端</li>
+<li>用户可通过 Client 提供的一些接口查看作业运行状态</li>
+</ul>
+<ol start="2">
+<li>JobTracker：负责所有节点的资源监控和作业调度。主节点只有一个 JobTracker。</li>
+</ol>
+<ul>
+<li>监控所有 TaskTracker 与 Job 的健康状况，一旦发现失败，就将相应的任务转移到其他节点。</li>
+<li>跟踪任务的执行进度、资源使用量等信息，并将这些信息告诉任务调度器（TaskScheduler），而调度器会在资源出现空闲时，选择合适的任务去使用这些资源。</li>
+</ul>
+<ol start="3">
+<li>TaskTracker：负责本节点的资源监控和作业调度。从节点有多个 TaskTracker。</li>
+</ol>
+<ul>
+<li>TaskTracker 会周期性地通过“心跳”将本节点上资源的使用情况和任务的运行进度汇报给 JobTracker，同时接收 JobTracker 发送过来的命令并执行相应的操作（如启动新任务、杀死任务等）</li>
+<li>TaskTracker 使用 slot等量划分本节点上的资源量（CPU、内存等）。一个 Task 获取到一个 slot 后才有机会运行，而 Hadoop 调度器的作用就是将各个 TaskTracker 上的空闲 slot 分配给 Task 使用。slot 分为 Map slot 和 Reduce slot 两种，分别供 MapTask 和 Reduce Task 使用</li>
+</ul>
+<ol start="4">
+<li>Task：分为 Map Task 和 Reduce Task 两种，均由 TaskTracker 启动</li>
+</ol>
+</blockquote>
+<ul>
+<li><p><strong>YARN</strong>：一个通用的资源管理系统，可为各类计算框架提供资源的管理和调度。它的基本设计思想是将 MRv1 中的 JobTracker 拆分成了两个独立的服务：一个全局的资源管理器 ResourceManager 和每个应用程序特有的 ApplicationMaster。其中 ResourceManager 负责整个系统的资源管理和分配，而 ApplicationMaster 负责单个应用程序的管理。详细可参考 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chushiyaoyue/p/5784871.html">Hadoop-Yarn-框架原理及运作机制（原理篇）</a> 和 <a target="_blank" rel="noopener" href="https://blog.csdn.net/bingduanlbd/article/details/51880019">理解Hadoop YARN架构</a></p>
+</li>
+<li><p><strong>Hbase</strong>：一个开源的非关系型分布式数据库，可以通过廉价的机器构建集群来处理庞大的数据表，例如超过10亿行数据和数百万列元素组成的数据表。</p>
+<blockquote>
+<p>HDFS 缺乏随机读写操作，HBase 可以用来弥补这种缺陷，其提供可以实时访问一些数据的随机读写功能。HBase 以 Google BigTable 为蓝本，以键值对的形式存储。项目的目标就是快速在主机内数十亿行数据中定位所需的数据并访问它。<br>你可以用 Hadoop 作为静态数据仓库，HBase 作为数据存储，可以放一些需要实时访问和操作的数据。</p>
+</blockquote>
+</li>
+<li><p><strong>Hive</strong>：一个数据仓库工具。可以把用户的 HiveQL（类 SQL）语句自动转换成 MapReduce 任务，这样用户就不用理解 MapReduce API 的接口内容和编写复杂的 MapReduce 程序，只需要编写简单的类 SQL 语句就可以进行数据分析。</p>
+</li>
+<li><p><strong>Pig</strong>：一种数据流语言，用来快速轻松的处理巨大的数据。包含 Pig Interface 和 Pig Latin 两部分。Pig可以非常方便的处理 HDFS 和 HBase 的数据，和 Hive 类似，通过编写简单的 Pig 脚本就可以自动转换成 MapReduce 作业来处理数据。当你想做一些数据处理但又不想编写 MapReduce jobs 就可以用 Pig。</p>
+<blockquote>
+<p>Hive 和 Pig 的区别：</p>
+<ul>
+<li>Hive 更适合于数据仓库的任务，Hive 主要用于静态的结构以及需要经常分析的工作。Hive 与 SQL 相似促使 其成为 Hadoop 与其他 BI 工具结合的理想交集。  </li>
+<li>Pig 赋予开发人员在大数据集领域更多的灵活性，并允许开发简洁的脚本用于转换数据流以便嵌入到较大的应用程序。  </li>
+<li>Pig 相比 Hive 相对轻量，它主要的优势是相比于直接使用Hadoop Java APIs可大幅削减代码量。正因为如此，Pig 仍然是吸引大量的软件开发人员。  </li>
+<li>Hive 和 Pig 都可以与HBase组合使用，Hive 和 Pig 还为 HBase 提供了高层语言支持，使得在 HBase 上进行数据统计处理变的非常简单</li>
+</ul>
+</blockquote>
+</li>
+<li><p><strong>Mahout</strong>：Hadoop 平台上的数据挖掘算法库</p>
+</li>
+<li><p><strong>Zookeeper</strong>：一种分布式的应用程序协调服务。随着计算节点的增多，集群成员需要彼此同步并了解去哪里访问服务和如何配置，ZooKeeper正是为此而生的。</p>
+</li>
+<li><p><strong>Sqoop</strong>：Sqoop 一种数据同步和传输工具，主要用于在 Hadoop(Hive) 与传统的数据库 (mysql、postgresql…) 间进行数据的传递，可以将一个关系型数据库（例如 ： MySQL, Oracle, Postgres等）中的数据导进到 Hadoop 的 HDFS 中，也可以将 HDFS 的数据导进到关系型数据库中。</p>
+</li>
+<li><p><strong>Flume</strong>：一种日志收集工具</p>
+</li>
+<li><p><strong>Ambari</strong>：一个集群的安装和管理工具</p>
+</li>
+</ul>
+<h2 id="Hadoop-安装"><a href="#Hadoop-安装" class="headerlink" title="Hadoop 安装"></a>Hadoop 安装</h2><p>以下配置环境</p>
+<ul>
+<li>Mac OS X 10.13.2</li>
+<li>Java 1.8.0_131</li>
+<li>Hadoop 2.8.4</li>
+</ul>
+<h3 id="1、Java-环境"><a href="#1、Java-环境" class="headerlink" title="1、Java 环境"></a>1、Java 环境</h3><p>在终端输入下面命令进行查看</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ java -version</span><br></pre></td></tr></table></figure>
+
+<p>如果没有报错表示 Java 环境配置成功，否则请自行安装 Java<br>环境，在这里不做详细介绍</p>
+<h3 id="2、SSH-配置"><a href="#2、SSH-配置" class="headerlink" title="2、SSH 配置"></a>2、SSH 配置</h3><p>在终端输入下面命令进行查看</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh localhost</span><br></pre></td></tr></table></figure>
+
+<p>如果没有报错直接显示登录时间则已经配置成功，一般来说可能会有下面两种异常情况。</p>
+<h4 id="用户没有权限"><a href="#用户没有权限" class="headerlink" title="用户没有权限"></a>用户没有权限</h4><p>进入 <strong>系统偏好设置</strong> &gt; <strong>共享</strong> &gt; <strong>勾选远程登录</strong>，并设置允许访问：所有用户。</p>
+<div style="width: 60%">![ssh](ssh.jpeg)</div>
+#### 还没生成 ssh 密钥
+可以选择 rsa 或者 dsa 协议来生成，以 rsa 协议为例
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa</span><br></pre></td></tr></table></figure>
+
+<p>一路回车后会在 ~&#x2F;.ssh 目录下生成 <code>id_rsa</code> 和 <code>id_rsa.pub</code> 两个文件，然后执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ cat ~/.ssh/id_rsa.pub &gt; ~/.ssh/authorized_keys</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、下载-Hadoop"><a href="#3、下载-Hadoop" class="headerlink" title="3、下载 Hadoop"></a>3、下载 Hadoop</h3><p>点击 <a target="_blank" rel="noopener" href="http://hadoop.apache.org/releases.html">Hadoop 官方下载地址</a>，选择所需版本的 <code>binary</code> 包进行下载（<code>source</code> 包是源代码，<code>binary</code> 包是编译后的文件，一般来说我们直接使用后者即可）。以 2.8.4 版本为例，点击下载后进行解压。我的解压后安装路径为 <code>/Users/mochuangbiao/hadoop-2.8.4</code></p>
+<div style="width: 80%">![xiazai](xiazai.jpeg)</div>
+### 4、配置 Hadoop
+
+<h4 id="配置-Java-环境"><a href="#配置-Java-环境" class="headerlink" title="配置 Java 环境"></a>配置 Java 环境</h4><p>如果还没有配置 Java 环境，查看 JDK 安装目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ /usr/libexec/java_home -V</span><br></pre></td></tr></table></figure>
+
+<p>添加该目录到环境配置文件 <code>~/.bash_profile</code> 中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home</span><br></pre></td></tr></table></figure>
+
+<h4 id="配置-Hadoop-环境"><a href="#配置-Hadoop-环境" class="headerlink" title="配置 Hadoop 环境"></a>配置 Hadoop 环境</h4><p>添加你的 Hadoop 安装目录路径到环境配置文件 <code>~/.bash_profile</code> 中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_HOME=/Users/mochuangbiao/hadoop-2.8.4</span><br><span class="line">export PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>修改 <code>~/.bash_profile</code> 文件后记得执行 <code>$ source ~/.bash_profile</code> 使其生效</p>
+</blockquote>
+<h4 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h4><p>需要修改的配置文件一共有四个：<strong>core-site.xml</strong>、<strong>hdfs-site.xml</strong>、<strong>mapred-site.xml</strong> 和 <strong>yarn-site.xml</strong>，所有文件均位于 <code>etc/hadoop</code> 目录下。文件的修改均为最简单化，如需要详细配置请参考官方文档。</p>
+<ul>
+<li>core-site.xml</li>
+</ul>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">       &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">       &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>hdfs-site.xml</li>
+</ul>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">       &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">       &lt;value&gt;1&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>mapred-site.xml</li>
+</ul>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">       &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">       &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>yarn-site.xml <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">       &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">       &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="5、启动"><a href="#5、启动" class="headerlink" title="5、启动"></a>5、启动</h3><h4 id="格式化-HDFS"><a href="#格式化-HDFS" class="headerlink" title="格式化 HDFS"></a>格式化 HDFS</h4><p>切换到 Hadoop 安装目录，输入命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hdfs namenode -format</span><br></pre></td></tr></table></figure>
+
+<h4 id="启动-HDFS"><a href="#启动-HDFS" class="headerlink" title="启动 HDFS"></a>启动 HDFS</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ start-dfs.sh</span><br></pre></td></tr></table></figure>
+
+<p>可能需要输入三次密码，分别用来启动 NameNode、DataNode 和 SecondaryNameNode 三个线程，访问 <a target="_blank" rel="noopener" href="http://localhost:50070/">http://localhost:50070</a>，能看到以下界面表示启动成功</p>
+<p><img src="/.com//hdfs.jpeg" alt="hdfs"></p>
+<h4 id="启动-YARN"><a href="#启动-YARN" class="headerlink" title="启动 YARN"></a>启动 YARN</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ start-yarn.sh</span><br></pre></td></tr></table></figure>
+
+<p>可能需要输入一次到多次密码用来启动 ResourceManager 线程和 Nodemanager 线程，访问 <a target="_blank" rel="noopener" href="http://localhost:8088/">http://localhost:8088</a>，能看到以下界面表示启动成功</p>
+<p><img src="/.com//yarn.jpeg" alt="yarn"></p>
+<p>输入命令 <code>$ jps</code>，可以查看到以下节点信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">12963 DataNode</span><br><span class="line">13076 SecondaryNameNode</span><br><span class="line">12651 ResourceManager</span><br><span class="line">12876 NameNode</span><br><span class="line">20844 Jps</span><br><span class="line">12748 NodeManager</span><br><span class="line">19885 Launcher</span><br><span class="line">19886 B2BApplication</span><br></pre></td></tr></table></figure>
+
+<h4 id="停止"><a href="#停止" class="headerlink" title="停止"></a>停止</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ stop-yarn.sh</span><br><span class="line">$ stop-dfs.sh</span><br></pre></td></tr></table></figure>
+
+<h2 id="Hadoop-常用-Shell-命令"><a href="#Hadoop-常用-Shell-命令" class="headerlink" title="Hadoop 常用 Shell 命令"></a>Hadoop 常用 Shell 命令</h2><p>调用 Hadoop Shell 命令在可使用 <code>$ hadoop fs &lt;args&gt;</code> 的形式（使用面最广，可以操作任何文件系统）或 <code>$ hdfs dfs &lt;args&gt;</code> 的形式（只能操作HDFS文件系统相关），区别可见 <a target="_blank" rel="noopener" href="https://blog.csdn.net/jediael_lu/article/details/37649609">何时使用hadoop fs、hadoop dfs与hdfs dfs命令</a>。常用 <code>&lt;args&gt;</code> 参数有：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-ls #表示对hdfs下一级目录的查看 </span><br><span class="line">-lsr #表示对hdfs目录的递归查看 </span><br><span class="line">-mkdir #创建目录 </span><br><span class="line">-put #从linux上传文件到hdfs </span><br><span class="line">-get #从hdfs下载文件到linux </span><br><span class="line">-text #查看文件内容 </span><br><span class="line">-rm #表示删除文件 </span><br><span class="line">-rmr #表示递归删除文件</span><br></pre></td></tr></table></figure>
+
+<p>详细的可参考 <a target="_blank" rel="noopener" href="http://hadoop.apache.org/docs/r1.0.4/cn/hdfs_shell.html">Hadoop Shell 命令</a></p>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li>通过 HDFS 创建的目录和存储的文件以特殊的编码方式存放在机器上，不能在文件夹界面直接查看这些文件和目录，只能通过 Shell 命令来查看和操作这些文件</li>
+<li>HDFS的根目录是 <code>/</code>，这个是在 HDFS 系统上的目录，与系统目录无关。默认的工作目录是 <code>/user/$USER</code>，<code>USER</code> 是你的登录用户名。使用命令 <code>$ hdfs dfs -ls</code> 会直接显示工作目录 <code>/user/$USER</code> 下的内容</li>
+<li>使用 <code>-mkdir</code> 参数创建目录的时候，如果父目录不存在会报 <code>No such file or directory</code> 的错误。可以加上 <code>-p</code> 参数，如 <code>hdfs dfs -mkdir -p /user/Hadoop/twitter_data</code>，当路径中的某个目录不存在时会自动创建。</li>
+</ul>
+<h2 id="Hadoop-样例"><a href="#Hadoop-样例" class="headerlink" title="Hadoop 样例"></a>Hadoop 样例</h2><p>在这里使用 Hadoop 的 exmaple jar 包进行样例测试，该 jar 包的 wordCount 功能可用来统计一系列文本文件中每个单词出现的次数。该 jar 包的存放路径为 <code>/Users/mochuangbiao/hadoop-2.8.4/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.8.4.jar</code></p>
+<ol>
+<li>准备样本数据。在网上下载一些英文内容保存为 txt 格式，保存路径为 <code>/Users/mochuangbiao/test</code>。</li>
+<li>创建目录。执行命令 <code>$ hdfs dfs -mkdir input</code>，在默认工作目录下创建 <code>input</code> 目录，该目录路径为 <code>/user/mochuangbiao/input</code>。</li>
+<li>上传文件到 hdfs 系统。执行 <code>$ hdfs dfs -put /Users/mochuangbiao/test/*.txt input</code>，上传刚才的 txt 文件到 <code>input</code> 目录。</li>
+<li>运行样例。执行 <code>$ hdfs dfs /Users/mochuangbiao/hadoop-2.8.4/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.8.4.jar wordcount input output</code>。调用 example jar 包里面的 wordcount 统计 <code>input</code> 目录里面的文档，统计结果自动输出到 <code>output</code> 文件夹。</li>
+<li>查看结果。执行 <code>$ hdfs dfs -ls output</code>，一般里面会有一个类似于 <code>part-r-00000</code> 的文件，执行 <code>hdfs dfs -cat output/part-r-00000</code> 查看结果。</li>
+</ol>
+<p>详细可参考 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/CherishFX/p/4239959.html">Hadoop例子——运行example中的wordCount例子</a></p>
+<h2 id="其他参考"><a href="#其他参考" class="headerlink" title="其他参考"></a>其他参考</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/34ec406eb40d">大数据学习 第一篇——基础知识</a><br><a target="_blank" rel="noopener" href="https://www.csdn.net/article/a/2016-07-28/3775">Hadoop大数据生态系统及常用组件简介
+</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/dashujuedu/article/details/53538609">数据分析：Hive、Pig和Impala</a><br><a target="_blank" rel="noopener" href="http://zhongyaonan.com/hadoop-tutorial/setting-up-hadoop-2-6-on-mac-osx-yosemite.html">Setting up Hadoop 2.6 on Mac OS X Yosemite</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/de7eb61c983a">Mac 系统安装Hadoop 2.7.3</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Hadoop/" rel="tag"># Hadoop</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/06/29/Hexo%E5%8D%9A%E5%AE%A2SEO%E4%BC%98%E5%8C%96/" rel="prev" title="Hexo博客SEO优化">
+      <i class="fa fa-chevron-left"></i> Hexo博客SEO优化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/06/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E8%B0%83%E6%95%B4/" rel="next" title="小程序获取openid、session_key和access_token">
+      小程序获取openid、session_key和access_token <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A5%E9%97%A8%E7%9F%A5%E8%AF%86"><span class="nav-number">1.</span> <span class="nav-text">入门知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hadoop-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.1.</span> <span class="nav-text">Hadoop 是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hadoop-%E7%94%9F%E6%80%81%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.2.</span> <span class="nav-text">Hadoop 生态系统</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hadoop-%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">Hadoop 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81Java-%E7%8E%AF%E5%A2%83"><span class="nav-number">2.1.</span> <span class="nav-text">1、Java 环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81SSH-%E9%85%8D%E7%BD%AE"><span class="nav-number">2.2.</span> <span class="nav-text">2、SSH 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%B2%A1%E6%9C%89%E6%9D%83%E9%99%90"><span class="nav-number">2.2.1.</span> <span class="nav-text">用户没有权限</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E4%B8%8B%E8%BD%BD-Hadoop"><span class="nav-number">2.3.</span> <span class="nav-text">3、下载 Hadoop</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-Java-%E7%8E%AF%E5%A2%83"><span class="nav-number">2.3.1.</span> <span class="nav-text">配置 Java 环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-Hadoop-%E7%8E%AF%E5%A2%83"><span class="nav-number">2.3.2.</span> <span class="nav-text">配置 Hadoop 环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">2.3.3.</span> <span class="nav-text">修改配置文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81%E5%90%AF%E5%8A%A8"><span class="nav-number">2.4.</span> <span class="nav-text">5、启动</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%BC%E5%BC%8F%E5%8C%96-HDFS"><span class="nav-number">2.4.1.</span> <span class="nav-text">格式化 HDFS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8-HDFS"><span class="nav-number">2.4.2.</span> <span class="nav-text">启动 HDFS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8-YARN"><span class="nav-number">2.4.3.</span> <span class="nav-text">启动 YARN</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2"><span class="nav-number">2.4.4.</span> <span class="nav-text">停止</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hadoop-%E5%B8%B8%E7%94%A8-Shell-%E5%91%BD%E4%BB%A4"><span class="nav-number">3.</span> <span class="nav-text">Hadoop 常用 Shell 命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">3.1.</span> <span class="nav-text">注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hadoop-%E6%A0%B7%E4%BE%8B"><span class="nav-number">4.</span> <span class="nav-text">Hadoop 样例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">其他参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
