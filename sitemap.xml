@@ -309,14 +309,14 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/Maven/</loc>
+    <loc>http://yoursite.com/tags/Hadoop/</loc>
     <lastmod>2023-02-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/Hadoop/</loc>
+    <loc>http://yoursite.com/tags/Maven/</loc>
     <lastmod>2023-02-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -388,7 +388,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E5%B7%A5%E5%85%B7/Maven/</loc>
+    <loc>http://yoursite.com/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/</loc>
     <lastmod>2023-02-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -402,7 +402,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/</loc>
+    <loc>http://yoursite.com/categories/%E5%B7%A5%E5%85%B7/Maven/</loc>
     <lastmod>2023-02-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
