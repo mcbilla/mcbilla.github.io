@@ -9,7 +9,6 @@
     "gitalk": "^1.8.0",
     "hexo": "^6.3.0",
     "hexo-admin": "^2.3.0",
-    "hexo-asset-image": "github:CodeFalling/hexo-asset-image",
     "hexo-deployer-git": "^3.0.0",
     "hexo-generator-archive": "^2.0.0",
     "hexo-generator-baidu-sitemap": "^0.1.9",
