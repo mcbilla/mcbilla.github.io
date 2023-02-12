@@ -27,18 +27,18 @@
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="Netty 是目前比较火的网络编程框架，是 java 进阶的必备知识点，特此记录 Netty 学习过程中的一些知识点用于日后翻阅。本章介绍 Netty 的一些入门准备知识，包括同步和异步、阻塞和非阻塞的区别，还有常见的 IO 模型。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/blockingIO.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/nonblockingIO.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/IOmultiplexing.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/asynchronousIO.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/signal-drivenIO.png">
-<meta property="og:image" content="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/fiveIO.png">
+<meta property="og:image" content="http://yoursite.com/blockingIO.png">
+<meta property="og:image" content="http://yoursite.com/nonblockingIO.png">
+<meta property="og:image" content="http://yoursite.com/IOmultiplexing.png">
+<meta property="og:image" content="http://yoursite.com/asynchronousIO.png">
+<meta property="og:image" content="http://yoursite.com/signal-drivenIO.png">
+<meta property="og:image" content="http://yoursite.com/fiveIO.png">
 <meta property="article:published_time" content="2020-01-17T08:50:22.000Z">
 <meta property="article:modified_time" content="2023-02-11T15:52:47.992Z">
 <meta property="article:author" content="mcbilla">
 <meta property="article:tag" content="Netty">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/blockingIO.png">
+<meta name="twitter:image" content="http://yoursite.com/blockingIO.png">
 
 <link rel="canonical" href="http://yoursite.com/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/">
 
@@ -356,7 +356,7 @@
 <p>这些概念是下面 IO 模型的基础。</p>
 <h3 id="1、同步阻塞-IO（blocking-IO）"><a href="#1、同步阻塞-IO（blocking-IO）" class="headerlink" title="1、同步阻塞 IO（blocking IO）"></a>1、同步阻塞 IO（blocking IO）</h3><h4 id="网络模型"><a href="#网络模型" class="headerlink" title="网络模型"></a>网络模型</h4><p>同步阻塞 IO 模型是最常用的一个模型，也是最简单的模型。在这个 IO 模型中，用户空间的应用程序执行一个系统调用（recvform），这会导致应用程序阻塞，什么也不干，直到数据准备好，并且将数据从内核复制到用户进程，最后进程再处理数据。</p>
 <p>在等待数据到处理数据的两个阶段，整个进程都被阻塞。不能处理别的网络 IO。调用应用程序处于一种不再消费 CPU 而只是简单等待响应的状态，因此从处理的角度来看，这是非常有效的。流程图如下：</p>
-<p><img src="/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/blockingIO.png" alt="blockingIO"></p>
+<p><img src="/blockingIO.png" alt="blockingIO"></p>
 <h4 id="流程描述"><a href="#流程描述" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
 <li>第一个阶段：准备数据。当用户进程调用了 <code>recv()/recvfrom()</code> 这个系统调用之后，用户进程就开始阻塞等待数据。对于网络 IO 来说，很多时候数据在一开始还没有到达。比如，还没有收到一个完整的UDP包。这个时候 kernel 就要等待足够的数据到来。这个过程也需要等待。也就是说数据被拷贝到操作系统内核的缓冲区中是需要一个过程的。</li>
 <li>第二个阶段：当kernel 一直等到数据准备好了，它就会将数据从 kernel 中拷贝到用户内存。然后 kernel 返回结果，用户进程才解除 block 的状态，重新运行起来。</li>
@@ -371,7 +371,7 @@
 <p><strong>缺点</strong></p>
 <p>性能差，不能支持高并发的应用场景。</p>
 <h3 id="2、同步非阻塞-IO（nonblocking-IO）"><a href="#2、同步非阻塞-IO（nonblocking-IO）" class="headerlink" title="2、同步非阻塞 IO（nonblocking IO）"></a>2、同步非阻塞 IO（nonblocking IO）</h3><h4 id="网络模型-1"><a href="#网络模型-1" class="headerlink" title="网络模型"></a>网络模型</h4><p>同步非阻塞就是「每隔一会儿瞄一眼进度条」的轮询方式。在这种模型中，非阻塞也会调用 <code>recvform</code> 系统调用，不管数据是否准备好，内核都会马上返回给进程。如果数据还没准备好，就会返回一个错误代码（EAGAIN 或 EWOULDBLOCK），说明这个命令不能立即满足。进程在返回之后，可以干点别的事情，过一段时间再发起<code>recvform</code> 系统调用，重复上面的过程。这个过程通常被称之为轮询。直到数据准备好，再拷贝数据到进程，进行数据处理。需要注意，拷贝数据整个过程，进程仍然是属于阻塞的状态。流程如图所示：</p>
-<p><img src="/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/nonblockingIO.png" alt="nonblockingIO"></p>
+<p><img src="/nonblockingIO.png" alt="nonblockingIO"></p>
 <h4 id="流程描述-1"><a href="#流程描述-1" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
 <li>用户进程发出 read 操作时，马上就得到了一个结果。<ul>
 <li>kernel中的数据还没有准备好，返回一个 error 信号。</li>
@@ -393,7 +393,7 @@
 </ul>
 <h3 id="3、IO-多路复用（-IO-multiplexing）"><a href="#3、IO-多路复用（-IO-multiplexing）" class="headerlink" title="3、IO 多路复用（ IO multiplexing）"></a>3、IO 多路复用（ IO multiplexing）</h3><h4 id="网络模型-2"><a href="#网络模型-2" class="headerlink" title="网络模型"></a>网络模型</h4><p>IO 多路复用就是用一个单独的非用户态的进程去完成同步非阻塞的轮询工作。和同步非阻塞 IO 的区别是，同步非阻塞 IO使用用户态的进程去完成这个轮询工作，而 IO多路复用使用 UNIX&#x2F;Linux 下的内核函数 <code>select、poll、epoll</code> 都可以完成这个轮询工作（epoll 比 poll、select 效率高，做的事情是一样的）。我们可以把这类函数的工作称为 select 轮询。</p>
 <p>select 轮询是内核级别的，可以监听多个 socket，能实现同时对多个IO端口进行监听，直到有数据可读或可写时（注意不是全部数据可读或可写），才真正调用 I&#x2F;O 操作函数。然后进程再进行 recvform 系统调用，将数据由内核拷贝到用户进程，当然这个过程是阻塞的。流程图如下：</p>
-<p><img src="/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/IOmultiplexing.png" alt="IOmultiplexing"></p>
+<p><img src="/IOmultiplexing.png" alt="IOmultiplexing"></p>
 <h4 id="流程描述-2"><a href="#流程描述-2" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
 <li>当用户进程调用了 select，整个进程会被 block，而同时，kernel 会监视所有 select 负责的 socket</li>
 <li>当任何一个 socket 中的数据准备好了，select 就会返回。</li>
@@ -416,7 +416,7 @@
 <p><strong>从整个IO过程来看，他们都是同步模型，因为都属于应用程序主动等待且向内核检查状态。</strong></p>
 <h3 id="4、异步非阻塞-IO（asynchronous-IO）"><a href="#4、异步非阻塞-IO（asynchronous-IO）" class="headerlink" title="4、异步非阻塞 IO（asynchronous IO）"></a>4、异步非阻塞 IO（asynchronous IO）</h3><h4 id="网络模型-3"><a href="#网络模型-3" class="headerlink" title="网络模型"></a>网络模型</h4><p>相对于同步IO，异步IO不是顺序执行。用户进程进行 aio_read 系统调用之后，无论内核数据是否准备好，都会直接返回给用户进程，然后用户态进程可以去做别的事情。等到socket数据准备好了，内核直接复制数据给进程，然后从内核向进程发送通知。IO两个阶段，进程都是非阻塞的。</p>
 <p>Linux 提供了 AIO 库函数实现异步，但是用的很少。目前有很多开源的异步IO库，例如 libevent、libev、libuv。异步过程如下图所示：</p>
-<p><img src="/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/asynchronousIO.png" alt="asynchronousIO"></p>
+<p><img src="/asynchronousIO.png" alt="asynchronousIO"></p>
 <h4 id="流程描述-3"><a href="#流程描述-3" class="headerlink" title="流程描述"></a>流程描述</h4><ul>
 <li>用户进程发起 aio_read 操作之后，立刻就可以开始去做其它的事。从 kernel 的角度，当它受到一个asynchronous read 之后，首先它会立刻返回，所以不会对用户进程产生任何 block。</li>
 <li>kernel 会等待数据准备完成，然后将数据拷贝到用户内存。</li>
@@ -436,7 +436,7 @@
 </li>
 </ul>
 <h3 id="5、信号驱动式IO（signal-driven-IO）"><a href="#5、信号驱动式IO（signal-driven-IO）" class="headerlink" title="5、信号驱动式IO（signal-driven IO）"></a>5、信号驱动式IO（signal-driven IO）</h3><p>信号驱动式I&#x2F;O：首先我们允许Socket进行信号驱动IO,并安装一个信号处理函数，进程继续运行并不阻塞。当数据准备好时，进程会收到一个SIGIO信号，可以在信号处理函数中调用I&#x2F;O操作函数处理数据。过程如下图所示：</p>
-<p><img src="/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/signal-drivenIO.png" alt="signal-drivenIO"></p>
+<p><img src="/signal-drivenIO.png" alt="signal-drivenIO"></p>
 <p>信号驱动IO实际使用得不多，所以在这里不做深入介绍。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本章介绍了同步&#x2F;异步、阻塞&#x2F;非阻塞的概念、linux IO的基础概念和五种常见的 IO 模型：</p>
 <ol>
@@ -461,7 +461,7 @@
 <li>信号驱动式IO（signal-driven IO）</li>
 </ul>
 <p>其中 IO 多路复用模型是 netty IO 模型的基础，必须要掌握，五种 IO 模型流程简单总结如下：</p>
-<p><img src="/2020/01/17/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AIO%E6%A8%A1%E5%9E%8B/fiveIO.png" alt="fiveIO"></p>
+<p><img src="/fiveIO.png" alt="fiveIO"></p>
 </li>
 </ol>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/486b0965c296">聊聊Linux 五种IO模型</a></p>

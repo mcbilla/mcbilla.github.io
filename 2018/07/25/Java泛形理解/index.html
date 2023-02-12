@@ -412,7 +412,7 @@
 <ol start="2">
 <li>在定义的方法体的业务逻辑与泛型类型无关，如 List.size()，List.clear() 等这些方法。实际上，最常用的就是 Class&lt;?&gt;。</li>
 </ol>
-<p>最后提醒一下的就是，List<Object> 与 List<?> 并不等同，List<Object> 是 List<?> 的子类。不能往 List&lt;?&gt; 里面获取和添加任何元素，除了 null。</Object></Object></p>
+<p>最后提醒一下的就是，List<Object> 与 List<?> 并不等同，List<Object> 是 List<?> 的子类。不能往 List&lt;?&gt; 里面获取和添加任何元素，除了 null。</p>
 <h2 id="深入理解泛型"><a href="#深入理解泛型" class="headerlink" title="深入理解泛型"></a>深入理解泛型</h2><h3 id="1、类型擦除"><a href="#1、类型擦除" class="headerlink" title="1、类型擦除"></a>1、类型擦除</h3><p><strong>类型擦除</strong> 就是说 Java 泛型只能用于在编译期间的静态类型检查，然后编译器生成的代码会擦除相应的类型信息，把所有类型参数替换为 BoundingType（若未加限定就替换为 Object ）。</p>
 <p>这样到了运行期间实际上 JVM 根本不知道泛型所代表的具体类型。这样做的目的是因为 Java 泛型是 1.5 之后才被引入的，为了保持向下的兼容性，所以只能做类型擦除来兼容以前的非泛型代码。</p>
 <p>例如下面这段代码</p>
@@ -446,7 +446,7 @@
 <h3 id="3、注意事项"><a href="#3、注意事项" class="headerlink" title="3、注意事项"></a>3、注意事项</h3><h4 id="1）不允许创建泛型数组"><a href="#1）不允许创建泛型数组" class="headerlink" title="1）不允许创建泛型数组"></a>1）不允许创建泛型数组</h4><p>Java 不支持创建泛型数组。假设如果允许创建泛型数组，会出现下面这种情况：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Object[] stringLists = new List&lt;String&gt;[];  // compiler error, but pretend it&#x27;s allowed</span><br><span class="line"></span><br><span class="line">stringLists[0] = new ArrayList&lt;String&gt;();  // OK</span><br><span class="line"></span><br><span class="line">stringLists[1] = new ArrayList&lt;Integer&gt;(); // An ArrayStoreException should be thrown, but the runtime can&#x27;t detect it.</span><br><span class="line"></span><br><span class="line">String s = stringLists[1].get(0); // Run-time error: ClassCastException.</span><br></pre></td></tr></table></figure>
 
-<p>假设我们支持泛型数组的创建，由于运行时期类型信息已经被擦除，JVM实际上根本就不知道 new ArrayList&lt; String &gt;() 和 new ArrayList&lt; Integer &gt;() 的区别，他们可以被添加到同一个数组里面 List<String>[] 里面。只有当运行时取出元素的时候进行类型转换时才会报 <code>ClassCastException</code> 的异常。为了避免这种情况我们不允许创建泛型数组，让编译器去帮助我们检查就可以避免这种情况。</String></p>
+<p>假设我们支持泛型数组的创建，由于运行时期类型信息已经被擦除，JVM实际上根本就不知道 new ArrayList&lt; String &gt;() 和 new ArrayList&lt; Integer &gt;() 的区别，他们可以被添加到同一个数组里面 List<String>[] 里面。只有当运行时取出元素的时候进行类型转换时才会报 <code>ClassCastException</code> 的异常。为了避免这种情况我们不允许创建泛型数组，让编译器去帮助我们检查就可以避免这种情况。</p>
 <h4 id="2）不能利用类型参数创建实例"><a href="#2）不能利用类型参数创建实例" class="headerlink" title="2）不能利用类型参数创建实例"></a>2）不能利用类型参数创建实例</h4><p>Java 不允许类型类型参数创建实例，例如下面这种情况：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public static &lt;E&gt; void append(List&lt;E&gt; list) &#123;</span><br><span class="line">    E elem = new E();  // compile-time error</span><br><span class="line">    list.add(elem);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 

@@ -27,18 +27,18 @@
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="之前对 Java 集合框架的了解仅仅停留在知道怎么使用一些常见集合，对集合框架的使用也没有做深一步的研究，经常被种类繁多的集合框架弄得云里雾里。现在对 Java 集合框架的设计思想和原理进行进一步学习，希望更加熟练灵活地掌握集合框架进而提高我们的开发效率。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://yoursite.com/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/jihe.gif">
-<meta property="og:image" content="http://yoursite.com/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/collection.png">
-<meta property="og:image" content="http://yoursite.com/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/hash.png">
-<meta property="og:image" content="http://yoursite.com/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/hashmap.png">
-<meta property="og:image" content="http://yoursite.com/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/map.png">
+<meta property="og:image" content="http://yoursite.com/jihe.gif">
+<meta property="og:image" content="http://yoursite.com/collection.png">
+<meta property="og:image" content="http://yoursite.com/hash.png">
+<meta property="og:image" content="http://yoursite.com/hashmap.png">
+<meta property="og:image" content="http://yoursite.com/map.png">
 <meta property="article:published_time" content="2018-07-12T03:25:39.000Z">
 <meta property="article:modified_time" content="2023-02-11T15:52:47.984Z">
 <meta property="article:author" content="mcbilla">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="集合">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/jihe.gif">
+<meta name="twitter:image" content="http://yoursite.com/jihe.gif">
 
 <link rel="canonical" href="http://yoursite.com/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/">
 
@@ -296,7 +296,7 @@
 <span id="more"></span>
 
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在 Java 2 之前，Java 是没有完整的集合框架的。它只有一些简单的可以自扩展的容器类，比如 Vector，Stack，Hashtable 等。这些容器类在使用的过程中由于效率问题饱受诟病，因此在 Java 2 中，Java 设计者们进行了大刀阔斧的整改，重新设计，于是就有了现在的集合框架。需要注意的是，之前的那些容器类库并没有被弃用而是进行了保留，主要是为了向下兼容的目的，但我们在平时使用中还是应该尽量少用。</p>
-<p><img src="/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/jihe.gif" alt="jihe"></p>
+<p><img src="/jihe.gif" alt="jihe"></p>
 <p>从上面我们可以看到 Java 集合框架主要有 <strong>Collection</strong> 和 <strong>Map</strong> 两种类型的容器接口，再下面是一些子接口或者抽象类，最后是具体实现类。：</p>
 <ul>
 <li>Collection 集合接口：存储单个元素数据，下面有 3 个经典的子接口类型 <strong>List</strong>、<strong>Set</strong> 和 <strong>Queue</strong>。</li>
@@ -306,9 +306,9 @@
 <li>Map 映射接口：存储 key-value 对元素数据，其中 key 是不可重复的。常用的实现类有 HashMap、TreeMap 等。</li>
 </ul>
 <h2 id="Collection-接口"><a href="#Collection-接口" class="headerlink" title="Collection 接口"></a>Collection 接口</h2><p>Collection 接口是集合的根接口，定义对集合元素进行操作的通用方法。Collection 的框架图如下所示：</p>
-<p><img src="/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/collection.png" alt="collection"></p>
+<p><img src="/collection.png" alt="collection"></p>
 <p>Collection 接口定义的所有方法如下所示：</p>
-<div style="width: 60%">![colfunc](colfunc.jpeg)</div>
+<div style='width: 60%'>![colfunc](colfunc.jpeg)</div>
 常用的方法有 `add()` 添加一个元素到集合中，`addAll()` 将指定集合中的所有元素添加到另外一个集合中，`contains()` 方法检测集合中是否包含指定的元素，`toArray()` 方法返回一个表示集合的数组，`iterator()` 获取集合的迭代器来遍历集合。
 
 <h3 id="遍历-Collection"><a href="#遍历-Collection" class="headerlink" title="遍历 Collection"></a>遍历 Collection</h3><p>由上图可见 Collection 接口包含 Iterator 变量，且继承了 Iterable 接口，根据官方文档</p>
@@ -360,7 +360,7 @@
 <h3 id="二、Set"><a href="#二、Set" class="headerlink" title="二、Set"></a>二、Set</h3><p>Set 是无序的不允许重复的集合。如果试图把两个相同的元素加入同一个 Set 集合中，则添加操作失败，add() 方法返回 false，且新元素不会被加入。</p>
 <h4 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h4><p>在介绍 Set 集合之前我们先来认识一下哈希表。</p>
 <h5 id="什么是散列表"><a href="#什么是散列表" class="headerlink" title="什么是散列表"></a>什么是散列表</h5><p>当我们用数组来存储元素，然后通过把元素的关键字通过某个函数映射到数组中的某个位置，然后把元素存储在该位置上。这样我们通过关键字就可以迅速查找到元素的数组位置，然后访问该位置上的元素。这种方式实现的数组就叫做 <strong>哈希表</strong> (hash table)，把关键字映射成存储位置的函数就叫做 <strong>哈希函数</strong> (hash function)，映射后得到一个整数值叫做 <strong>哈希码</strong> (hash code)。如下图所示</p>
-<p><img src="/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/hash.png" alt="hash"></p>
+<p><img src="/hash.png" alt="hash"></p>
 <h5 id="哈希冲突"><a href="#哈希冲突" class="headerlink" title="哈希冲突"></a>哈希冲突</h5><p>当我们对某个元素进行哈希运算，得到一个存储地址，然后要进行插入的时候，发现已经被其他元素占用了，其实这就是所谓的 <strong>哈希冲突</strong>。解决哈希冲突的方法有</p>
 <ul>
 <li>开放定址法（线性探测再散列，二次探测再散列，伪随机探测再散列）</li>
@@ -375,7 +375,7 @@
 <li>如果 a.equals(b) 为 true，a 和 b 必须有相同的散列码。</li>
 <li>如果 a 和 b 有相同的散列码，a.equals(b) 不一定为 true。</li>
 </ul>
-<p><img src="/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/hashmap.png" alt="hashmap"></p>
+<p><img src="/hashmap.png" alt="hashmap"></p>
 <p>Set 有三个常见实现类 <strong>TreeSet</strong>、<strong>HashSet</strong>(下面有子类 <strong>LinkedHashSet</strong>)和 <strong>EnumSet</strong>。</p>
 <h4 id="1、HashSet"><a href="#1、HashSet" class="headerlink" title="1、HashSet"></a>1、HashSet</h4><p><em><strong>HashSet 是基于散列表实现的无序 Set 集合</strong></em>。HashSet 中的元素的排序顺序随机分配，所以访问顺序也是随机。</p>
 <p>HashSet 的底层是基于 HashMap 实现的，使用 HashMap 来保存所有元素。因此 HashSet  的实现比较简单，相关 HashSet 的操作，基本上都是直接调用底层 HashMap 的相关方法来完成的。参考 <a target="_blank" rel="noopener" href="http://zhangshixi.iteye.com/blog/673143">深入Java集合学习系列：HashSet的实现原理</a></p>
@@ -401,9 +401,9 @@
 <p>ArrayDeque 为了满足可以同时在数组两端插入或删除元素的需求，其内部的动态数组还必须是循环的，即循环数组（circular array），也就是说数组的任何一点都可能被看作起点或者终点。</p>
 <p>ArrayDeque 不是线程安全的。当作为栈使用时，性能比 Stack 好；当作为队列使用时，性能比 LinkedList 好。</p>
 <h2 id="Map-接口"><a href="#Map-接口" class="headerlink" title="Map 接口"></a>Map 接口</h2><p><em><strong>Map 是用于保存具有映射关系的数据集合</strong></em>。Map 集合里保存着 key 和 value 两组值，key 和 value 都可以是任何引用类型的数据。Map 的 key 不允许重复，同一个 Map 对象的任何两个 key 通过 equals 方法比较总是返回 false。key 和 value 之间存在单向一对一关系，即通过指定的 key，总能找到唯一的、确定的 value。</p>
-<p><img src="/2018/07/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%80%BB%E7%BB%93/map.png" alt="map"></p>
+<p><img src="/map.png" alt="map"></p>
 <p>Map 接口定义的所有方法如下所示：</p>
-<div style="width: 60%">![mapfunc](mapfunc.jpeg)</div>
+<div style='width: 60%'>![mapfunc](mapfunc.jpeg)</div>
 从上面我们可以看到 key、value 和 key-value 对应的成员变量如下所示：
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Set&lt;K&gt; keySet();</span><br><span class="line"></span><br><span class="line">Collection&lt;V&gt; values();</span><br><span class="line"></span><br><span class="line">Set&lt;Map.Entry&lt;K, V&gt;&gt; entrySet();</span><br></pre></td></tr></table></figure>
