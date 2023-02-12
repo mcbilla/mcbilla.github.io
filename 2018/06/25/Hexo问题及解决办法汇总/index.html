@@ -27,12 +27,16 @@
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="对通过 Hexo 搭建博客过程中遇到的问题进行了汇总，以后再遇到相同的问题可以迅速定位解决问题。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/localsearch1.jpeg">
+<meta property="og:image" content="http://yoursite.com/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/localsearch2.jpeg">
+<meta property="og:image" content="http://yoursite.com/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/404.png">
 <meta property="article:published_time" content="2018-06-25T06:37:47.000Z">
-<meta property="article:modified_time" content="2023-02-11T15:52:47.965Z">
+<meta property="article:modified_time" content="2023-02-12T09:00:47.426Z">
 <meta property="article:author" content="mcbilla">
 <meta property="article:tag" content="Hexo">
 <meta property="article:tag" content="问题汇总">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/localsearch1.jpeg">
 
 <link rel="canonical" href="http://yoursite.com/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/">
 
@@ -220,7 +224,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-02-11 23:52:47" itemprop="dateModified" datetime="2023-02-11T23:52:47+08:00">2023-02-11</time>
+                <time title="修改时间：2023-02-12 17:00:47" itemprop="dateModified" datetime="2023-02-12T17:00:47+08:00">2023-02-12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -252,22 +256,38 @@
 </blockquote>
 <span id="more"></span>
 
-<h2 id="搜索问题"><a href="#搜索问题" class="headerlink" title="搜索问题"></a>搜索问题</h2><h3 id="点击-Local-Search-本地搜索页面卡住"><a href="#点击-Local-Search-本地搜索页面卡住" class="headerlink" title="点击 Local Search 本地搜索页面卡住"></a>点击 Local Search 本地搜索页面卡住</h3><p>问题描述：安装教程配置好 Local Search 本地搜索之后，点击 <strong>搜索</strong> 按钮页面一直卡在转圈圈的地方，F12进入开发者工具没有看到错误提示，以 <code>debug</code> 模式启动的服务器也没有错误输出？</p>
-<p>问题解决：出现这种情况是因为你的某一篇文章中出现了非 UTF-8 编码的字符，解决办法是 <em>找到把该异常字符并删除</em>。</p>
+<h3 id="一、点击-Local-Search-本地搜索页面卡住"><a href="#一、点击-Local-Search-本地搜索页面卡住" class="headerlink" title="一、点击 Local Search 本地搜索页面卡住"></a>一、点击 Local Search 本地搜索页面卡住</h3><p>问题描述：安装教程配置好 Local Search 本地搜索之后，点击 <strong>搜索</strong> 按钮页面一直卡在转圈圈的地方，F12进入开发者工具没有看到错误提示，以 <code>debug</code> 模式启动的服务器也没有错误输出？</p>
+<p>问题解决：<strong>出现这种情况是因为你的某一篇文章中出现了非 UTF-8 编码的字符，解决办法是找到把该异常字符并删除</strong>。</p>
 <ul>
-<li>打开 <code>http://localhost:4000/search.xml</code>，确认错误字符所在的位置。如下图所示就在 <em>第6行第35列</em></li>
+<li>打开 <code>http://localhost:4000/search.xml</code>，确认错误字符所在的位置。如下图所示就在第6行第35列。</li>
 </ul>
-<div style="width: 80%; margin: auto">![localsearch1](localsearch1.jpeg)</div>
-* 通过 `$ vim public/search.xml` 打开 `search.xml` 文件，根据刚才的位置定位到出现问题的文章的该行该列。该位置一般会出现一个异常字符，例如 `^H` 或者 `^M` 等字符。*注意不用直接修改 `search.xml` 文件*。
-* 编辑出现问题的文章的 `md` 文件，找到出现问题的行列，把该位置的特殊字符删掉。该字符有可能是一个隐藏的字符如 `^H`，一般的 markdown 编辑工具可能看不到该字符，可以通过 `vim` 编辑删除该字符。
-* 执行 `$ hexo clean && hexo g` 后重启服务器，然后再打开 `http://localhost:4000/search.xml`，看到下图所示表示可以正常使用本地搜索功能。
+<p><img src="/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/localsearch1.jpeg" alt="localsearch1"></p>
+<ul>
+<li>通过 <code>$ vim public/search.xml</code> 打开 <code>search.xml</code> 文件，根据刚才的位置定位到出现问题的文章的该行该列。该位置一般会出现一个异常字符，例如 <code>^H</code> 或者 <code>^M</code> 等字符。注意不用直接修改 <code>search.xml</code> 文件。</li>
+<li>编辑出现问题的文章的 <code>md</code> 文件，找到出现问题的行列，把该位置的特殊字符删掉。该字符有可能是一个隐藏的字符如 <code>^H</code>，一般的 markdown 编辑工具可能看不到该字符，可以通过 <code>vim</code> 编辑删除该字符。</li>
+<li>执行 <code>$ hexo clean &amp;&amp; hexo g</code> 后重启服务器，然后再打开 <code>http://localhost:4000/search.xml</code>，看到下图所示表示可以正常使用本地搜索功能。</li>
+</ul>
+<p><img src="/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/localsearch2.jpeg" alt="localsearch2"></p>
+<h3 id="二、在执行-hexo-d-部署到-GitHub-上的时候总是卡住"><a href="#二、在执行-hexo-d-部署到-GitHub-上的时候总是卡住" class="headerlink" title="二、在执行 hexo d 部署到 GitHub 上的时候总是卡住"></a>二、在执行 <code>hexo d</code> 部署到 GitHub 上的时候总是卡住</h3><p>问题描述：在执行 <code>hexo d</code> 部署到 GitHub 上的时候总是卡住没有往下面执行，这时候只能 <code>ctrl + c</code> 中断或等待很久一段时间后才执行完毕。</p>
+<p>问题解决：这是由于国内墙对 GitHub 的阻挡影响，导致国内用户在向 GitHub 仓库 <code>pull</code> 或者 <code>push</code> 的时候速度都会受到不同程度的影响。解决办法是<strong>使用 vpn，然后设置 git 代理</strong>。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 查看当前代理设置</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global http.proxy</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global https.proxy</span></span><br><span class="line"></span><br><span class="line">// 设置当前代理为 http://127.0.0.1:1080 或 socket5://127.0.0.1:1080</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global http.proxy <span class="string">&#x27;http://127.0.0.1:1080&#x27;</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global https.proxy <span class="string">&#x27;http://127.0.0.1:1080&#x27;</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global http.proxy <span class="string">&#x27;socks5://127.0.0.1:1080&#x27;</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global https.proxy <span class="string">&#x27;socks5://127.0.0.1:1080&#x27;</span></span></span><br><span class="line"></span><br><span class="line">// 删除 proxy</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global --<span class="built_in">unset</span> http.proxy</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global --<span class="built_in">unset</span> https.proxy</span></span><br></pre></td></tr></table></figure>
 
-<div style="width: 80%; margin: auto">![localsearch2](localsearch2.jpeg)</div>
-## 部署问题
 
-<h3 id="在执行-hexo-d-部署到-GitHub-上的时候总是卡住"><a href="#在执行-hexo-d-部署到-GitHub-上的时候总是卡住" class="headerlink" title="在执行 hexo d 部署到 GitHub 上的时候总是卡住"></a>在执行 <code>hexo d</code> 部署到 GitHub 上的时候总是卡住</h3><p>问题描述：在执行 <code>hexo d</code> 部署到 GitHub 上的时候总是卡住没有往下面执行，这时候只能 <code>ctrl + c</code> 中断或等待很久一段时间后才执行完毕。</p>
-<p>问题解决：这是由于国内墙对 GitHub 的阻挡影响，导致国内用户在向 GitHub 仓库 <code>pull</code> 或者 <code>push</code> 的时候速度都会受到不同程度的影响。解决办法是 <em>买或者自己搭建个 vpn，然后设置 git 代理</em>。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 查看当前代理设置</span><br><span class="line">git config --global http.proxy</span><br><span class="line">git config --global https.proxy</span><br><span class="line"></span><br><span class="line">// 设置当前代理为 http://127.0.0.1:1080 或 socket5://127.0.0.1:1080</span><br><span class="line">git config --global http.proxy &#x27;http://127.0.0.1:1080&#x27;</span><br><span class="line">git config --global https.proxy &#x27;http://127.0.0.1:1080&#x27;</span><br><span class="line"></span><br><span class="line">git config --global http.proxy &#x27;socks5://127.0.0.1:1080&#x27;</span><br><span class="line">git config --global https.proxy &#x27;socks5://127.0.0.1:1080&#x27;</span><br><span class="line"></span><br><span class="line">// 删除 proxy</span><br><span class="line">git config --global --unset http.proxy</span><br><span class="line">git config --global --unset https.proxy</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、Hexo-文件名大小写不敏感的问题"><a href="#三、Hexo-文件名大小写不敏感的问题" class="headerlink" title="三、Hexo 文件名大小写不敏感的问题"></a>三、Hexo 文件名大小写不敏感的问题</h3><p>有时候经常会出现文章部署后又修改了 Tag 或 Categories，而恰好修改的内容涉及到英文字母大写改小写或小写改大写，譬如 news 改为 News，修改后确发现部署到 Github 上无法生效，当点击对应的Tag或Categories时会出现路径无法找到从而跳转到404页面，但本地预览确一切正常。</p>
+<p><img src="/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/404.png" alt="404"></p>
+<p>这个现象的问题是由于git 默认是大小写不敏感，而且如果你使用的是mac，系统默认也是大小写不敏感的。因此即便文件夹的大小写发生了变更，git 也会表现出置之不理。解决思路如下：</p>
+<h4 id="1、使用-git-修改文件名大小写。"><a href="#1、使用-git-修改文件名大小写。" class="headerlink" title="1、使用 git 修改文件名大小写。"></a>1、使用 git 修改文件名大小写。</h4><p>有两种方式。第一种是设置 git 为大小写敏感。用这种方法进行重命名，用git status就可以识别出修改了，但是不推荐用这种方式，因为在更新这种修改的时候会有麻烦（比如会 git push 创建一个新命名的文件，而且不是直接修改原来文件的命名）。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config core.ignorecase <span class="literal">false</span></span></span><br></pre></td></tr></table></figure>
+
+<p>第二种方式，使用 git mv 命令（仅当core.ignorecase为true时可用）。此时的状态是 renamed，git commit 即可。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">mv</span> ABC.java Abc.java</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2、清空部署目录-deploy-git"><a href="#2、清空部署目录-deploy-git" class="headerlink" title="2、清空部署目录 .deploy_git"></a>2、清空部署目录 .deploy_git</h4><p><code>.deploy_git</code> 在 hexo 的安装目录下面，是一个隐藏文件夹。在执行 <code>hexo deploy</code> 的时候会先清空 <code>.deploy_git</code>，然后把 <code>public</code> 目录下的文件拷到<code>.deploy_git</code>，再把 <code>.deploy_git</code>的、 的内容推送到 master 分支上面。</p>
+<p>接下来删除 <code>.deploy_git</code>文件夹内的所有文件，并 push 到 Github 仓库（默认是 master 分支），完成后你的 github.io 项目中没有任何文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cd</span> .deploy_git</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">rm</span> -rf *</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git commit -m <span class="string">&quot;clean all file&quot;</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git push</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3、重新部署并发布"><a href="#3、重新部署并发布" class="headerlink" title="3、重新部署并发布"></a>3、重新部署并发布</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo clean &amp;&amp; hexo g -d</span></span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -351,7 +371,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">搜索问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%82%B9%E5%87%BB-Local-Search-%E6%9C%AC%E5%9C%B0%E6%90%9C%E7%B4%A2%E9%A1%B5%E9%9D%A2%E5%8D%A1%E4%BD%8F"><span class="nav-number">1.1.</span> <span class="nav-text">点击 Local Search 本地搜索页面卡住</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E6%89%A7%E8%A1%8C-hexo-d-%E9%83%A8%E7%BD%B2%E5%88%B0-GitHub-%E4%B8%8A%E7%9A%84%E6%97%B6%E5%80%99%E6%80%BB%E6%98%AF%E5%8D%A1%E4%BD%8F"><span class="nav-number">1.2.</span> <span class="nav-text">在执行 hexo d 部署到 GitHub 上的时候总是卡住</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%82%B9%E5%87%BB-Local-Search-%E6%9C%AC%E5%9C%B0%E6%90%9C%E7%B4%A2%E9%A1%B5%E9%9D%A2%E5%8D%A1%E4%BD%8F"><span class="nav-number">1.</span> <span class="nav-text">一、点击 Local Search 本地搜索页面卡住</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%9C%A8%E6%89%A7%E8%A1%8C-hexo-d-%E9%83%A8%E7%BD%B2%E5%88%B0-GitHub-%E4%B8%8A%E7%9A%84%E6%97%B6%E5%80%99%E6%80%BB%E6%98%AF%E5%8D%A1%E4%BD%8F"><span class="nav-number">2.</span> <span class="nav-text">二、在执行 hexo d 部署到 GitHub 上的时候总是卡住</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81Hexo-%E6%96%87%E4%BB%B6%E5%90%8D%E5%A4%A7%E5%B0%8F%E5%86%99%E4%B8%8D%E6%95%8F%E6%84%9F%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">三、Hexo 文件名大小写不敏感的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81%E4%BD%BF%E7%94%A8-git-%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E5%90%8D%E5%A4%A7%E5%B0%8F%E5%86%99%E3%80%82"><span class="nav-number">3.1.</span> <span class="nav-text">1、使用 git 修改文件名大小写。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E6%B8%85%E7%A9%BA%E9%83%A8%E7%BD%B2%E7%9B%AE%E5%BD%95-deploy-git"><span class="nav-number">3.2.</span> <span class="nav-text">2、清空部署目录 .deploy_git</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81%E9%87%8D%E6%96%B0%E9%83%A8%E7%BD%B2%E5%B9%B6%E5%8F%91%E5%B8%83"><span class="nav-number">3.3.</span> <span class="nav-text">3、重新部署并发布</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
