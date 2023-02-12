@@ -158,7 +158,7 @@ ChannelHandler 分为 ChannelInboundHandler 和 ChannelOutboundHandler：
 
 其中 ChannelOutboundHandler 用的比较少（Netty 5 后面已经有废弃的趋势），下面介绍下 ChannelInboundHandler 的生命周期：
 
-![image-20200701181542816](/Users/mochuangbiao/Library/Application%20Support/typora-user-images/image-20200701181542816.png)
+![channel3](channel3.png)
 
 1. handlerAdded：新建立的连接会按照初始化策略，把 handler 添加到该 channel 的 pipeline 里面，也就是 channel.pipeline.addLast(new LifeCycleInBoundHandler) 执行完成后的回调；
 2. channelRegistered：当该连接分配到具体的 worker 线程后，该回调会被调用。
