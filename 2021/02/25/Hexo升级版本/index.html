@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="本文介绍了 Hexo 博客框架以及所使用主题 Next 的升级过程。经过一番折腾，最终把 Hexo 从 3.7.1 升级到 6.3.0，把 Next 主题从 4.3.0 升级到 7.8.0。升级后发现性能提升较为明显，特地记录下升级过程，方便下一次版本升级。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo升级版本">
+<meta property="og:url" content="http://yoursite.com/2021/02/25/Hexo%E5%8D%87%E7%BA%A7%E7%89%88%E6%9C%AC/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="本文介绍了 Hexo 博客框架以及所使用主题 Next 的升级过程。经过一番折腾，最终把 Hexo 从 3.7.1 升级到 6.3.0，把 Next 主题从 4.3.0 升级到 7.8.0。升级后发现性能提升较为明显，特地记录下升级过程，方便下一次版本升级。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-02-25T14:48:17.000Z">
+<meta property="article:modified_time" content="2021-02-26T14:48:17.000Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Hexo">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/02/25/Hexo%E5%8D%87%E7%BA%A7%E7%89%88%E6%9C%AC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Hexo升级版本 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/02/25/Hexo%E5%8D%87%E7%BA%A7%E7%89%88%E6%9C%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Hexo升级版本
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-02-25 22:48:17" itemprop="dateCreated datePublished" datetime="2021-02-25T22:48:17+08:00">2021-02-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-26 22:48:17" itemprop="dateModified" datetime="2021-02-26T22:48:17+08:00">2021-02-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hexo/" itemprop="url" rel="index"><span itemprop="name">Hexo</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/02/25/Hexo%E5%8D%87%E7%BA%A7%E7%89%88%E6%9C%AC/" class="post-meta-item leancloud_visitors" data-flag-title="Hexo升级版本" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/02/25/Hexo%E5%8D%87%E7%BA%A7%E7%89%88%E6%9C%AC/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/02/25/Hexo%E5%8D%87%E7%BA%A7%E7%89%88%E6%9C%AC/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>本文介绍了 Hexo 博客框架以及所使用主题 Next 的升级过程。经过一番折腾，最终把 Hexo 从 3.7.1 升级到 6.3.0，把 Next 主题从 4.3.0 升级到 7.8.0。升级后发现性能提升较为明显，特地记录下升级过程，方便下一次版本升级。</p>
+</blockquote>
+<span id="more"></span>
+
+<h1 id="升级-Hexo"><a href="#升级-Hexo" class="headerlink" title="升级 Hexo"></a>升级 Hexo</h1><ol>
+<li>先全局升级 <code>hexo-cli</code>：<code>hexo</code>本身是一个静态博客生成工具，具备编译Markdown、拼接主题模板、生成 HTML、上传 Git 等基本功能。<code>hexo-cli</code>能够将这些功能封装为命令，提供给用户通过<code>hexo server / hexo deploy</code>等命令调用的模块。<code>CLI = Command Line Interface</code>命令行界面。</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install hexo-cli -g</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><code>npm-check</code> 检查系统中的插件是否有升级的，可以看到自己前面都安装了那些插件。</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install -g npm-check</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm-check</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><code>npm-upgrade</code> 升级系统中的插件</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm install -g npm-upgrade</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm-upgrade</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>更新全局包。<code>-g</code> 参数表示安装到全局 <code>node_modules</code> 目录中，如果不带 <code>-g</code> 参数就表示把包安装到 npm 命令执行所在目录的<code>node_modules</code>目录中。</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm update -g</span></span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>进入 Hexo 安装目录，更新依赖包。<code>—save</code> 参数表示在更新 <code>node_modules</code>目录的同时并且添加到 <code>dependencies</code> 文件中。</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm update --save</span></span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>升级完查看 Hexo 版本</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hexo vesion</span></span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li>然后再查看 <code>dependencies</code> 文件，发现 hexo 版本已经更新到 6.3.0。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;hexo-site&quot;,</span><br><span class="line">  &quot;version&quot;: &quot;0.0.0&quot;,</span><br><span class="line">  &quot;private&quot;: true,</span><br><span class="line">  &quot;hexo&quot;: &#123;</span><br><span class="line">    &quot;version&quot;: &quot;6.3.0&quot;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;dependencies&quot;: &#123;</span><br><span class="line">    &quot;gitalk&quot;: &quot;^1.8.0&quot;,</span><br><span class="line">    &quot;hexo&quot;: &quot;^6.3.0&quot;,</span><br><span class="line">    &quot;hexo-admin&quot;: &quot;^2.3.0&quot;,</span><br><span class="line">    &quot;hexo-deployer-git&quot;: &quot;^3.0.0&quot;,</span><br><span class="line">    &quot;hexo-generator-archive&quot;: &quot;^2.0.0&quot;,</span><br><span class="line">    &quot;hexo-generator-baidu-sitemap&quot;: &quot;^0.1.9&quot;,</span><br><span class="line">    &quot;hexo-generator-category&quot;: &quot;^2.0.0&quot;,</span><br><span class="line">    &quot;hexo-generator-index&quot;: &quot;^3.0.0&quot;,</span><br><span class="line">    &quot;hexo-generator-searchdb&quot;: &quot;^1.4.1&quot;,</span><br><span class="line">    &quot;hexo-generator-sitemap&quot;: &quot;^3.0.1&quot;,</span><br><span class="line">    &quot;hexo-generator-tag&quot;: &quot;^2.0.0&quot;,</span><br><span class="line">    &quot;hexo-renderer-ejs&quot;: &quot;^2.0.0&quot;,</span><br><span class="line">    &quot;hexo-renderer-marked&quot;: &quot;^6.0.0&quot;,</span><br><span class="line">    &quot;hexo-renderer-stylus&quot;: &quot;^2.1.0&quot;,</span><br><span class="line">    &quot;hexo-renderer-swig&quot;: &quot;^2.0.0&quot;,</span><br><span class="line">    &quot;hexo-server&quot;: &quot;^3.0.0&quot;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;scripts&quot;: &#123;</span><br><span class="line">    &quot;start&quot;: &quot;hexo clean &amp;&amp; hexo g &amp;&amp; hexo s&quot;,</span><br><span class="line">    &quot;debug&quot;: &quot;hexo clean &amp;&amp; hexo g&quot;,</span><br><span class="line">    &quot;deploy&quot;: &quot;hexo clean &amp;&amp; hexo g -d&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="升级-Next-主题"><a href="#升级-Next-主题" class="headerlink" title="升级 Next 主题"></a>升级 Next 主题</h1><p> NexT 主题升级从 v5 升级到 v7，跨度很大，官方提供了升级指导：<a target="_blank" rel="noopener" href="https://github.com/theme-next/hexo-theme-next/blob/master/docs/zh-CN/UPDATE-FROM-5.1.X.md">从 NexT v5.1.x 更新</a>。这里总结一下主题升级步骤。</p>
+<ol>
+<li>克隆新的仓库到任一异于 <code>next</code> 的目录（如 <code>next-reloaded</code>）：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">clone</span> https://github.com/theme-next/hexo-theme-next themes/next-reloaded</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>在 Hexo 的主配置文件中设置主题：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">theme: next-reloaded</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>如此，你的 <code>next-reloaded</code> 主题将在生成站点时被加载。如果你遇到了任何错误、或只是不喜欢这一新版本，你可以随时切换回旧的 v5.1.x 版本。</p>
+<ol start="3">
+<li>更新语言配置</li>
+</ol>
+<p>从 v6.0.3 版本起，<code>zh-Hans</code> 改名为 <code>zh-CN</code>：<a target="_blank" rel="noopener" href="https://github.com/theme-next/hexo-theme-next/releases/tag/v6.0.3%E3%80%82%E5%8D%87%E7%BA%A7%E5%88%B0">https://github.com/theme-next/hexo-theme-next/releases/tag/v6.0.3。升级到</a> v6.0.3 及以后版本的用户，需要显式修改 Hexo 主配置文件 <code>_config.yml</code> 里的 <code>language</code> 配置，否则语言显示不正确。</p>
+<ol start="4">
+<li>修改主题文件</li>
+</ol>
+<p>这里有两种方式，第一种是直接修改主题的_config.yml 文件，但是这样操作，后续 <code>git pull</code> 更新的时候，需要解决冲突问题，即使是手动下载 release 版本，也要手动合并 _config.yml 文件。第二种方式是创建自己单独的 next.yml 进行配置。参考 <a target="_blank" rel="noopener" href="https://github.com/theme-next/hexo-theme-next/blob/master/docs/zh-CN/DATA-FILES.md">数据文件</a>。</p>
+<ol start="5">
+<li>更新 Hexo 和 Hexo 插件</li>
+</ol>
+<p>如果完成了以上步骤后，执行 <code>hexo s</code> 或 <code>hexo g</code> 出现错误，这意味着可能是旧版的 Hexo 和 Hexo 插件与新版的 NexT 主题产生了冲突。我们建议将 Hexo 升级至 4.0 以上的版本，将 Hexo 插件升级到最新版本。你可以执行 <code>npm outdated</code> 查看所有可以升级的插件。</p>
+<h1 id="升级问题汇总"><a href="#升级问题汇总" class="headerlink" title="升级问题汇总"></a>升级问题汇总</h1><h3 id="next主题升级提示错误"><a href="#next主题升级提示错误" class="headerlink" title="next主题升级提示错误"></a>next主题升级提示错误</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% extends ‘_layout.swig‘ %&#125; &#123;% import ‘_macro/post.swig‘ as post_template %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>原因是 hexo 在 5.0 之后把 swig 给删除了，需要自己手动安装。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">npm i hexo-renderer-swig</span></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/11/Netty%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%83%EF%BC%89%EF%BC%9AByteBuf/" rel="prev" title="Netty系列（七）：ByteBuf">
+      <i class="fa fa-chevron-left"></i> Netty系列（七）：ByteBuf
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%87%E7%BA%A7-Hexo"><span class="nav-number">1.</span> <span class="nav-text">升级 Hexo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%87%E7%BA%A7-Next-%E4%B8%BB%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">升级 Next 主题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%87%E7%BA%A7%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB"><span class="nav-number">3.</span> <span class="nav-text">升级问题汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#next%E4%B8%BB%E9%A2%98%E5%8D%87%E7%BA%A7%E6%8F%90%E7%A4%BA%E9%94%99%E8%AF%AF"><span class="nav-number">3.0.1.</span> <span class="nav-text">next主题升级提示错误</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
