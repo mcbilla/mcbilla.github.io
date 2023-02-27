@@ -27,16 +27,16 @@
 <meta property="og:site_name" content="飙戈的博客">
 <meta property="og:description" content="对通过 Hexo 搭建博客过程中遇到的问题进行了汇总，以后再遇到相同的问题可以迅速定位解决问题。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://yoursite.com/localsearch1.jpeg">
-<meta property="og:image" content="http://yoursite.com/localsearch2.jpeg">
-<meta property="og:image" content="http://yoursite.com/404.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/localsearch1.jpeg">
+<meta property="og:image" content="http://yoursite.com/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/localsearch2.jpeg">
+<meta property="og:image" content="http://yoursite.com/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/404.png">
 <meta property="article:published_time" content="2018-06-25T06:37:47.000Z">
 <meta property="article:modified_time" content="2023-02-12T09:00:47.426Z">
 <meta property="article:author" content="mcbilla">
 <meta property="article:tag" content="Hexo">
 <meta property="article:tag" content="问题汇总">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/localsearch1.jpeg">
+<meta name="twitter:image" content="http://yoursite.com/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/localsearch1.jpeg">
 
 <link rel="canonical" href="http://yoursite.com/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/">
 
@@ -298,13 +298,13 @@
 <ul>
 <li>打开 <code>http://localhost:4000/search.xml</code>，确认错误字符所在的位置。如下图所示就在第6行第35列。</li>
 </ul>
-<p><img src="/localsearch1.jpeg" alt="localsearch1"></p>
+<p><img src="/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/localsearch1.jpeg" alt="localsearch1"></p>
 <ul>
 <li>通过 <code>$ vim public/search.xml</code> 打开 <code>search.xml</code> 文件，根据刚才的位置定位到出现问题的文章的该行该列。该位置一般会出现一个异常字符，例如 <code>^H</code> 或者 <code>^M</code> 等字符。注意不用直接修改 <code>search.xml</code> 文件。</li>
 <li>编辑出现问题的文章的 <code>md</code> 文件，找到出现问题的行列，把该位置的特殊字符删掉。该字符有可能是一个隐藏的字符如 <code>^H</code>，一般的 markdown 编辑工具可能看不到该字符，可以通过 <code>vim</code> 编辑删除该字符。</li>
 <li>执行 <code>$ hexo clean &amp;&amp; hexo g</code> 后重启服务器，然后再打开 <code>http://localhost:4000/search.xml</code>，看到下图所示表示可以正常使用本地搜索功能。</li>
 </ul>
-<p><img src="/localsearch2.jpeg" alt="localsearch2"></p>
+<p><img src="/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/localsearch2.jpeg" alt="localsearch2"></p>
 <h3 id="二、在执行-hexo-d-部署到-GitHub-上的时候总是卡住"><a href="#二、在执行-hexo-d-部署到-GitHub-上的时候总是卡住" class="headerlink" title="二、在执行 hexo d 部署到 GitHub 上的时候总是卡住"></a>二、在执行 <code>hexo d</code> 部署到 GitHub 上的时候总是卡住</h3><p>问题描述：在执行 <code>hexo d</code> 部署到 GitHub 上的时候总是卡住没有往下面执行，这时候只能 <code>ctrl + c</code> 中断或等待很久一段时间后才执行完毕。</p>
 <p>问题解决：这是由于国内墙对 GitHub 的阻挡影响，导致国内用户在向 GitHub 仓库 <code>pull</code> 或者 <code>push</code> 的时候速度都会受到不同程度的影响。解决办法是<strong>使用 vpn，然后设置 git 代理</strong>。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 查看当前代理设置</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global http.proxy</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global https.proxy</span></span><br><span class="line"></span><br><span class="line">// 设置当前代理为 http://127.0.0.1:1080 或 socket5://127.0.0.1:1080</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global http.proxy <span class="string">&#x27;http://127.0.0.1:1080&#x27;</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global https.proxy <span class="string">&#x27;http://127.0.0.1:1080&#x27;</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global http.proxy <span class="string">&#x27;socks5://127.0.0.1:1080&#x27;</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global https.proxy <span class="string">&#x27;socks5://127.0.0.1:1080&#x27;</span></span></span><br><span class="line"></span><br><span class="line">// 删除 proxy</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global --<span class="built_in">unset</span> http.proxy</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config --global --<span class="built_in">unset</span> https.proxy</span></span><br></pre></td></tr></table></figure>
@@ -312,7 +312,7 @@
 
 
 <h3 id="三、Hexo-文件名大小写不敏感的问题"><a href="#三、Hexo-文件名大小写不敏感的问题" class="headerlink" title="三、Hexo 文件名大小写不敏感的问题"></a>三、Hexo 文件名大小写不敏感的问题</h3><p>有时候经常会出现文章部署后又修改了 Tag 或 Categories，而恰好修改的内容涉及到英文字母大写改小写或小写改大写，譬如 news 改为 News，修改后确发现部署到 Github 上无法生效，当点击对应的Tag或Categories时会出现路径无法找到从而跳转到404页面，但本地预览确一切正常。</p>
-<p><img src="/404.png" alt="404"></p>
+<p><img src="/2018/06/25/Hexo%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%B1%87%E6%80%BB/404.png" alt="404"></p>
 <p>这个现象的问题是由于git 默认是大小写不敏感，而且如果你使用的是mac，系统默认也是大小写不敏感的。因此即便文件夹的大小写发生了变更，git 也会表现出置之不理。解决思路如下：</p>
 <h4 id="1、使用-git-修改文件名大小写。"><a href="#1、使用-git-修改文件名大小写。" class="headerlink" title="1、使用 git 修改文件名大小写。"></a>1、使用 git 修改文件名大小写。</h4><p>有两种方式。第一种是设置 git 为大小写敏感。用这种方法进行重命名，用git status就可以识别出修改了，但是不推荐用这种方式，因为在更新这种修改的时候会有麻烦（比如会 git push 创建一个新命名的文件，而且不是直接修改原来文件的命名）。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git config core.ignorecase <span class="literal">false</span></span></span><br></pre></td></tr></table></figure>
