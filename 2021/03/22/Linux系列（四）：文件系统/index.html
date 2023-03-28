@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="Linux系列（四）：文件系统">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系列（四）：文件系统">
+<meta property="og:url" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="Linux系列（四）：文件系统">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124545628.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124558896.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124613490.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124632752.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124643911.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124700993.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319194815845.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319194915087.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319194928721.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319194947998.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195003571.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195043863.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195057586.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195110693.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195127368.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195142787.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195157353.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195221093.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195236679.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195248755.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195302942.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195318100.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195333530.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195347396.png">
+<meta property="article:published_time" content="2021-03-22T04:40:16.000Z">
+<meta property="article:modified_time" content="2023-03-27T11:54:31.962Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124545628.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux系列（四）：文件系统 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux系列（四）：文件系统
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-22 12:40:16" itemprop="dateCreated datePublished" datetime="2021-03-22T12:40:16+08:00">2021-03-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-27 19:54:31" itemprop="dateModified" datetime="2023-03-27T19:54:31+08:00">2023-03-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" class="post-meta-item leancloud_visitors" data-flag-title="Linux系列（四）：文件系统" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>Linux系列（四）：文件系统</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="文件系统结构"><a href="#文件系统结构" class="headerlink" title="文件系统结构"></a>文件系统结构</h2><p>文件系统是操作系统中负责管理持久数据的子系统，说简单点，就是负责把用户的文件存到磁盘硬件中，因为即使计算机断电了，磁盘里的数据并不会丢失，所以可以持久化的保存文件。</p>
+<p>linux支持的文件系统类型有：</p>
+<ul>
+<li><code>磁盘的文件系统</code>，它是直接把数据存储在磁盘中，比如 Ext 2&#x2F;3&#x2F;4、XFS 等都是这类文件系统。</li>
+<li><code>内存的文件系统</code>，这类文件系统的数据不是存储在硬盘的，而是占用内存空间，我们经常用到的 &#x2F;proc 和 &#x2F;sys 文件系统都属于这一类读写这类文件，实际上是读写内核中相关的数据。</li>
+<li><code>网络的文件系统</code>，用来访问其他计算机主机数据的文件系统，比如 NFS、SMB 等等。</li>
+</ul>
+<h3 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h3><p>文件系统的基本数据单位是<code>文件</code>。Linux 最经典的一句话是:「<code>一切皆文件</code>」，不仅普通的文件和目录，就连块设备、管道、socket 等，也 都是统一交给文件系统管理的。</p>
+<p>一个文件由目录项、inode和数据块组成</p>
+<ul>
+<li><code>目录项(directory entry)</code>：用来记录文件的名字、索引节点指针以及与其他目录项的层级关联关系。多个目录项关联起来，就会形成目录结构，但它与索引节点不同的是，<code>目录项是由内核维护的一个数据结构，不存放于磁盘，而是缓存在内存</code>。</li>
+<li><code>索引节点(index node，inode)</code>：<code>用来记录文件的元信息</code>，比如 inode 编号、文件大小、访问权限、创建时 间、修改时间、数据在磁盘的位置等等。<code>索引节点是文件的唯一标识</code>，同样都会被存储在硬盘中，所以<code>索引节点同样占用磁盘空间</code>。</li>
+<li><code>数据块(data block)</code>：存储数据的地方。</li>
+</ul>
+<p>由于索引节点唯一标识一个文件，而目录项记录着文件的名，所以<code>目录项和索引节点的关系是多对一</code>。也就是说，一个文件可以有多个别字。比如，硬链接的实现就是多个目录项中的索引节点指向同一个文件。</p>
+<p><code>目录是特殊文件</code>，和普通文件不同的是：<code>普通文件的data block里面保存的是文件数据，而目录文件的data block里面保存的是一项项的文件信息</code>。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124545628.png" alt="image-20230319124545628"></p>
+<p>通常，第一项是「 . 」，表示当前目录，第二项是「 .. 」，表示上一级目录，接下来就是一个哈希表，对文件名进行哈希计算，把哈希值和对应的 inode 保存起来。</p>
+<blockquote>
+<p>目录和目录项的区别和联系：</p>
+<ul>
+<li>目录是个文件，持久化存储在磁盘，而目录项是内核一个数据结构，缓存在内存。</li>
+<li>目录文件保存的内容相当于一个目录项列表，目录项的内容是文件名和指向inode的指针。</li>
+</ul>
+</blockquote>
+<p>磁盘读写的最小单位是扇区，扇区的大小只有 512B 大小，很明显，如果每次读写都以这么小为单位， 那这读写的效率会非常低。所以，文件系统把多个扇区组成了一个逻辑块，每次读写的最小单位就是逻辑块(数据块)，<code>Linux 中的逻辑块大小为 4KB</code>，也就是一次性读写 8 个扇区，这将大大提高了磁盘的读写的效率。</p>
+<p>整个文件结构大概如下所示：<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124558896.png" alt="image-20230319124558896"></p>
+<p>另外，磁盘进行格式化的时候，会被分成三个存储区域，分别是超级块、索引节点区和数据块区。</p>
+<ul>
+<li>超级块，用来存储文件系统的详细信息，比如块个数、块大小、空闲块等等。</li>
+<li>索引节点区，用来存储索引节点。</li>
+<li>数据块区，用来存储文件或目录数据。</li>
+</ul>
+<h3 id="虚拟文件系统"><a href="#虚拟文件系统" class="headerlink" title="虚拟文件系统"></a>虚拟文件系统</h3><p>文件系统的种类众多，而操作系统希望对用户提供一个统一的接口，于是在用户层与文件系统层引入了中 间层，这个中间层就称为<code>虚拟文件系统(Virtual File System，VFS)</code>。</p>
+<p>VFS 定义了一组所有文件系统都支持的数据结构和标准接口，这样程序员不需要了解文件系统的工作原理，只需要了解 VFS 提供的统一接口即可。</p>
+<p><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124613490.png" alt="image-20230319124613490"></p>
+<h3 id="软链接和硬链接"><a href="#软链接和硬链接" class="headerlink" title="软链接和硬链接"></a>软链接和硬链接</h3><p><code>硬链接是多个目录项中的「索引节点」指向同一个 inode</code>。但是 inode 是不可能跨越文件系统的，每个文件系统都有各自的 inode 数据结构和列表，所以硬链接是不可用于跨文件系统的。 由于多个目录项都是指向一个 inode，那么只有删除文件的所有硬链接以及源文件时，系统才会彻底删除该文件。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124632752.png" alt="image-20230319124632752"></p>
+<p><code>软链接的多个目录项的「索引节点」分别指向不同的 inode，inode 对应的 data block 的内容是另外一个文件的地址</code>。所以访问软链接的时候，实际上相当于访问到了另外一个文件，所以软链接是可以跨文件系统的，甚至目标文件被删除了，链接文件还是在的，只不过指向的文件找不到了而已。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124643911.png" alt="image-20230319124643911"></p>
+<h3 id="文件的存储"><a href="#文件的存储" class="headerlink" title="文件的存储"></a>文件的存储</h3><h4 id="分配文件空间"><a href="#分配文件空间" class="headerlink" title="分配文件空间"></a>分配文件空间</h4><p>文件的数据是要存储在硬盘上面的，数据在磁盘上的存放方式，就像程序在内存中存放的方式那样，有以下两种：</p>
+<ul>
+<li>连续空间存放方式：文件存放在磁盘「连续的」物理空间中。这种模式下，文件的数据都是紧密相连，读写效率很高，因为一次磁盘寻道就可以读出整个文件；但是存在「磁盘空间碎片」和「文件⻓度不易扩展」的问题。</li>
+<li>非连续空间存放方式：非连续空间存放方式分为「链表方式」和「索引方式」。</li>
+</ul>
+<h5 id="链表方式分配"><a href="#链表方式分配" class="headerlink" title="链表方式分配"></a>链表方式分配</h5><p>根据实现的方式的不同，链表可分为「隐式链表」和「显式链接」两种形式。</p>
+<p><code>隐式链表是指文件头要包含「第一块」和「最后一块」的位置， 并且每个数据块里面留出一个指针空间，用来存放下一个数据块的位置，这样一个数据块连着一个数据块，从链头开是就可以顺着指针找到所有的数据块，所以存放的方式可以是不连续的</code>。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319124700993.png" alt="image-20230319124700993"></p>
+<p>隐式链表的存放方式的缺点在于无法直接访问数据块，只能通过指针顺序访问文件，以及数据块指针消耗了一定的存储空间。隐式链接分配的稳定性较差，系统在运行过程中由于软件或者硬件错误导致链表中的 指针丢失或损坏，会导致文件数据的丢失。</p>
+<p><code>显式链接是指把用于链接文件各数据块的指针，显式地存放在内存的一张链接表中，每个表项中存放链接指针，指向下一个数据块号。该表在整个磁盘仅设置一张</code>。这个表格称为<code>文件分配表(File Allocation Table，FAT)</code>。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319194815845.png" alt="image-20230319194815845"></p>
+<p>由于查找记录的过程是在内存中进行的，因而不仅显著地提高了检索速度，而且大大减少了访问磁盘的次 数。但也正是整个表都存放在内存中的关系，它的主要的缺点是不适用于大磁盘。比如，对于 200GB 的磁盘和 1KB 大小的块，这张表需要有 2 亿项，每一项对应于这 2 亿个磁盘块中的一 个块，每项如果需要 4 个字节，那这张表要占用 800MB 内存，很显然 FAT 方案对于大磁盘而言不太合适。</p>
+<h5 id="索引方式分配"><a href="#索引方式分配" class="headerlink" title="索引方式分配"></a>索引方式分配</h5><p>索引的实现是为每个文件创建一个「索引数据块」，里面存放的是指向「索引数据块」的指针列表。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319194915087.png" alt="image-20230319194915087"></p>
+<p>这样只需要在创建文件的时候再创建索引数据块，而不需要创建一张全局的FAT。但是由于索引数据也是存放在磁盘块的，如果文件很小，明明只需一块就可以存放的下，但还是需要额外分配一块来存放索引数据，就会造成额外开销。</p>
+<h5 id="linux文件存储的实现"><a href="#linux文件存储的实现" class="headerlink" title="linux文件存储的实现"></a>linux文件存储的实现</h5><p><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319194928721.png" alt="image-20230319194928721"></p>
+<p>根据文件的大小，存放的方式会有所变化:</p>
+<ul>
+<li>如果存放文件所需的数据块小于 10 块，则采用直接查找的方式。</li>
+<li>如果存放文件所需的数据块超过 10 块，则采用一级间接索引方式。</li>
+<li>如果前面两种方式都不够存放大文件，则采用二级间接索引方式。</li>
+<li>如果二级间接索引也不够存放大文件，这采用三级间接索引方式。</li>
+</ul>
+<p>那么，文件头(Inode)就需要包含 13 个指针:</p>
+<ul>
+<li>10 个指向数据块的指针。</li>
+<li>第 11 个指向索引块的指针。</li>
+<li>第 12 个指向二级索引块的指针。</li>
+<li>第 13 个指向三级索引块的指针。</li>
+</ul>
+<p>所以，这种方式能很灵活地支持小文件和大文件的存放：</p>
+<ul>
+<li>对于小文件使用直接查找的方式可减少索引数据块的开销。</li>
+<li>对于大文件则以多级索引的方式来支持，所以大文件在访问数据块时需要大量查询。</li>
+</ul>
+<h4 id="空闲空间管理"><a href="#空闲空间管理" class="headerlink" title="空闲空间管理"></a>空闲空间管理</h4><p>前面说到的文件的存储是针对已经被占用的数据块组织和管理，磁盘的空闲空间管理用于快速找出一个新的空闲地址空间用于存储新的数据块。接下来介绍几种常⻅的方法：</p>
+<ul>
+<li>空闲表法</li>
+<li>空闲链表法</li>
+<li>位图法</li>
+</ul>
+<h5 id="空闲表法"><a href="#空闲表法" class="headerlink" title="空闲表法"></a>空闲表法</h5><p>空闲表法就是为所有空闲空间建立一张表，表内容包括空闲区的第一个块号和该空闲区的块个数，注意，这个方式是连续分配的。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319194947998.png" alt="image-20230319194947998"></p>
+<p>当请求分配磁盘空间时，系统依次扫描空闲表里的内容，直到找到一个合适的空闲区域为止。当用户撤销一个文件时，系统回收文件空间。这时，也需顺序扫描空闲表，寻找一个空闲表条目并将释放空间的第一个物理块号及它占用的块数填到这个条目中。</p>
+<h5 id="空闲链表法"><a href="#空闲链表法" class="headerlink" title="空闲链表法"></a>空闲链表法</h5><p>我们也可以使用「链表」的方式来管理空闲空间，每一个空闲块里有一个指针指向下一个空闲块，这样也能很方便的找到空闲块并管理起来。如下图：<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195003571.png" alt="image-20230319195003571"></p>
+<p>当创建文件需要一块或几块时，就从链头上依次取下一块或几块。反之，当回收空间时，把这些空闲块依次接到链头上。</p>
+<p>这种技术只要在主存中保存一个指针，令它指向第一个空闲块。其特点是简单，但不能随机访问，工作效 率低，因为每当在链上增加或移动空闲块时需要做很多 I&#x2F;O 操作，同时数据块的指针消耗了一定的存储空间。</p>
+<p>空闲表法和空闲链表法都不适合用于大型文件系统，因为这会使空闲表或空闲链表太大。</p>
+<h5 id="位图法"><a href="#位图法" class="headerlink" title="位图法"></a>位图法</h5><p>位图是利用二进制的一位来表示磁盘中一个盘块的使用情况，磁盘上所有的盘块都有一个二进制位与之对应。当值为 0 时，表示对应的盘块空闲，值为 1 时，表示对应的盘块已分配。它形式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1111110011111110001110110111111100111 ...</span><br></pre></td></tr></table></figure>
+
+<p>在 Linux 文件系统就采用了位图的方式来管理空闲空间，不仅用于数据空闲块的管理，还用于 inode 空闲块的管理，因为 inode 也是存储在磁盘的，自然也要有对其管理。</p>
+<h3 id="文件系统结构-1"><a href="#文件系统结构-1" class="headerlink" title="文件系统结构"></a>文件系统结构</h3><p>数据块的位图是放在磁盘块里的，假设是放在一个块里，一个块 4K，每位表示一个数据块，共可以表示 4 * 1024 * 8 &#x3D; 2^15 个空闲块，由于 1 个数据块是 4K 大小，那么最大可以表示的空间为 2^15 * 4 *<br>1024 &#x3D; 2^27 个 byte，也就是 128M。「一个块的位图 + 一系列的块」这种数据结构就表示一个<code>块组</code>。linux 文件系统由大量块组组成。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195043863.png" alt="image-20230319195043863"></p>
+<p>最前面的第一个块是引导块，在系统启动时用于启用引导，接着后面就是一个一个连续的块组了，块组的内容如下:</p>
+<ul>
+<li><code>超级块</code>，包含的是文件系统的重要信息，比如 inode 总个数、块总个数、每个块组的 inode 个数、每个块组的块个数等等。</li>
+<li><code>块组描述符</code>，包含文件系统中各个块组的状态，比如块组中空闲块和 inode 的数目等，每个块组都包 含了文件系统中「所有块组的组描述符信息」。</li>
+<li><code>数据位图和 inode 位图</code>， 用于表示对应的数据块或 inode 是空闲的，还是被使用中。</li>
+<li><code>inode 列表</code>，包含了块组中所有的 inode，inode 用于保存文件系统中与各个文件和目录相关的所有元数据。</li>
+<li><code>数据块</code>，包含文件的有用数据。</li>
+</ul>
+<h2 id="文件系统I-x2F-O"><a href="#文件系统I-x2F-O" class="headerlink" title="文件系统I&#x2F;O"></a>文件系统I&#x2F;O</h2><h3 id="多种I-x2F-O模型"><a href="#多种I-x2F-O模型" class="headerlink" title="多种I&#x2F;O模型"></a>多种I&#x2F;O模型</h3><p>根据<code>调用方在发起数据请求后，是否会被阻塞等待数据返回</code>，I&#x2F;O模型分为：</p>
+<ul>
+<li>阻塞I&#x2F;O：调用方会被阻塞，直到数据返回。</li>
+<li>非阻塞I&#x2F;O：调用方不会被阻塞，可以先做自己的事情，等数据准备好了之后再得到数据。</li>
+</ul>
+<p>根据<code>调用方是主动还是被动接受准备好的数据</code>，I&#x2F;O模型分为：</p>
+<ul>
+<li>同步I&#x2F;O：调用方主动轮询数据是否准备好，如果准备好就主动拉取数据。</li>
+<li>异步I&#x2F;O：调用方只需要被动等待准备好的数据。</li>
+</ul>
+<p>总共可以分为以下四种I&#x2F;O模型<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195057586.png" alt="image-20230319195057586"></p>
+<h4 id="同步阻塞I-x2F-O"><a href="#同步阻塞I-x2F-O" class="headerlink" title="同步阻塞I&#x2F;O"></a>同步阻塞I&#x2F;O</h4><p><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195110693.png" alt="image-20230319195110693"></p>
+<p><code>同步阻塞 I/O</code>：当用户程序执行 read ，线程会被阻塞，一直等到内核数据准备好，并把数据从内核缓冲区拷⻉到应用程序的缓冲区中，当拷⻉过程完成， read 才会返回。 </p>
+<p>注意，<code>阻塞等待的是「内核数据准备好」和「数据从内核态拷⻉到用户态」这两个过程</code>。</p>
+<h4 id="同步非阻塞I-x2F-O"><a href="#同步非阻塞I-x2F-O" class="headerlink" title="同步非阻塞I&#x2F;O"></a>同步非阻塞I&#x2F;O</h4><p><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195127368.png" alt="image-20230319195127368"></p>
+<p>同步非阻塞 I&#x2F;O：非阻塞的 read 请求在数据未准备好的情况下立即返回，可以继续往 下执行，此时应用程序不断轮询内核，直到数据准备好，内核将数据拷⻉到应用程序缓冲区， read 调用 才可以获取到结果。</p>
+<p>这里最后一次 read 调用，获取数据的过程，是一个同步的过程，是需要等待的过程。这里的同步指的是内核态的数据拷⻉到用户程序的缓存区这个过程。</p>
+<p>但是单纯的同步非阻塞I&#x2F;O其实应用意义不大，因为应用程序一直轮询内核的 I&#x2F;O 是否准备好。如果轮询频率太高，应用程序相当于什么也做不了，只是在循环，和同步阻塞I&#x2F;O没什么区别；如果轮询频率太低，可能不能及时获取数据。</p>
+<p>那能不能把轮询的任务交给一个单独的线程专门完成？这就衍生了I&#x2F;O多路复用技术。</p>
+<h4 id="I-x2F-O多路复用"><a href="#I-x2F-O多路复用" class="headerlink" title="I&#x2F;O多路复用"></a>I&#x2F;O多路复用</h4><p><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195142787.png" alt="image-20230319195142787"></p>
+<p>I&#x2F;O多路复用把轮询任务交给专门的系统函数（select&#x2F;poll&#x2F;epoll），当内核数据准备好时，系统函数再以事件通知应用程序进行操作。</p>
+<h4 id="异步I-x2F-O"><a href="#异步I-x2F-O" class="headerlink" title="异步I&#x2F;O"></a>异步I&#x2F;O</h4><p>实际上，无论是阻塞 I&#x2F;O、非阻塞 I&#x2F;O，还是基于非阻塞 I&#x2F;O 的多路复用都是同步调用。<code>因为它们在 read 调用时，内核将数据从内核空间拷⻉到应用程序空间，过程都是需要等待的，也就是说这个过程是同步的</code>。如果内核实现的拷⻉效率不高，read 调用就会在这个同步过程中等待比较⻓的时间。</p>
+<p>而真正的异步 I&#x2F;O 是「内核数据准备好」和「数据从内核态拷⻉到用户态」这两个过程都不用等待。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195157353.png" alt="image-20230319195157353"></p>
+<h4 id="select-x2F-poll-x2F-epoll"><a href="#select-x2F-poll-x2F-epoll" class="headerlink" title="select&#x2F;poll&#x2F;epoll"></a>select&#x2F;poll&#x2F;epoll</h4><p>select&#x2F;poll&#x2F;epoll 是内核提供给用户态的多路复用系统调用，进程可以通过一个系统调用函数从内核中获取多个事件。</p>
+<h5 id="select"><a href="#select" class="headerlink" title="select"></a>select</h5><p>select 实现多路复用的方式是：</p>
+<ol>
+<li>将已连接的 Socket 都放到一个文件描述符集合，然后调用 select 函数将文件描述符集合拷⻉到内核里。</li>
+<li>内核遍历文件描述符集合检查是否有网络事件产生。当检查到有事件产生后，将此 Socket 标记为可读或可写。</li>
+<li>把整个文件描述符集合拷⻉回用户态里，然后用户态还需要再通过遍历的方法找到可读或可写的 Socket，然后再对其处理。</li>
+</ol>
+<p>select函数的格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);</span><br></pre></td></tr></table></figure>
+<p>select 函数监视的文件描述符分3类，分别是writefds、readfds、和exceptfds。调用后select函数会阻塞，直到有描述副就绪（有数据可读、可写、或者有except），或者超时（timeout指定等待时间，如果立即返回设为null即可），函数返回。当select函数返回后，可以通过遍历fdset，来找到就绪的描述符。</p>
+<p>select 这种方式，需要进行 <code>2 次「遍历文件描述符集合」</code>和 <code>2 次「拷⻉文件描述符集合」</code>。select 使用固定长度的 BitsMap 来表示文件描述符集合，支持最大数量为 <code>1024</code>。select 目前几乎在所有的平台上支持。</p>
+<h5 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h5><p>poll 和 select 唯一的区别是：不再用 BitsMap 来存储所关注的文件描述符，取而代之用动态数组，以链表形式来组织，突破了 select 的文件描述符个数限制，当然还会受到系统文件描述符限制。</p>
+<p>poll函数的格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int poll (struct pollfd *fds, unsigned int nfds, int timeout);</span><br></pre></td></tr></table></figure>
+<p>不同与 select 使用三个 BitsMap 来表示三个 fdset 的方式，poll 使用一个 pollfd 的指针实现。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct pollfd &#123;</span><br><span class="line">    int fd; /* file descriptor */</span><br><span class="line">    short events; /* requested events to watch */</span><br><span class="line">    short revents; /* returned events witnessed */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>pollfd 结构包含了要监视的 event 和发生的 event，不再使用select “参数-值”传递的方式。同时，pollfd 并没有最大数量限制（但是数量过大后性能也是会下降）。 和 select 函数一样，poll 返回后，需要轮询 pollfd 来获取就绪的描述符。</p>
+<p><code>select 和 poll 都需要在返回后，通过遍历文件描述符来获取已经就绪的 socket</code>。事实上，同时连接的大量客户端在一时刻可能只有很少的处于就绪状态，因此随着监视的描述符数量的增长，其效率也会线性下降。</p>
+<h5 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h5><p>epoll 是在 2.6 内核中提出的，用于解决 select 和 poll 的性能问题和描述符限制问题。</p>
+<p>epoll 需要三个函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int epoll_create(int size)；</span><br><span class="line">int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)；</span><br><span class="line">int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>epoll_create：<code>创建一个 epoll 的句柄</code>，size 用来告诉内核这个监听的数目一共有多大。参数 size 并不是限制了 epoll 所能监听的描述符最大个数，只是对内核初始分配内部数据结构的一个建议。当创建好 epoll 句柄后，它就会占用一个 fd 值。</li>
+<li>epoll_ctl：<code>把需要监控的 socket 加入内核中的红黑树里</code>。epoll 在内核里使用红黑树来跟踪进程所有待检测的文件描述字符。这样就不需要像 select&#x2F;poll 每次操作时都传入整个 socket 集合，只需要传入一个待检测的 socket。</li>
+<li>epoll_wait：<code>从内核返回有事件发生的文件描述符的个数</code>。内核里维护了一个链表来记录就绪事件，并且采用<code>事件驱动</code>的机制，当某个 socket 有事件发生时，通过回调函数内核会将其加入到这个就绪事件链表中。不需要像 select&#x2F;poll 那样轮询扫描整个 socket 集合，大大提高了检测的效率。</li>
+</ul>
+<p><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195221093.png" alt="image-20230319195221093"></p>
+<p>epoll 支持两种事件触发模式，分别是<code>边缘触发(edge-triggered，ET)</code>和<code>水平触发(level-triggered，LT)</code>。</p>
+<ul>
+<li>边缘触发模式：当被监控的 Socket 描述符上有可读事件发生时，<code>服务器端只会从 epoll_wait 中苏醒一次</code>，即使进程没有调用 read 函数从内核读取数据，也依然只苏醒一次，因此我们程序要保证一次性将内核缓冲区的数据读取完。</li>
+<li>水平触发模式：当被监控的 Socket 上有可读事件发生时，<code>服务器端不断地从 epoll_wait 中苏醒，直到内核缓冲区数据被 read 函数读完才结束</code>。</li>
+</ul>
+<p>一般来说，边缘触发的效率比水平触发的效率要高，因为边缘触发可以减少 epoll_wait 的系统调用次数，系统调用也是有一定的开销的的，毕竟也存在上下文的切换。epoll 默认的触发模式是水平触发，但是可以根据应用场景设置为边缘触发模式。</p>
+<p>如果使用边缘触发模式，I&#x2F;O 事件发生时只会通知一次，而且我们不知道到底能读写多少数据，所以在收到通知后应尽可能地读写数据，以免错失读写的机会。因此，我们会循环从文件描述符读写数据，那么如果 文件描述符是阻塞的，没有数据可读写时，进程会阻塞在读写函数那里，程序就没办法继续往下执行。<code>所以使用边缘触发模式一般和非阻塞 I/O 搭配使用，程序会一直执行 I/O 操作</code>，直到系统调用(如 read 和 write )返回错误，错误类型为 EAGAIN 或 EWOULDBLOCK 。</p>
+<h3 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h3><h4 id="DMA"><a href="#DMA" class="headerlink" title="DMA"></a>DMA</h4><p>在了解零拷贝之前，我们先了解下 DMA 技术。在没有 DMA 技术前，I&#x2F;O 的过程是这样的：<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195236679.png" alt="image-20230319195236679"></p>
+<p>可以看到，整个数据的传输过程，都要需要 CPU 亲自参与搬运数据的过程，而且这个过程，CPU 是不能做其他事情的。而且由于网络传输和数据复制的速度远远低于 CPU 的速度，CPU 大部分时间都是空等，造成性能的极大浪费。所以就出现了 <code>DMA (Direct Memory Access)</code>技术。</p>
+<p>DMA 技术的原理：<code>在进行 I/O 设备和内存的数据传输的时候，数据搬运的工作全部交给 DMA 控制器，而 CPU 不再参与任何与数据搬运相关的事情，这样 CPU 就可以去处理别的事务</code>。使用 DMA 技术后的 I&#x2F;O 的过程是这样的：<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195248755.png" alt="image-20230319195248755"></p>
+<p>但是注意<code>数据从内核缓冲区拷贝到用户缓冲区这个过程，还是由 CPU 来完成的</code>。而且read函数的调用和返回都会发生用户态和内核态的切换。这些都是比较耗时的过程。所谓的<code>零拷贝</code>技术，其实就是减少两个过程：</p>
+<ul>
+<li>减少数据在内核缓冲区拷贝和用户缓冲区的来回复制</li>
+<li>减少上下文切换</li>
+</ul>
+<h4 id="传统文件传输（read-write）"><a href="#传统文件传输（read-write）" class="headerlink" title="传统文件传输（read + write）"></a>传统文件传输（read + write）</h4><p>传统文件传输直接调用 <code>read</code> 和 <code>write</code> 函数：<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195302942.png" alt="image-20230319195302942"></p>
+<p>发生了 4 次上下文切换，2 次 CPU 拷贝，2 次 DMA 拷贝。</p>
+<h4 id="mmap-write"><a href="#mmap-write" class="headerlink" title="mmap + write"></a>mmap + write</h4><p>可以用 mmap() 替换 read() 系统调用函数。mmap() 系统调用函数会直接把内核缓冲区里的数据「映射」到用户空间，这样，操作系统内核与用户空 间就不需要再进行任何的数据拷⻉操作。<code>这样就减少 1 次 CPU 拷贝</code>。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195318100.png" alt="image-20230319195318100"></p>
+<p>发生了 4 次上下文切换，1 次 CPU 拷贝，2 次 DMA 拷贝。</p>
+<h4 id="sendfile"><a href="#sendfile" class="headerlink" title="sendfile"></a>sendfile</h4><p>sendfile() 可以替代 read() 和 write() 这两个系统调用，这样就可以减少一次系统调用，也就<code>减少了 2 次上下文切换的开销</code>。其次，该系统调用，可以直接把内核缓冲区里的数据拷⻉到 socket 缓冲区里，不再拷⻉到用户态，这样就<code>减少 1 次 CPU 拷贝</code>。<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195333530.png" alt="image-20230319195333530"></p>
+<p>发生了 2 次上下文切换，1 次 CPU 拷贝，2 次 DMA 拷贝。</p>
+<p>如果网卡支持 <code>SG-DMA</code>(The Scatter-Gather Direct Memory Access) 技术，我们还可以把这 1 次 CPU 拷贝也省略。</p>
+<p>查看网卡是否支持 scatter-gather 特性：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ethtool -k eth0 | grep scatter-gather</span><br><span class="line">scatter-gather: on</span><br></pre></td></tr></table></figure>
+
+<p>Linux 内核 2.4 版本开始起，对于支持网卡支持 SG-DMA 技术的情况下， sendfile() 系统调用的过程如下：<br><img src="/2021/03/22/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/image-20230319195347396.png" alt="image-20230319195347396"></p>
+<p>发生了 2 次上下文切换，2 次 DMA 拷贝。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/21/Linux%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/" rel="prev" title="Linux系列（三）：进程管理">
+      <i class="fa fa-chevron-left"></i> Linux系列（三）：进程管理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/24/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/" rel="next" title="计算机网络系列（一）：基础篇">
+      计算机网络系列（一）：基础篇 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">文件系统结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.</span> <span class="nav-text">文件结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.2.</span> <span class="nav-text">虚拟文件系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AF%E9%93%BE%E6%8E%A5%E5%92%8C%E7%A1%AC%E9%93%BE%E6%8E%A5"><span class="nav-number">1.3.</span> <span class="nav-text">软链接和硬链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E5%AD%98%E5%82%A8"><span class="nav-number">1.4.</span> <span class="nav-text">文件的存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E9%85%8D%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4"><span class="nav-number">1.4.1.</span> <span class="nav-text">分配文件空间</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%93%BE%E8%A1%A8%E6%96%B9%E5%BC%8F%E5%88%86%E9%85%8D"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">链表方式分配</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%96%B9%E5%BC%8F%E5%88%86%E9%85%8D"><span class="nav-number">1.4.1.2.</span> <span class="nav-text">索引方式分配</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#linux%E6%96%87%E4%BB%B6%E5%AD%98%E5%82%A8%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.4.1.3.</span> <span class="nav-text">linux文件存储的实现</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A9%BA%E9%97%B2%E7%A9%BA%E9%97%B4%E7%AE%A1%E7%90%86"><span class="nav-number">1.4.2.</span> <span class="nav-text">空闲空间管理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A9%BA%E9%97%B2%E8%A1%A8%E6%B3%95"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">空闲表法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A9%BA%E9%97%B2%E9%93%BE%E8%A1%A8%E6%B3%95"><span class="nav-number">1.4.2.2.</span> <span class="nav-text">空闲链表法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%8D%E5%9B%BE%E6%B3%95"><span class="nav-number">1.4.2.3.</span> <span class="nav-text">位图法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%BB%93%E6%9E%84-1"><span class="nav-number">1.5.</span> <span class="nav-text">文件系统结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9FI-x2F-O"><span class="nav-number">2.</span> <span class="nav-text">文件系统I&#x2F;O</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%A7%8DI-x2F-O%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text">多种I&#x2F;O模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9EI-x2F-O"><span class="nav-number">2.1.1.</span> <span class="nav-text">同步阻塞I&#x2F;O</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E9%9D%9E%E9%98%BB%E5%A1%9EI-x2F-O"><span class="nav-number">2.1.2.</span> <span class="nav-text">同步非阻塞I&#x2F;O</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#I-x2F-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8"><span class="nav-number">2.1.3.</span> <span class="nav-text">I&#x2F;O多路复用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%82%E6%AD%A5I-x2F-O"><span class="nav-number">2.1.4.</span> <span class="nav-text">异步I&#x2F;O</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#select-x2F-poll-x2F-epoll"><span class="nav-number">2.1.5.</span> <span class="nav-text">select&#x2F;poll&#x2F;epoll</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#select"><span class="nav-number">2.1.5.1.</span> <span class="nav-text">select</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#poll"><span class="nav-number">2.1.5.2.</span> <span class="nav-text">poll</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#epoll"><span class="nav-number">2.1.5.3.</span> <span class="nav-text">epoll</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%B6%E6%8B%B7%E8%B4%9D"><span class="nav-number">2.2.</span> <span class="nav-text">零拷贝</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#DMA"><span class="nav-number">2.2.1.</span> <span class="nav-text">DMA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%EF%BC%88read-write%EF%BC%89"><span class="nav-number">2.2.2.</span> <span class="nav-text">传统文件传输（read + write）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mmap-write"><span class="nav-number">2.2.3.</span> <span class="nav-text">mmap + write</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sendfile"><span class="nav-number">2.2.4.</span> <span class="nav-text">sendfile</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

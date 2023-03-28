@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="java 并发系列。先从基础 java 内存模型开始说起。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发系列（一）：Java内存模型">
+<meta property="og:url" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="java 并发系列。先从基础 java 内存模型开始说起。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155212640.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155301224.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155431666.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155525064.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155730292.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155756136.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155811154.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155826515.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155921306.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155933684.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155954882.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160005197.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160018811.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160039038.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160103162.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160123685.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160145523.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160208972.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160232981.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160248180.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160301472.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160314419.png">
+<meta property="article:published_time" content="2021-03-02T07:45:50.000Z">
+<meta property="article:modified_time" content="2023-03-27T11:54:31.712Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155212640.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Java并发系列（一）：Java内存模型 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java并发系列（一）：Java内存模型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-02 15:45:50" itemprop="dateCreated datePublished" datetime="2021-03-02T15:45:50+08:00">2021-03-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-27 19:54:31" itemprop="dateModified" datetime="2023-03-27T19:54:31+08:00">2023-03-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Java%E5%B9%B6%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Java并发</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="post-meta-item leancloud_visitors" data-flag-title="Java并发系列（一）：Java内存模型" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>java 并发系列。先从基础 java 内存模型开始说起。</p>
+</blockquote>
+<span id="more"></span>
+
+<h1 id="并发问题的根源"><a href="#并发问题的根源" class="headerlink" title="并发问题的根源"></a>并发问题的根源</h1><p>并发的三大特性：</p>
+<ul>
+<li><code>可见性</code>：一个线程对共享变量的修改，另外一个线程能够立刻看到。</li>
+<li><code>原子性</code>：即一个操作或者多个操作要么全部执行并且执行的过程不会被任何因素打断，要么就都不执行。</li>
+<li><code>有序性</code>：即程序执行的顺序按照代码的先后顺序执行。</li>
+</ul>
+<p>只要破坏这三个特性其中之一，就会导致并发问题。</p>
+<h2 id="可见性问题：CPU缓存引起"><a href="#可见性问题：CPU缓存引起" class="headerlink" title="可见性问题：CPU缓存引起"></a>可见性问题：CPU缓存引起</h2><p>假若执行线程1的是CPU1，执行线程2的是CPU2。由上面的分析可知，当线程1执行 i &#x3D; 10 这句时，会先把i的初始值加载到CPU1的高速缓存中，然后赋值为10，那么在CPU1的高速缓存当中i的值变为10了，却没有立即写入到主存当中。 </p>
+<p>此时线程2执行 j &#x3D; i，它会先去主存读取i的值并加载到CPU2的缓存当中，注意此时内存当中i的值还是0，那么就会使得j的值为0，而不是10。</p>
+<p>这就是可见性问题，线程1对变量i修改了分时复用引起之后，线程2没有立即看到线程1修改的值。</p>
+<h2 id="原子性问题：分时复用引起"><a href="#原子性问题：分时复用引起" class="headerlink" title="原子性问题：分时复用引起"></a>原子性问题：分时复用引起</h2><p>i +&#x3D; 1需要三条 CPU 指令</p>
+<ul>
+<li>将变量 i 从内存读取到 CPU寄存器；</li>
+<li>在CPU寄存器中执行 i + 1 操作；</li>
+<li>将最后的结果i写入内存（缓存机制导致可能写入的是 CPU 缓存而不是内存）。</li>
+</ul>
+<p>由于CPU分时复用（线程切换）的存在，线程1执行了第一条指令后，就切换到线程2执行，假如线程2执行了这三条指令后，再切换会线程1执行后续两条指令，将造成最后写到内存中的i值是2而不是3。</p>
+<h2 id="有序性问题：重排序引起"><a href="#有序性问题：重排序引起" class="headerlink" title="有序性问题：重排序引起"></a>有序性问题：重排序引起</h2><p>在执行程序时为了提高性能，编译器和处理器常常会对指令做重排序。重排序分三种类型： </p>
+<ul>
+<li>编译器优化的重排序。编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。 </li>
+<li>指令级并行的重排序。现代处理器采用了指令级并行技术（Instruction-Level Parallelism， ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。</li>
+<li>内存系统的重排序。由于处理器使用缓存和读 &#x2F; 写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。</li>
+</ul>
+<p>从 java 源代码到最终实际执行的指令序列，会分别经历下面三种重排序：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155212640.png" alt="image-20230302155212640"></p>
+<p>上述的 1 属于编译器重排序，2 和 3 属于处理器重排序。这些重排序都可能会导致多线程程序出现内存可见性问题。</p>
+<p>下面是常见处理器允许的重排序类型的列表：</p>
+<table>
+<thead>
+<tr>
+<th>\</th>
+<th>Load-Load</th>
+<th>Load-Store</th>
+<th>Store-Store</th>
+<th>Store-Load</th>
+<th>数据依赖</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>sparc-TSO</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>Y</td>
+<td>N</td>
+</tr>
+<tr>
+<td>x86</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>Y</td>
+<td>N</td>
+</tr>
+<tr>
+<td>ia64</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+</tr>
+<tr>
+<td>PowerPC</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+</tr>
+</tbody></table>
+<p>上表单元格中的“N”表示处理器不允许两个操作重排序，“Y”表示允许重排序。</p>
+<p>从上表我们可以看出：常见的处理器都允许 Store-Load 重排序；常见的处理器都不允许对存在数据依赖的操作做重排序。sparc-TSO 和 x86 拥有相对较强的处理器内存模型，它们仅允许对写 - 读操作做重排序（因为它们都使用了写缓冲区）。</p>
+<h1 id="顺序一致性模型"><a href="#顺序一致性模型" class="headerlink" title="顺序一致性模型"></a>顺序一致性模型</h1><p>为了解决并发问题，提出了<code>顺序一致性模型</code>。顺序一致性内存模型是一个被计算机科学家理想化了的理论参考模型，它为程序员提供了极强的内存可见性保证。顺序一致性内存模型有两大特性：</p>
+<ul>
+<li>一个线程中的所有操作必须按照程序的顺序来执行。不管程序是否同步，所有线程都只能看到一个单一的操作执行顺序。</li>
+<li>每个操作都必须原子执行且立刻对所有线程可见。</li>
+</ul>
+<p>顺序一致性内存模型为程序员提供的视图如下：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155301224.png" alt="image-20230302155301224"></p>
+<p>在概念上，顺序一致性模型有一个单一的全局内存，这个内存通过一个左右摆动的开关可以连接到任意一个线程。同时，每一个线程必须按程序的顺序来执行内存读 &#x2F; 写操作。从上图我们可以看出，在任意时间点最多只能有一个线程可以连接到内存。当多个线程并发执行时，图中的开关装置能把所有线程的所有内存读 &#x2F; 写操作串行化。</p>
+<p>假设有两个线程 A 和 B 并发执行。其中 A 线程有三个操作，它们在程序中的顺序是：A1-&gt;A2-&gt;A3。B 线程也有三个操作，它们在程序中的顺序是：B1-&gt;B2-&gt;B3。 </p>
+<p>假设这两个线程使用监视器来正确同步：A 线程的三个操作执行后释放监视器，随后 B 线程获取同一个监视器。那么程序在顺序一致性模型中的执行效果将如下图所示：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155431666.png" alt="image-20230302155431666"></p>
+<p>现在我们再假设这两个线程没有做同步，下面是这个未同步程序在顺序一致性模型中的执行示意图：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155525064.png" alt="image-20230302155525064"></p>
+<p>未同步程序在顺序一致性模型中虽然整体执行顺序是无序的，但所有线程都只能看到一个一致的整体执行顺序。以上图为例，线程 A 和 B 看到的执行顺序都是：B1-&gt;A1-&gt;A2-&gt;B2-&gt;A3-&gt;B3。之所以能得到这个保证是因为顺序一致性内存模型中的每个操作必须立即对任意线程可见。</p>
+<p>但是，在 JMM 中就没有这个保证。未同步程序在 JMM 中不但整体的执行顺序是无序的，而且所有线程看到的操作执行顺序也可能不一致。比如，在当前线程把写过的数据缓存在本地内存中，且还没有刷新到主内存之前，这个写操作仅对当前线程可见；从其他线程的角度来观察，会认为这个写操作根本还没有被当前线程执行。只有当前线程把本地内存中写过的数据刷新到主内存之后，这个写操作才能对其他线程可见。在这种情况下，当前线程和其它线程看到的操作执行顺序将不一致。</p>
+<h2 id="JMM的设计"><a href="#JMM的设计" class="headerlink" title="JMM的设计"></a>JMM的设计</h2><h3 id="JMM的抽象"><a href="#JMM的抽象" class="headerlink" title="JMM的抽象"></a>JMM的抽象</h3><p><strong>Java 线程之间的通信由 Java 内存模型（JMM）控制，JMM 决定一个线程对共享变量的写入何时对另一个线程可见</strong>。</p>
+<p>在 java 中，所有实例域、静态域和数组元素存储在堆内存中，堆内存在线程之间共享（本文使用“共享变量”这个术语代指实例域，静态域和数组元素）。局部变量（Local variables），方法定义参数（java 语言规范称之为 formal method parameters）和异常处理器参数（exception handler parameters）不会在线程之间共享，它们不会有内存可见性问题，也不受内存模型的影响。</p>
+<p>从抽象的角度来看，JMM 定义了线程和主内存之间的抽象关系：线程之间的共享变量存储在主内存（main memory）中，每个线程都有一个私有的本地内存（local memory），本地内存中存储了该线程以读 &#x2F; 写共享变量的副本。本地内存是 JMM 的一个抽象概念，并不真实存在。它涵盖了缓存，写缓冲区，寄存器以及其他的硬件和编译器优化。Java 内存模型的抽象示意图如下：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155730292.png" alt="image-20230302155730292"></p>
+<p>从上图来看，线程 A 与线程 B 之间如要通信的话，必须要经历下面 2 个步骤：</p>
+<ol>
+<li>首先，线程 A 把本地内存 A 中更新过的共享变量刷新到主内存中去。</li>
+<li>然后，线程 B 到主内存中去读取线程 A 之前已更新过的共享变量。</li>
+</ol>
+<p>为了解决重排序问题：</p>
+<ul>
+<li>对于编译器重排序，JMM 的编译器重排序规则会禁止特定类型的编译器重排序（不是所有的编译器重排序都要禁止）。</li>
+<li>对于处理器重排序，由于常见的处理器内存模型比 JMM 要弱，JMM 的处理器重排序规则会要求 java 编译器在生成指令序列时，插入特定类型的内存屏障（memory barriers，intel 称之为 memory fence）指令，通过内存屏障指令来禁止特定类型的处理器重排序（不是所有的处理器重排序都要禁止）。JMM 把内存屏障指令分为下列四类：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>屏障类型</th>
+<th>指令示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LoadLoad Barriers</td>
+<td>Load1; LoadLoad; Load2</td>
+<td>确保 Load1 数据的装载，之前于 Load2 及所有后续装载指令的装载。</td>
+</tr>
+<tr>
+<td>StoreStore Barriers</td>
+<td>Store1; StoreStore; Store2</td>
+<td>确保 Store1 数据对其他处理器可见（刷新到内存），之前于 Store2 及所有后续存储指令的存储。</td>
+</tr>
+<tr>
+<td>LoadStore Barriers</td>
+<td>Load1; LoadStore; Store2</td>
+<td>确保 Load1 数据装载，之前于 Store2 及所有后续的存储指令刷新到内存。</td>
+</tr>
+<tr>
+<td>StoreLoad Barriers</td>
+<td>Store1; StoreLoad; Load2</td>
+<td>确保 Store1 数据对其他处理器变得可见（指刷新到内存），之前于 Load2 及所有后续装载指令的装载。</td>
+</tr>
+</tbody></table>
+<p><code>StoreLoad Barriers</code> 会使该屏障之前的所有内存访问指令（存储和装载指令）完成之后，才执行该屏障之后的内存访问指令。 StoreLoad Barriers 是一个“全能型”的屏障，它同时具有其他三个屏障的效果。现代的多处理器大都支持该屏障（其他类型的屏障不一定被所有处理器支持）。执行该屏障开销会很昂贵，因为当前处理器通常要把写缓冲区中的数据全部刷新到内存中（buffer fully flush）。</p>
+<h3 id="happens-before原则"><a href="#happens-before原则" class="headerlink" title="happens-before原则"></a>happens-before原则</h3><p>从 JDK5 开始，java 使用新的 JSR -133 内存模型（本文除非特别说明，针对的都是 JSR- 133 内存模型）。JSR-133 提出了 happens-before 的概念，通过这个概念来阐述操作之间的内存可见性。<code>如果一个操作执行的结果需要对另一个操作可见，那么这两个操作之间必须存在 happens-before 关系。</code></p>
+<p>这里提到的两个操作既可以是在一个线程之内，也可以是在不同线程之间。 与程序员密切相关的 happens-before 规则如下：</p>
+<ul>
+<li>程序顺序规则：同一个线程中的，前面的操作 happen-before 后续的操作。（即单线程内按代码顺序执行。但是，在不影响在单线程环境执行结果的前提下，编译器和处理器可以进行重排序，这是合法的。换句话说，这一是规则无法保证编译重排和指令重排）。</li>
+<li>Synchronized 规则：对一个监视器锁的解锁，happens- before 于随后对这个监视器锁的加锁。 </li>
+<li>volatile 规则：对一个 volatile 域的写，happens- before 于任意后续对这个 volatile 域的读。 </li>
+<li>线程启动规则：线程的start() 方法 happen-before 该线程所有的后续操作。</li>
+<li>线程所有的操作 happen-before 其他线程在该线程上调用 join 返回成功后的操作。</li>
+<li>传递性：如果 A happens- before B，且 B happens- before C，那么 A happens- before C。</li>
+</ul>
+<p>注意，两个操作之间具有 happens-before 关系，并不意味着前一个操作必须要在后一个操作之前执行！happens-before 仅仅要求前一个操作（执行的结果）对后一个操作可见，且前一个操作按顺序排在第二个操作之前。</p>
+<p>happens-before 与 JMM 的关系如下图所示：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155756136.png" alt="image-20230302155756136"></p>
+<p>如上图所示，一个 happens-before 规则通常对应于多个编译器重排序规则和处理器重排序规则。对于 java 程序员来说，happens-before 规则简单易懂，它避免程序员为了理解 JMM 提供的内存可见性保证而去学习复杂的重排序规则以及这些规则的具体实现。</p>
+<p>在 happens-before 的原则基础上，JMM 对于不同性质的重排序，采取了不同的策略：</p>
+<ul>
+<li>对于会改变程序执行结果的重排序，JMM 要求编译器和处理器必须禁止这种重排序。</li>
+<li>对于不会改变程序执行结果的重排序，JMM 对编译器和处理器不作要求（JMM 允许这种重排序）。</li>
+</ul>
+<p><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155811154.png" alt="image-20230302155811154"></p>
+<p>从上图可以看出两点： </p>
+<ul>
+<li>JMM 向程序员提供的 happens- before 规则能满足程序员的需求。JMM 的 happens- before 规则不但简单易懂，而且也向程序员提供了足够强的内存可见性保证（有些内存可见性保证其实并不一定真实存在，比如上面的 A happens- before B）。 </li>
+<li>JMM 对编译器和处理器的束缚已经尽可能的少。从上面的分析我们可以看出，JMM 其实是在遵循一个基本原则：只要不改变程序的执行结果（指的是单线程程序和正确同步的多线程程序），编译器和处理器怎么优化都行。比如，如果编译器经过细致的分析后，认定一个锁只会被单个线程访问，那么这个锁可以被消除。再比如，如果编译器经过细致的分析后，认定一个 volatile 变量仅仅只会被单个线程访问，那么编译器可以把这个 volatile 变量当作一个普通变量来对待。这些优化既不会改变程序的执行结果，又能提高程序的执行效率。</li>
+</ul>
+<h3 id="as-if-serial语义"><a href="#as-if-serial语义" class="headerlink" title="as-if-serial语义"></a>as-if-serial语义</h3><p>as-if-serial 语义的意思指：不管怎么重排序（编译器和处理器为了提高并行度），（单线程）程序的执行结果不能被改变。编译器，runtime 和处理器都必须遵守 as-if-serial 语义。</p>
+<p>为了遵守 as-if-serial 语义，编译器和处理器不会对存在数据依赖关系的操作做重排序，因为这种重排序会改变执行结果。但是，如果操作之间不存在数据依赖关系，这些操作可能被编译器和处理器重排序。</p>
+<h3 id="JMM内存可见性保证"><a href="#JMM内存可见性保证" class="headerlink" title="JMM内存可见性保证"></a>JMM内存可见性保证</h3><p>Java 程序的内存可见性保证按程序类型可以分为下列三类： </p>
+<ul>
+<li>单线程程序。单线程程序不会出现内存可见性问题。编译器，runtime 和处理器会共同确保单线程程序的执行结果与该程序在顺序一致性模型中的执行结果相同。</li>
+<li>正确同步的多线程程序。正确同步的多线程程序的执行将具有顺序一致性（程序的执行结果与该程序在顺序一致性内存模型中的执行结果相同）。这是 JMM 关注的重点，JMM 通过限制编译器和处理器的重排序来为程序员提供内存可见性保证。</li>
+<li>未同步 &#x2F; 未正确同步的多线程程序。JMM 为它们提供了最小安全性保障：线程执行时读取到的值，要么是之前某个线程写入的值，要么是默认值（0，null，false）。</li>
+</ul>
+<p><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155826515.png" alt="image-20230302155826515"></p>
+<h2 id="关键字的内存语义"><a href="#关键字的内存语义" class="headerlink" title="关键字的内存语义"></a>关键字的内存语义</h2><h3 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h3><p>volatile 主要有两个特性：</p>
+<ul>
+<li><code>可见性</code>：通过<code>lock前缀</code>实现，lock前缀可实现嗅探机制，每个处理器都会有一个嗅探机制，去看自己的工作内存中的数值与主内存中那个的是否一致，不一致，会将自己的工作内存中的数值设置成无效，同时会从主内存中读取数值更新到自己的工作内存中。</li>
+<li><code>有序性</code>：通过<code>内存屏障</code>实现的，禁止指令重排，内存屏障还可以强制刷出各种CPU的缓存数据保证可见性。</li>
+</ul>
+<p>注意 volatile 不保证原子性的实际含义：对volatile变量的单次读&#x2F;写操作可以保证原子性的，但是并不能保证i++这种操作的原子性，因为本质上i++是读、写两次操作。</p>
+<h4 id="lock-前缀"><a href="#lock-前缀" class="headerlink" title="lock 前缀"></a>lock 前缀</h4><p>用 volitle 修饰的变量，hsdis 和 jitwatch 工具可以得到编译后的汇编代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">0x000000000295157f: and    $0x37f,%rax</span><br><span class="line">0x0000000002951586: mov    %rax,%rdi</span><br><span class="line">0x0000000002951589: or     %r15,%rdi</span><br><span class="line">0x000000000295158c: lock movl %rdi,(%rdx)  //在 volatile 修饰的共享变量进行写操作的时候会多出 lock 前缀的指令</span><br><span class="line">0x0000000002951591: jne    0x0000000002951a15</span><br><span class="line">0x0000000002951597: jmpq   0x00000000029515f8</span><br><span class="line">0x000000000295159c: mov    0x8(%rdx),%edi</span><br></pre></td></tr></table></figure>
+<p>lock 前缀是一个特殊的信号，movl 是一个汇编指令，执行过程如下：</p>
+<ul>
+<li>对总线和缓存上锁。</li>
+<li>强制所有lock信号之前的指令，都在此之前被执行，并同步相关缓存。</li>
+<li>执行lock后的指令（如cmpxchg）。</li>
+<li>释放对总线和缓存上的锁。</li>
+<li>强制所有lock信号之后的指令，都在此之后被执行，并同步相关缓存。</li>
+</ul>
+<p>lock 前缀有两种实现途径：</p>
+<ul>
+<li>锁总线（lock bus）：在 Pentium 和早期的 IA-32 处理器中，带有lock前缀的指令在执行期间会锁住总线，使得其它处理器暂时无法通过总线访问内存。锁总线的开销比较大。</li>
+<li>锁缓存（lock cache）：在新的处理器中，Intel使用缓存锁定来保证指令执行的原子性，缓存锁定将大大降低lock前缀指令的执行开销。这里锁缓存（Cache Locking）就是用了Ringbus + MESI协议。</li>
+</ul>
+<p>缓存一致性协议保证两件事情：</p>
+<ul>
+<li>将当前处理器缓存行的数据写回到系统内存。</li>
+<li>写回内存的操作会使在其他 CPU 里缓存了该内存地址的数据无效。</li>
+</ul>
+<h4 id="内存屏障"><a href="#内存屏障" class="headerlink" title="内存屏障"></a>内存屏障</h4><p>内存屏障，又称内存栅栏，是一个 CPU 指令。插入一条内存屏障会告诉编译器和 CPU，<code>不管什么指令都不能和这条 Memory Barrier 指令重排序</code>。</p>
+<p>前面说了 lock 只是一个前缀，lock 后面才是真正要执行的指令。lock 之前的读写请求都不能越过lock指令进行重排。<code>lock 前缀 + 执行指令</code>达到了内存屏障的效果。查看 jdk 源码四种内存屏障的实现：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">OrderAccess::loadload</span><span class="params">()</span>   &#123; acquire(); &#125;</span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">OrderAccess::storestore</span><span class="params">()</span> &#123; release(); &#125;</span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">OrderAccess::loadstore</span><span class="params">()</span>  &#123; acquire(); &#125;</span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">OrderAccess::storeload</span><span class="params">()</span>  &#123; fence(); &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">OrderAccess::acquire</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="keyword">volatile</span> <span class="type">intptr_t</span> local_dummy;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> AMD64</span></span><br><span class="line">  __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;movq 0(%%rsp), %0&quot;</span> : <span class="string">&quot;=r&quot;</span> (local_dummy) : : <span class="string">&quot;memory&quot;</span>)</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">  __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;movl 0(%%esp),%0&quot;</span> : <span class="string">&quot;=r&quot;</span> (local_dummy) : : <span class="string">&quot;memory&quot;</span>)</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">// AMD64</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">OrderAccess::release</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="comment">// Avoid hitting the same cache-line from</span></span><br><span class="line">  <span class="comment">// different threads.</span></span><br><span class="line">  <span class="keyword">volatile</span> jint local_dummy = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">OrderAccess::fence</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (os::is_MP()) &#123;</span><br><span class="line">    <span class="comment">// always use locked addl since mfence is sometimes expensive</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> AMD64</span></span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;lock; addl $0,0(%%rsp)&quot;</span> : : : <span class="string">&quot;cc&quot;</span>, <span class="string">&quot;memory&quot;</span>)</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;lock; addl $0,0(%%esp)&quot;</span> : : : <span class="string">&quot;cc&quot;</span>, <span class="string">&quot;memory&quot;</span>)</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不同的内存屏障通过 lock 后面跟不同的指令来实现，例如 storeload 屏障通过 <code>lock addl $0x0,(%rsp)</code> 来实现。</p>
+<p>JSR-133 增强了模型。旧内存模型允许 volatile 变量与普通变量重排序。JSR-133 严格限制 volatile 变量与普通变量的重排序，使 volatile 的写 - 读和锁的释放 - 获取具有相同的内存语义。JMM 会针对编译器制定 volatile 重排序规则表：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155921306.png" alt="image-20230302155921306"></p>
+<p>“ NO “ 表示禁止重排序。为了实现 volatile 内存语义，Java 编译器会在生成指令系列时在适当的位置会插入内存屏障指令来禁止特定类型的处理器重排序。最保守的策略是：</p>
+<ul>
+<li>在每个 volatile 写操作的前面插入一个 StoreStore 屏障。</li>
+<li>在每个 volatile 写操作的后面插入一个 StoreLoad 屏障。</li>
+<li>在每个 volatile 读操作的后面插入一个 LoadLoad 屏障。</li>
+<li>在每个 volatile 读操作的后面插入一个 LoadStore 屏障。</li>
+</ul>
+<p>volatile 写是在前面和后面分别插入内存屏障，而 volatile 读操作是在后面插入两个内存屏障。<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155933684.png" alt="image-20230302155933684"></p>
+<p>使用 volatile 必须具备的条件：</p>
+<ul>
+<li>对变量的写操作不依赖于当前值。</li>
+<li>该变量没有包含在具有其他变量的不变式中。</li>
+<li>只有在状态真正独立于程序内其他内容时才能使用 volatile。</li>
+</ul>
+<p>使用 volatile 的场景：</p>
+<ul>
+<li>状态标志。例如完成初始化这种一次性事件。</li>
+<li>定期发布观察结果供程序内部使用。例如，假设有一种环境传感器能够感觉环境温度。一个后台线程可能会每隔几秒读取一次该传感器，并更新包含当前文档的 volatile 变量。然后，其他线程可以读取这个变量，从而随时能够看到最新的温度值。</li>
+<li>双重检查。</li>
+</ul>
+<h3 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h3><p>synchronized 是利用锁的机制来实现同步的。synchronized 的特性是：</p>
+<ul>
+<li>互斥性：即在同一时间只允许一个线程持有某个对象锁，通过这种特性来实现多线程中的协调机制，这样在同一时间只有一个线程对需同步的代码块(复合操作)进行访问。互斥性我们也往往称为操作的原子性。</li>
+<li>可见性：必须确保在锁被释放之前，对共享变量所做的修改，对于随后获得该锁的另一个线程是可见的（即在获得锁时应获得最新共享变量的值），否则另一个线程可能是在本地缓存的某个副本上继续操作从而引起不一致。</li>
+</ul>
+<p>synchronized有三种用法：</p>
+<ul>
+<li>修饰普通实例方法，锁对象为this</li>
+<li>修饰静态方法，锁对象为当前类的class对象</li>
+<li>修饰代码块：<ul>
+<li>synchronized(this|object)：锁对象为this</li>
+<li>synchronized(类.class)：锁对象为指定类的class对象</li>
+</ul>
+</li>
+</ul>
+<p>每个对象有一个监视器锁（monitor），当monitor被占用时就会处于锁定状态。每一个对象在同一时间只与一个monitor(锁)相关联，而一个monitor在同一时间只能被一个线程获得。为了获取 monitor 的拥有权，synchronized 底层通过 <code>monitorenter</code> 和 <code>monitorexit</code> 字节码来实现：</p>
+<ul>
+<li>monitorenter：尝试获取monitor锁的所有权。<ul>
+<li>如果monitor的进入数为0，则该线程进入monitor，然后将进入数设置为1，该线程即为monitor的所有者。</li>
+<li>如果这个monitor已经拿到了这个锁的所有权，又重入了这把锁，那锁计数器就会累加，变成2，并且随着重入的次数，会一直累加。</li>
+<li>如果其他线程已经占用了monitor，则该线程进入阻塞状态，直到monitor的进入数为0，再重新尝试获取monitor的所有权。</li>
+</ul>
+</li>
+<li>monitorexit：释放对于monitor的所有权，释放过程很简单，就是讲monitor的计数器减1，如果减完以后，计数器不是0，则代表刚才是重入进来的，当前线程还继续持有这把锁的所有权，如果计数器变成0，则代表当前线程不再拥有该monitor的所有权，即释放锁。</li>
+</ul>
+<p>JVM中的 monitorenter 和 monitorexit 字节码依赖于底层的操作系统的 <code>Mutex Lock</code> 来实现的，同步方法是运行在单线程环境(无锁竞争环境)如果每次都调用 Mutex Lock 那么将严重的影响程序的性能。</p>
+<p>jdk1.6为了减少获取锁和释放锁的性能消耗，引入「偏向锁」和「轻量级锁」的概念，优化后的 synchronied 同步锁一共有四种状态：</p>
+<ul>
+<li><code>无锁</code></li>
+<li><code>偏向锁</code></li>
+<li><code>轻量级锁</code></li>
+<li><code>重量级锁</code></li>
+</ul>
+<p>另外还有其他优化手段：</p>
+<ul>
+<li><code>适应性自旋</code></li>
+<li><code>锁消除</code></li>
+<li><code>锁粗化</code></li>
+</ul>
+<p>锁会随着竞争情况发生膨胀，锁膨胀方向：<code>无锁 → 偏向锁 → 轻量级锁 → 重量级锁</code>。锁可以升级但是不可以降级。</p>
+<p>synchronized 用的锁存在于Java对象头，Java对象头里面包含三部分信息：</p>
+<ul>
+<li><code>Mark Word</code>，用于存储自身的运行时数据，如：HashCode、GC分代年龄、锁标记、偏向锁线程ID等。</li>
+<li><code>类型指针</code>，即对象指向它的类元信息，虚拟机通过这个指针来确定这个对象是哪个类的实例。</li>
+<li><code>数组长度（可选）</code>，如果java对象是一个数组，那么对象头中还必须有一块用于记录数组长度的数据。</li>
+</ul>
+<p>锁记录在对象头中的「Mark Word」。在32位虚拟机中，Mark Word 存储结构如下图：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302155954882.png" alt="image-20230302155954882"></p>
+<p>在64位虚拟机中，“Mark Word”存储结构如下图：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160005197.png" alt="image-20230302160005197"></p>
+<h4 id="无锁"><a href="#无锁" class="headerlink" title="无锁"></a>无锁</h4><p>jvm会有4秒的偏向锁开启的延迟时间，在这个偏向延迟内对象处于为无锁态。如果关闭偏向锁启动延迟、或是经过4秒且没有线程竞争对象的锁，那么对象会进入<code>无锁可偏向</code>状态。</p>
+<p>准确来说，无锁可偏向状态应该叫做<code>匿名偏向</code>(Anonymously biased)状态，因为这时对象的mark word中后三位已经是101，但是threadId指针部分仍然全部为0，它还没有向任何线程偏向。另外可以通过 -XX:-UseBiasedLocking 参数关闭偏向锁。综上所述：</p>
+<ul>
+<li><code>如果没有关闭偏向锁，对象在刚被创建时，根据jvm的配置对象可能会处于「无锁」或「匿名偏向」两个状态，mark word后三位为101</code>。</li>
+<li><code>如果关闭偏向锁，那么直到有线程获取这个锁对象之前，会一直处于无锁不可偏向状态，mark word后三位为001</code>。在无锁不可偏向状态下，如果有线程试图获取锁，那么将跳过升级偏向锁的过程，直接使用轻量级锁。</li>
+</ul>
+<blockquote>
+<p>为什么会有偏向锁启动有延迟？</p>
+<p>JVM内部的代码有很多地方也用到了synchronized，明确在这些地方存在线程的竞争，如果还需要从偏向状态再逐步升级，会带来额外的性能损耗，所以JVM设置了一个偏向锁的启动延迟，来降低性能损耗。</p>
+</blockquote>
+<p>在目前的基础上，可以用流程图概括上面的过程：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160018811.png" alt="image-20230302160018811"></p>
+<h4 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h4><p><code>偏向锁适用于同一线程多次申请同一个锁的场景</code>。如果大部分时间一个锁都是被一个线程持有和竞争，使用 monitor 的话每次都会发生用户态和内核态的切换，性能低下。</p>
+<p>偏向锁获取：</p>
+<ol>
+<li>首先获取锁对象头中的 Mark Word，判断当前对象是否处于可偏向状态（即偏向锁打开，且当前没有其他对象获得偏向锁）。</li>
+<li>如果是可偏向状态，则通过 CAS 原子操作，尝试把当前线程的ID写入到 MarkWord，如果 CAS 成功，表示获得偏向锁成功。</li>
+<li>如果是不可偏向状态，检查Mark Word中的ThreadID是否和自己相等，如果相等则不需要再次获得锁，可以直接执行同步代码块，如果不相等，说明当前偏向的是其他线程，需要撤销偏向锁并升级到轻量级锁。</li>
+</ol>
+<p>偏向锁撤销：</p>
+<ol>
+<li>偏向锁的撤销并不是把对象恢复到无锁可偏向状态（因为偏向锁并不存在锁释放的概念），而是直接把被偏向的锁对象升级到被加了轻量级锁的状态。</li>
+<li>偏向锁的撤销需要等待全局安全点Safe Point（安全点是 jvm为了保证在垃圾回收的过程中引用关系不会发生变化设置的安全状态，在这个状态上会暂停所有线程工作），在这个安全点会挂起获得偏向锁的线程。</li>
+<li>在暂停线程后，会通过遍历当前jvm的所有线程的方式，检查持有偏向锁的线程状态是否存活：<ul>
+<li>如果线程还存活，且线程正在执行同步代码块中的代码，则升级为轻量级锁。</li>
+<li>如果持有偏向锁的线程未存活，或者持有偏向锁的线程未在执行同步代码块中的代码，则进行校验是否允许重偏向：<ul>
+<li>不允许重偏向，则撤销偏向锁，将mark word升级为轻量级锁，进行CAS竞争锁</li>
+<li>允许重偏向，设置为匿名偏向锁状态，CAS将偏向锁重新指向新线程</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>完成上面的操作后，唤醒暂停的线程，从安全点继续执行代码。</li>
+</ol>
+<p><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160039038.png" alt="image-20230302160039038"></p>
+<p>一旦出现其它线程竞争锁资源，偏向锁就会被撤销。</p>
+<p>另外有两点需要注意：</p>
+<ul>
+<li>偏向锁在java 6之后是默认启动的（java 15开始已经废弃了偏向锁），但是在应用程序启动几秒后才激活，可以使用参数关闭延迟：<code>-XXBiaseLockingStartupDelay=0</code></li>
+<li>如果我们确定代码中同步资源一直是被多线程访问的，那么建议是关闭偏向锁，因为开启反而会因为偏向锁撤销操作而引起更多的资源消耗。使用参数关闭偏向锁：<code>-XX:UseBiaseLocking=false</code>。程序默认直接进入轻量级锁状态。</li>
+</ul>
+<h4 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h4><p><code>轻量级锁适用于两个线程在交替使用锁的场景</code>。由于没有同时抢锁，属于一种比较和谐的状态，就可以使用轻量级锁。</p>
+<p>轻量级锁加锁：</p>
+<ol>
+<li>在代码访问同步资源时，如果锁对象处于无锁不可偏向状态，jvm首先将在当前线程的栈帧中创建一条锁记录（<code>lock record</code>），用于存放：<ul>
+<li><code>displaced mark word</code>（置换标记字）：存放锁对象当前的mark word的拷贝。</li>
+<li><code>owner</code>指针：指向当前的锁对象的指针，在拷贝mark word阶段暂时不会处理它。</li>
+</ul>
+</li>
+<li>在拷贝mark word完成后，首先会挂起线程，jvm 使用 CAS 操作尝试将锁对象的 mark word 中的 lock record 指针指向刚才创建的线程栈帧中的 lock record，并将 lock record 中的 owner 指针指向锁对象的 mark word。如果 CAS 替换成功，表示竞争锁对象成功，则将锁标志位设置成 <code>00</code>，表示对象处于轻量级锁状态。<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160103162.png" alt="image-20230302160103162"></li>
+<li>如果CAS替换失败，则判断锁对象的 mark word 是否指向当前线程的栈帧：<ul>
+<li>如果是则表示当前线程已经持有对象的锁，执行下面<code>轻量级锁重入的过程</code>，可以直接执行同步代码块。</li>
+<li>否则说明该其他线程已经持有了该对象的锁，执行下面<code>轻量级锁自旋和升级的过程</code>。如果在自旋一定次数后仍未获得锁，那么轻量级锁需要升级为重量级锁，将锁标志位变成10，后面等待的线程将会进入阻塞状态。</li>
+</ul>
+</li>
+</ol>
+<p>轻量级锁重入：</p>
+<ol>
+<li>轻量级锁的每次重入，都会在栈中生成一个lock record，但是保存的数据不同：<ul>
+<li>首次分配的lock record，displaced mark word复制了锁对象的mark word，owner指针指向锁对象</li>
+<li>之后重入时在栈中分配的lock record中的displaced mark word为null，只存储了指向对象的owner指针<br> <img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160123685.png" alt="image-20230302160123685"></li>
+</ul>
+</li>
+<li>重入的次数等于该锁对象在栈帧中lock record的数量，这个数量隐式地充当了锁重入机制的计数器。这里需要计数的原因是每次解锁都需要对应一次加锁，只有最后解锁次数等于加锁次数时，锁对象才会被真正释放。在释放锁的过程中，如果是重入则删除栈中的lock record，直到没有重入时则使用CAS替换锁对象的mark word。</li>
+</ol>
+<p>轻量级锁自旋和升级：</p>
+<ol>
+<li>在jdk1.6以前，默认轻量级锁自旋次数是10次，可以通过 <code>-XX:PreBlockSpin</code> 参数修改。jdk1.6以后加入了<code>自适应自旋锁</code>，自旋的次数不再固定，由jvm自己控制，由前一次在同一个锁上的自旋时间及锁的拥有者的状态来决定：<ul>
+<li>对于某个锁对象，如果自旋等待刚刚成功获得过锁，并且持有锁的线程正在运行中，那么虚拟机就会认为这次自旋也是很有可能再次成功，进而允许自旋等待持续相对更长时间</li>
+<li>对于某个锁对象，如果自旋很少成功获得过锁，那在以后尝试获取这个锁时将可能省略掉自旋过程，直接阻塞线程，避免浪费处理器资源。</li>
+</ul>
+</li>
+<li>如果自旋超过设定次数或自旋线程数超过CPU核数的一半，就会升级为重量级锁。</li>
+</ol>
+<p>轻量级锁解锁：</p>
+<ol>
+<li>轻量级锁的释放同样使用了CAS操作，尝试将displaced mark word 替换回mark word，这时需要检查锁对象的mark word中lock record指针是否指向当前线程的锁记录：<ul>
+<li>如果替换成功，则表示没有竞争发生，整个同步过程就完成了</li>
+<li>如果替换失败，则表示当前锁资源存在竞争，有可能其他线程在这段时间里尝试过获取锁失败，导致自身被挂起，并修改了锁对象的mark word升级为重量级锁，最后在执行重量级锁的解锁流程后唤醒被挂起的线程</li>
+</ul>
+</li>
+</ol>
+<p><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160145523.png" alt="image-20230302160145523"></p>
+<h4 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h4><p>重量级锁是依赖对象内部的 monitor（监视器&#x2F;管程）来实现的，任意一个对象都有自己的 monitor，而 monitor 又依赖于操作系统底层的 Mutex Lock（互斥锁）实现。使用重量级锁之后，被阻塞的线程便进入内核（Linux）调度状态，系统切换线程需要在用户态与内核态之间来回切换，严重影响锁的性能。</p>
+<p>monitor中的核心概念：</p>
+<ul>
+<li>owner：标识拥有该monitor的线程，初始时和锁被释放后都为null</li>
+<li>cxq (ConnectionList)：竞争队列，所有竞争锁的线程都会首先被放入这个队列中</li>
+<li>EntryList：候选者列表，当owner解锁时会将cxq队列中的线程移动到该队列中</li>
+<li>OnDeck：在将线程从cxq移动到EntryList时，会指定某个线程为Ready状态（即OnDeck），表明它可以竞争锁，如果竞争成功那么称为owner线程，如果失败则放回EntryList中</li>
+<li>WaitSet：因为调用wait()或wait(time)方法而被阻塞的线程会被放在该队列中</li>
+<li>count：monitor的计数器，数值加1表示当前对象的锁被一个线程获取，线程释放monitor对象时减1</li>
+<li>recursions：线程重入次数</li>
+</ul>
+<p>用图来表示线程竞争的的过程：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160208972.png" alt="image-20230302160208972"><br>当线程调用wait()方法，将释放当前持有的monitor，将owner置为null，进入WaitSet集合中等待被唤醒。当有线程调用notify()或notifyAll()方法时，也会释放持有的monitor，并唤醒WaitSet的线程重新参与monitor的竞争。</p>
+<p>重量级锁加锁：</p>
+<ol>
+<li>当升级为重量级锁的情况下，锁对象的mark word中的指针不再指向线程栈中的lock record，而是指向堆中与锁对象关联的monitor对象。当多个线程同时访问同步代码时，这些线程会先尝试获取当前锁对象对应的monitor的所有权：<ul>
+<li>获取成功，判断当前线程是不是重入，如果是重入那么recursions+1。<ul>
+<li>获取失败，当前线程会被阻塞，等待其他线程解锁后被唤醒，再次竞争锁对象。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="锁膨胀过程"><a href="#锁膨胀过程" class="headerlink" title="锁膨胀过程"></a>锁膨胀过程</h4><p><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160232981.png" alt="image-20230302160232981"><br>锁膨胀过程中锁对象的 mark word 变化过程：<br><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160248180.png" alt="image-20230302160248180"></p>
+<h4 id="锁消除"><a href="#锁消除" class="headerlink" title="锁消除"></a>锁消除</h4><p>这属于编译器对锁的优化，JIT 编译器在动态编译同步块时，会使用逃逸分析技术，判断同步块的锁对象是否只能被一个对象访问，以及不会逃逸出去从而被其他线程访问到。</p>
+<p>如果确认没有逃逸，JVM就把它们当作栈上数据对待，认为这些数据是线程独有的。JIT 编译器就不会生成 Synchronized 对应的锁申请和释放的机器码，就消除了锁的使用。</p>
+<h4 id="锁粗化"><a href="#锁粗化" class="headerlink" title="锁粗化"></a>锁粗化</h4><p>JIT 编译器动态编译时，如果发现几个相邻的同步块使用的是同一个锁实例，那么 JIT 编译器将会把这几个同步块合并为一个大的同步块，从而避免一个线程反复申请、释放同一个锁所带来的性能开销。</p>
+<h3 id="final"><a href="#final" class="headerlink" title="final"></a>final</h3><p>final声明的变量，要么在声明语句里面赋值，要么在构造函数里面赋值。如果字段由static和final修饰，仅能在声明时赋值或声明后在静态代码块中赋值。</p>
+<p>写final域的重排序规则禁止对final域的写重排序到构造函数之外，这个规则的实现主要包含了两个方面：</p>
+<ul>
+<li>JMM禁止编译器把final域的写重排序到构造函数之外</li>
+<li>编译器会在final域写之后，构造函数return之前，插入一个storestore屏障。这个屏障可以禁止处理器把final域的写重排序到构造函数之外。</li>
+</ul>
+<p><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160301472.png" alt="image-20230302160301472"></p>
+<p>读final域重排序规则为：在一个线程中，初次读对象引用和初次读该对象包含的final域，JMM会禁止这两个操作的重排序。(注意，这个规则仅仅是针对处理器)，处理器会在读final域操作的前面插入一个LoadLoad屏障。读final域的重排序规则可以确保：在读一个对象的final域之前，一定会先读这个包含这个final域的对象的引用。</p>
+<p><img src="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image-20230302160314419.png" alt="image-20230302160314419"></p>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><h2 id="双重检查锁"><a href="#双重检查锁" class="headerlink" title="双重检查锁"></a>双重检查锁</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Singleton</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton uniqueSingleton;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">Singleton</span><span class="params">()</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="literal">null</span> == uniqueSingleton) &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (Singleton.class) &#123;</span><br><span class="line">                <span class="keyword">if</span> (<span class="literal">null</span> == uniqueSingleton) &#123;</span><br><span class="line">                    uniqueSingleton = <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> uniqueSingleton;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意这里不能漏掉volatile修饰，禁止重排序，保证所有的写（write）操作都将发生在读（read）操作之前。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/25/Hexo%E5%8D%87%E7%BA%A7%E7%89%88%E6%9C%AC/" rel="prev" title="Hexo升级版本">
+      <i class="fa fa-chevron-left"></i> Hexo升级版本
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/" rel="next" title="Java并发系列（二）：线程模型">
+      Java并发系列（二）：线程模型 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E9%97%AE%E9%A2%98%E7%9A%84%E6%A0%B9%E6%BA%90"><span class="nav-number">1.</span> <span class="nav-text">并发问题的根源</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E8%A7%81%E6%80%A7%E9%97%AE%E9%A2%98%EF%BC%9ACPU%E7%BC%93%E5%AD%98%E5%BC%95%E8%B5%B7"><span class="nav-number">1.1.</span> <span class="nav-text">可见性问题：CPU缓存引起</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7%E9%97%AE%E9%A2%98%EF%BC%9A%E5%88%86%E6%97%B6%E5%A4%8D%E7%94%A8%E5%BC%95%E8%B5%B7"><span class="nav-number">1.2.</span> <span class="nav-text">原子性问题：分时复用引起</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7%E9%97%AE%E9%A2%98%EF%BC%9A%E9%87%8D%E6%8E%92%E5%BA%8F%E5%BC%95%E8%B5%B7"><span class="nav-number">1.3.</span> <span class="nav-text">有序性问题：重排序引起</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%BA%E5%BA%8F%E4%B8%80%E8%87%B4%E6%80%A7%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">顺序一致性模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JMM%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.1.</span> <span class="nav-text">JMM的设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JMM%E7%9A%84%E6%8A%BD%E8%B1%A1"><span class="nav-number">2.1.1.</span> <span class="nav-text">JMM的抽象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#happens-before%E5%8E%9F%E5%88%99"><span class="nav-number">2.1.2.</span> <span class="nav-text">happens-before原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#as-if-serial%E8%AF%AD%E4%B9%89"><span class="nav-number">2.1.3.</span> <span class="nav-text">as-if-serial语义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JMM%E5%86%85%E5%AD%98%E5%8F%AF%E8%A7%81%E6%80%A7%E4%BF%9D%E8%AF%81"><span class="nav-number">2.1.4.</span> <span class="nav-text">JMM内存可见性保证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%86%85%E5%AD%98%E8%AF%AD%E4%B9%89"><span class="nav-number">2.2.</span> <span class="nav-text">关键字的内存语义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile"><span class="nav-number">2.2.1.</span> <span class="nav-text">volatile</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#lock-%E5%89%8D%E7%BC%80"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">lock 前缀</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">内存屏障</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#synchronized"><span class="nav-number">2.2.2.</span> <span class="nav-text">synchronized</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%A0%E9%94%81"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">无锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%81%8F%E5%90%91%E9%94%81"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">偏向锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">轻量级锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81"><span class="nav-number">2.2.2.4.</span> <span class="nav-text">重量级锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%94%81%E8%86%A8%E8%83%80%E8%BF%87%E7%A8%8B"><span class="nav-number">2.2.2.5.</span> <span class="nav-text">锁膨胀过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%94%81%E6%B6%88%E9%99%A4"><span class="nav-number">2.2.2.6.</span> <span class="nav-text">锁消除</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%94%81%E7%B2%97%E5%8C%96"><span class="nav-number">2.2.2.7.</span> <span class="nav-text">锁粗化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#final"><span class="nav-number">2.2.3.</span> <span class="nav-text">final</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%94%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8C%E9%87%8D%E6%A3%80%E6%9F%A5%E9%94%81"><span class="nav-number">3.1.</span> <span class="nav-text">双重检查锁</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

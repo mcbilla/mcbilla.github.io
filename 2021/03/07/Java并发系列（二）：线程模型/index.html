@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="这一篇介绍 java 的线程模型。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发系列（二）：线程模型">
+<meta property="og:url" content="http://yoursite.com/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="这一篇介绍 java 的线程模型。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/image-20230307152728759.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/image-20230307152802376.png">
+<meta property="article:published_time" content="2021-03-07T07:20:01.000Z">
+<meta property="article:modified_time" content="2023-03-27T11:54:31.798Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/image-20230307152728759.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Java并发系列（二）：线程模型 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java并发系列（二）：线程模型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-07 15:20:01" itemprop="dateCreated datePublished" datetime="2021-03-07T15:20:01+08:00">2021-03-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-27 19:54:31" itemprop="dateModified" datetime="2023-03-27T19:54:31+08:00">2023-03-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Java%E5%B9%B6%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Java并发</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/" class="post-meta-item leancloud_visitors" data-flag-title="Java并发系列（二）：线程模型" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>这一篇介绍 java 的线程模型。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="线程状态"><a href="#线程状态" class="headerlink" title="线程状态"></a>线程状态</h2><p>Java中线程的状态分为6种：</p>
+<ol>
+<li><code>初始(NEW)</code>：新创建了一个线程对象，但还没有调用start()方法。</li>
+<li><code>运行(RUNNABLE)</code>：Java线程中将就绪（ready）和运行中（running）两种状态笼统的称为“运行”。线程对象创建后，其他线程(比如main线程）调用了该对象的start()方法。该状态的线程位于可运行线程池中，等待被线程调度选中，获取CPU的使用权，此时处于就绪状态（ready）。就绪状态的线程在获得CPU时间片后变为运行中状态（running）。</li>
+<li><code>阻塞(BLOCKED)</code>：表示线程阻塞于锁。一般是线程阻塞在进入synchronized关键字修饰的方法或代码块(获取锁)时的状态。</li>
+<li><code>等待(WAITING)</code>：进入该状态的线程需要等待其他线程做出一些特定动作（通知或中断）。该状态的线程必须被显式地唤醒，否则会处于无限期等待的状态。</li>
+<li><code>超时等待(TIMED_WAITING)</code>：状态类似于WAITING，但不同于WAITING，它可以在指定的时间后自行返回。</li>
+<li><code>终止(TERMINATED)</code>：表示该线程已经执行完毕。</li>
+</ol>
+<p>线程队列中有两种类型：</p>
+<ul>
+<li><code>同步队列（SynchronizedQueue）</code>：处于BLOCKED状态的线程队列。</li>
+<li><code>等待队列（WatiQueue）</code>：处于WAITING或者TIMED_WAITING状态的线程队列。</li>
+</ul>
+<p>java六种状态的完整变迁图如下：<br><img src="/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/image-20230307152728759.png" alt="image-20230307152728759"></p>
+<h2 id="线程的实现"><a href="#线程的实现" class="headerlink" title="线程的实现"></a>线程的实现</h2><p>有三种使用线程的方法：</p>
+<ul>
+<li>实现 Runnable 接口。</li>
+<li>实现 Callable 接口。</li>
+<li>继承 Thread 类。</li>
+</ul>
+<p>实现 Runnable 和 Callable 接口的类只能当做一个可以在线程中运行的任务，不是真正意义上的线程，因此最后还需要通过 Thread 来调用。可以说任务是通过线程驱动从而执行的。</p>
+<h2 id="线程方法"><a href="#线程方法" class="headerlink" title="线程方法"></a>线程方法</h2><h3 id="start"><a href="#start" class="headerlink" title="start()"></a>start()</h3><p>实现 Runnable 接口或者继承 Thread 可以得到一个线程类，new一个实例出来，线程就进入了 NEW 状态。</p>
+<p>调用线程的 start() 方法，线程就进入 RUNNABLE 状态。RUNNABLE状态的线程不一定在运行，有可能处于 READY 状态，也有可能处于 RUNNING 状态，这主要看是否被调度器调度运行。</p>
+<h3 id="yield"><a href="#yield" class="headerlink" title="yield()"></a>yield()</h3><p><code>只能当前线程调用此方法，所以yield()是静态方法</code>。当线程的 CPU 时间片用完或调用 yield() 函数主动放弃 CPU 时间片，由 RUNNING 状态变为 READY 状态，但不释放锁资源，让线程调度器再次选择线程。</p>
+<p>yield()的作用：让相同优先级的线程轮流执行，但并不保证一定会轮流执行。实际中无法保证 yield() 达到让步目的，因为让步的线程还有可能被线程调度程序再次选中。Thread.yield() 不会导致阻塞。该方法与 sleep() 类似，只是不能由用户指定暂停多长时间。</p>
+<h3 id="sleep-long-millis"><a href="#sleep-long-millis" class="headerlink" title="sleep(long millis)"></a>sleep(long millis)</h3><p><code>只能当前线程调用此方法，所以sleep(long millis)是静态方法</code>。当前线程进入TIMED_WAITING状态，但不释放对象锁，millis后线程自动苏醒进入就绪状态。</p>
+<p>sleep()的作用：给其它线程执行机会的最佳方式。</p>
+<h3 id="join-x2F-join-long-millis"><a href="#join-x2F-join-long-millis" class="headerlink" title="join()&#x2F;join(long millis)"></a>join()&#x2F;join(long millis)</h3><p><code>当前线程里调用其它线程的join方法</code>。当前线程进入 WAITING&#x2F;TIMED_WAITING 状态，但不会释放已经持有的对象锁。等待其他线程执行完毕或者 millis 时间到，当前线程一般情况下进入 RUNNABLE 状态，也有可能进入 BLOCKED 状态（因为 join 是基于 wait 实现的）。</p>
+<p>join()的作用：等待其他进程完成后再执行下一步动作。</p>
+<h3 id="wait-notify-notifyAll"><a href="#wait-notify-notifyAll" class="headerlink" title="wait() notify() notifyAll()"></a>wait() notify() notifyAll()</h3><p><code>两个不同线程分别调用中间对象的这三个方法</code>：</p>
+<ol>
+<li>线程 A 调用了对象 O 的 wait() 方法进入等待状态，并释放对象锁。</li>
+<li>另一个线程 B 获取对象锁，执行完自己的任务后，调用了对象 O 的 notify() 或者 notifyAll() 方法。</li>
+<li>线程 A 收到通知后，等待线程 B 释放对象锁，重新获取对象锁，然后从对象 O 的 wait() 方法返回，进而执行后续操作。</li>
+</ol>
+<p>上述两个线程通过对象 O 来完成交互，而对象 O 上的 wait() 和 notify&#x2F;notifyAll() 的关系就如同开关信号一样，用来完成等待方和通知方之间的交互工作。</p>
+<p>注意事项：</p>
+<ol>
+<li>使用 wait()、notify() 和 notifyAll() 之前需要先用 synchronized 对调用对象加锁。</li>
+<li>调用 wait() 方法后，线程状态由 RUNNING 变为 WAITING，并将当前线程放置到对象的等待队列。</li>
+<li>notify() 或 notifyAll() 方法调用后，等待线程依旧不会立刻从 wait() 返回，需要调用 notify() 或 notifAll() 的线程释放了锁，等待线程获得了锁之后，才会从 wait() 返回。</li>
+<li>notify() 方法将等待队列中的一个等待线程从等待队列中移到同步队列中，而 notifyAll() 方法则是将等待队列中所有的线程全部移到同步队列，被移动的线程状态由 WAITING 变为 BLOCKED。</li>
+<li>任意一个object以及其子类对象都有两个队列<ul>
+<li>同步队列：所有尝试获取该对象Monitor失败的线程，都加入同步队列排队获取锁。</li>
+<li>等待队列：已经拿到锁的线程在等待其他资源时，主动释放锁，置入该对象等待队列中，等待被唤醒。</li>
+</ul>
+</li>
+</ol>
+<p><img src="/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/image-20230307152802376.png" alt="image-20230307152802376"><br>如上图所示：</p>
+<ol>
+<li>WaitThread 首先获取了对象的锁，然后调用对象的 wait() 方法，从而放弃了锁并进入了对象的等待队列 WaitQueue 中，进入等待状态。</li>
+<li>由于 WaitThread 释放了对象的锁，NotifyThread 随后获取了对象的锁，在执行完自己的任务后，并调用对象的 notify() 方法，将WaitThread 从 WaitQueue 移到 SynchronizedQueue 中，此时WaitThread 的状态变为 BLOCKED 状态。</li>
+<li>NotifyThread 释放了锁之后，WaitThread 再次获取到锁并从 wait() 方法返回继续执行。</li>
+</ol>
+<p>sleep() 和 wait() 的区别：</p>
+<ul>
+<li>释放锁时机不同：wait() 释放锁，sleep() 不释放锁。</li>
+<li>用法不同：sleep() 是 Thread 类的静态方法，在任何地方都能使用；wait() 是 Object 类的方法，必须放在 synchronized 块里面。</li>
+<li>苏醒不同：sleep() 方法睡眠指定时间之后，线程会自动苏醒；<br>wait() 方法被调用后，可以通过 notify() 或 notifyAll() 来唤醒。</li>
+<li>使用场景不同：sleep() 一般用于当前线程休眠，或者轮循暂停操作；wait() 则多用于多线程之间的通信。</li>
+</ul>
+<h3 id="interrupt"><a href="#interrupt" class="headerlink" title="interrupt()"></a>interrupt()</h3><p><code>当前线程里调用其它线程的interrupt()方法</code>。通过调用一个线程的 interrupt() 来中断该线程，如果该线程处于BLOCKED、WAITING 或者TIME_WAITING 状态，那么就会抛出 InterruptedException，从而提前结束该线程。但是不能中断 I&#x2F;O 阻塞和 synchronized 锁阻塞。</p>
+<h3 id="LockSupport"><a href="#LockSupport" class="headerlink" title="LockSupport"></a>LockSupport</h3><p>LockSupport 是 <code>rt.jar</code> 提供的工具类，用于阻塞或唤醒一个线程，是构建同步组件（AQS、Condition等）的基础工具。LockSupport 定义了一组的公共静态方法，以 <code>park</code> 开头的方法用来阻塞当前线程，以及 <code>unpark(Thread thread)</code>方法来唤醒一个被阻塞的线程。下面是主要函数：</p>
+<ul>
+<li><code>void park()</code>: 阻塞当前线程，如果调用 unpark(Thread thread) 方法或者当前线程被中断，才能从 park()方法返回。</li>
+<li><code>void parkNanos(long nanos)</code>: 阻塞当前线程，最长不超过 nanos 纳秒，返回条件在park() 的基础上增加了超时返回。</li>
+<li><code>void parkUntil(long deadline)</code>: 阻塞当前线程，知道 deadline 时间 （从 1970 年开始到 deadline 时间的毫秒数）。</li>
+<li><code>void unpark(Thread thread)</code>: 唤醒处于阻塞状态的线程 thread。</li>
+<li><code>void park(Object blocker)</code>: 阻塞当前线程，blocker 用来标识当前线程在等待的对象，<code>该对象主要用于问题排查和系统监控</code>。</li>
+<li><code>parkNanos(Object blocker, long nanos)</code>: 比 void park(Object blocker) 增加一个超时时间。</li>
+<li><code>parkUntil(Object blocker, long deadline)</code>: 比 void parkUntil(long deadline)  多一个阻塞当前对象。</li>
+</ul>
+<p><code>LockSupport 的 park 类方法不需要获得锁就可以让线程进入 WAITING/TIMED_WAITING 状态</code>，因此可以在任何地方执行，比 wait 方法更灵活。</p>
+<h3 id="Condition"><a href="#Condition" class="headerlink" title="Condition"></a>Condition</h3><p>任意一个 Java 对象，都拥有一组监视器方法（定义在java.lang.Object上），主要包括 wait()、wait(long timeout)、notify() 以及 notifyAll() 方法，这些方法与 synchronized 同步关键字配合，可以实现等待&#x2F;通知模式。</p>
+<p>Condition 接口也提供了类似 Object 的监视器方法，await()、signal() 和 signalAll() 方法分别对应 Object 的 wait()、notify() 和 notifyAll() 方法。Condition 底层是使用 LockSupport 工具来实现的。</p>
+<p>Condition 的主要函数有：</p>
+<ul>
+<li><code>void await()</code>：当前线程进入等待状态直到被通知（signal）或中断。如果当前等待线程从 await() 方法返回，那么表明该线程已经获取了Condition 对象所对应的锁。当前线程从 await() 方法返回的情况包括：1、其他线程调用该 Condition 的 signal() 或 signalAll() 方法 ，而当前线程被选中唤醒；2、其他线程调用 Interrupt()方法中断当前线程</li>
+<li><code>void awaitUninterruptibly()</code>：当前线程进入等待状态被通知，从方法返回名称上可以看出该方法对中断不敏感</li>
+<li><code>long awaitNanos(long nanosTimeout)</code>：当前线程进入等待状态直到被通知，中断或者超时。返回值表示剩余的时间，如果在 nanosTimeout 纳秒之前被唤醒，那么返回值就是 （nanosTimeout-实际耗时）。如果返回 0 或者负数，那么可以认定已经超时了</li>
+<li><code>boolean awaitUntil(Date deadline)</code>：当前线程进入等待状态知道被通知、中断或者到某一个时间。如果没有到指定时间就被通知，方法返回 true ，否则，表示到了指定时间，方法返回 false。</li>
+<li><code>void signal()</code>：唤醒一个等待在 Condition 上的线程，该线程从等待方法返回前必须获得与 Condition 相关的锁</li>
+<li><code>void signalAll()</code>：唤醒所有等待在 Condition 上的线程，能够从等待方法返回的线程必须获得与 Condition相关的锁</li>
+</ul>
+<p>Condition 一般和 Lock 的实现类一起搭配使用，获取一个 Condition 必须通过 Lock 的 <code>newCondition()</code> 方法。</p>
+<blockquote>
+<p>Thread.sleep()、Object.wait() 和 LockSupport.park() 的区别？</p>
+</blockquote>
+<p>这三个方法都会使线程变成 <code>WAITING</code> 状态，他们的区别是：</p>
+<ol>
+<li>锁资源：Thread.sleep() 和 LockSupport.park() 不会释放占有的锁；Object.wait() 会释放占有的锁。</li>
+<li>传参：Thread.sleep() 必须传入时间，时间了会自动唤醒，然后继续执行；LockSupport.park()&#x2F;Object.wait() 可传可不传，不传会一直阻塞下去，直到被另外一个线程使用。Object.notify()&#x2F;LockSupport.unpark() 唤醒。</li>
+<li>唤醒执行：Thread.sleep()时间到了会继续执行；LockSupport.park()超时或者被LockSupport.unpark()唤醒后也会立刻执行；Object.wait()超时了或者被 Object.notify() 不一定会立刻执行，要等到获取锁资源才会立刻执行。</li>
+<li>使用场地：Thread.sleep() 和 LockSupport.park() 都是静态方法，可以随时执行，Object.wait()需要使用 synchronized 获取锁才能执行。</li>
+<li>异常：Thread.sleep() 和 Object.wait() 需要捕获异常，LockSupport.park()不需要捕获中断异常。</li>
+<li>实现：Thread.sleep() 和 Object.wait() 本身就是 native 方法；LockSupport.park() 底层是调用的 Unsafe 的 native 方法。</li>
+</ol>
+<blockquote>
+<p>Object.wait()和Condition.await()，以及Object.notify()和Condition.signal()的区别？</p>
+</blockquote>
+<p>Object.wait()和Condition.await()的原理是基本一致的，不同的是Condition.await()底层是调用LockSupport.park()来实现阻塞当前线程的。 实际上，它在阻塞当前线程之前还干了两件事，一是把当前线程添加到条件队列中，二是“完全”释放锁，也就是让state状态变量变为0，然后才是调用LockSupport.park()阻塞当前线程。</p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><h3 id="等待-x2F-通知的经典范式"><a href="#等待-x2F-通知的经典范式" class="headerlink" title="等待&#x2F;通知的经典范式"></a>等待&#x2F;通知的经典范式</h3><p>等待方遵循如下原则：</p>
+<ol>
+<li>获取对象的锁。</li>
+<li>如果条件不满足，那么调用对象的wait()方法，被通知后仍要检查条件。</li>
+<li>条件满足则执行对应的逻辑。</li>
+</ol>
+<p>对应的伪代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">synchronized</span>(对象) &#123;</span><br><span class="line">    <span class="keyword">while</span>(条件不满足) &#123;</span><br><span class="line">        对象.wait();</span><br><span class="line">    &#125; 对应的处理逻辑</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通知方遵循如下原则。</p>
+<ol>
+<li>获得对象的锁。</li>
+<li>改变条件。</li>
+<li>通知所有等待在对象上的线程。</li>
+</ol>
+<p>对应的伪代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">synchronized</span>(对象) &#123;</span><br><span class="line">    改变条件</span><br><span class="line">    对象.notifyAll();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/02/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" rel="prev" title="Java并发系列（一）：Java内存模型">
+      <i class="fa fa-chevron-left"></i> Java并发系列（一）：Java内存模型
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/07/Java%E5%B9%B6%E5%8F%91%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" rel="next" title="Java并发系列（三）：底层原理">
+      Java并发系列（三）：底层原理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81"><span class="nav-number">1.</span> <span class="nav-text">线程状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">线程的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">线程方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#start"><span class="nav-number">3.1.</span> <span class="nav-text">start()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yield"><span class="nav-number">3.2.</span> <span class="nav-text">yield()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sleep-long-millis"><span class="nav-number">3.3.</span> <span class="nav-text">sleep(long millis)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#join-x2F-join-long-millis"><span class="nav-number">3.4.</span> <span class="nav-text">join()&#x2F;join(long millis)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wait-notify-notifyAll"><span class="nav-number">3.5.</span> <span class="nav-text">wait() notify() notifyAll()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#interrupt"><span class="nav-number">3.6.</span> <span class="nav-text">interrupt()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LockSupport"><span class="nav-number">3.7.</span> <span class="nav-text">LockSupport</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Condition"><span class="nav-number">3.8.</span> <span class="nav-text">Condition</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%94%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%89%E5%BE%85-x2F-%E9%80%9A%E7%9F%A5%E7%9A%84%E7%BB%8F%E5%85%B8%E8%8C%83%E5%BC%8F"><span class="nav-number">4.1.</span> <span class="nav-text">等待&#x2F;通知的经典范式</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
