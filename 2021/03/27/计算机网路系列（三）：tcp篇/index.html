@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="计算机网路系列（三）：tcp篇">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网路系列（三）：tcp篇">
+<meta property="og:url" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="计算机网路系列（三）：tcp篇">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230319214213819.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230319214229334.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230319214251423.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606232951407.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233026823.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233048027.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233101407.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233129431.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233247296.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233310097.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233329185.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233417173.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233436577.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233456890.png">
+<meta property="og:image" content="evernotecid://1A77DB63-CEBF-4C5E-B653-7DD2D90B3827/appyinxiangcom/9108333/ENResource/p6912">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233541767.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233618052.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233646633.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233702008.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233723745.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233742771.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233801771.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233828155.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233844756.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233904584.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233919277.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233936925.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233951694.png">
+<meta property="og:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606234004574.png">
+<meta property="article:published_time" content="2021-03-27T13:36:20.000Z">
+<meta property="article:modified_time" content="2023-07-05T08:22:55.134Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230319214213819.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>计算机网路系列（三）：tcp篇 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机网路系列（三）：tcp篇
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-27 21:36:20" itemprop="dateCreated datePublished" datetime="2021-03-27T21:36:20+08:00">2021-03-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-05 16:22:55" itemprop="dateModified" datetime="2023-07-05T16:22:55+08:00">2023-07-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/" class="post-meta-item leancloud_visitors" data-flag-title="计算机网路系列（三）：tcp篇" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>计算机网路系列（三）：tcp篇</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="tcp是什么"><a href="#tcp是什么" class="headerlink" title="tcp是什么"></a>tcp是什么</h2><p>TCP 工作在传输层，是面向连接的、可靠的、基于字节流的传输层通信协议。这次有三个重要概念：</p>
+<ul>
+<li><strong>面向连接</strong>：一定是「一对一」才能连接，不能像 UDP 协议可以一个主机同时向多个主机发送消息。</li>
+<li><strong>可靠的</strong>：无论的网络链路中出现了怎样的链路变化，TCP 都可以保证一个报文一定能够到达接收端;</li>
+<li><strong>字节流</strong>：消息是「没有边界」的，所以无论我们消息有多大都可以进行传输。并且消息是「有序的」，当 「前一个」消息没有收到的时候，即使它先收到了后面的字节，那么也不能扔给应用层去处理，同时对「重复」的报文会自动丢弃。</li>
+</ul>
+<h2 id="tcp格式"><a href="#tcp格式" class="headerlink" title="tcp格式"></a>tcp格式</h2><p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230319214213819.png" alt="image-20230319214213819"></p>
+<p>重要字段解析：</p>
+<ul>
+<li><code>源端口号</code>&#x2F;<code>目标端口号</code>：注意tcp协议只指定端口号，ip地址在ip层。</li>
+<li><code>序列号</code>：在建立连接时由计算机生成的随机数作为其初始值，通过 SYN 包传给接收端主机，每发送一次数据，就 「累加」一次该「数据字节数」的大小。用来解决网络包乱序问题。</li>
+<li><code>确认应答号</code>：指下一次「期望」收到的数据的序列号，发送端收到这个确认应答以后可以认为在这个序号以前的数据都已经被正常接收。用来解决不丢包的问题。</li>
+<li><code>窗口大小</code>：服务器向客户端返回的滑动窗口大小，表示服务器当前可以接受的数据量大小，用于流量控制。</li>
+<li><code>控制位</code>:<ul>
+<li><code>ACK</code>：该位为 1 时，「确认应答」的字段变为有效，TCP 规定除了最初建立连接时的 SYN 包之外该位必 须设置为 1 。</li>
+<li><code>RST</code>：该位为 1 时，表示 TCP 连接中出现异常必须强制断开连接。</li>
+<li><code>SYN</code>：该位为 1 时，表示希望建立连接，并在其「序列号」的字段进行序列号初始值的设定。</li>
+<li><code>FIN</code>：该位为 1 时，表示今后不会再有数据发送，希望断开连接。当通信结束希望断开连接时，通信双方的 主机之间就可以相互交换 FIN 位为 1 的 TCP 段。</li>
+</ul>
+</li>
+</ul>
+<p>TCP 四元组可以唯一的确定一个连接，四元组包括如下：</p>
+<ul>
+<li>源地址</li>
+<li>源端口</li>
+<li>目的地址</li>
+<li>目的端口</li>
+</ul>
+<p>源地址和目的地址的字段(32位)是在 IP 头部中，作用是通过 IP 协议发送报文给对方主机。<br>源端口和目的端口的字段(16位)是在 TCP 头部中，作用是告诉 TCP 协议应该把报文发给哪个进程。</p>
+<h3 id="MTU和MSS"><a href="#MTU和MSS" class="headerlink" title="MTU和MSS"></a>MTU和MSS</h3><p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230319214229334.png" alt="image-20230319214229334"></p>
+<p><code>MTU</code>：一个网络包的最大⻓度，以太网中一般为 1500 字节;<br><code>MSS</code>：除去 IP 和 TCP 头部之后，一个网络包所能容纳的 TCP 数据的最大⻓度;</p>
+<p>当 IP 层有一个超过 MTU 大小的数据要发送，那么 IP 层就要进行分片，把数据分片成 若干片，保证每一个分片都小于 MTU。把一份 IP 数据报进行分片以后，由目标主机的 IP 层来进行􏰁新组装后，再交给上一层 TCP 传输层。但是注意 <code>IP 层没有超时重传等纠错机制</code>，如果一个 IP 分片丢失，整个 IP 报文的所有分片都得重传。</p>
+<p>为了只重传丢失的数据，我们会在 TCP 层把超过 MSS 大小的数据提前进行数据分片，确保最后在 IP 层组装分片长度不会大于 MTU，自然也就不用 IP 分片了。</p>
+<p>经过 TCP 层分片后，如果一个 TCP 分片丢失后，进行重发时也是以 MSS 为单位，而不用重传所有的分片，大大增加了重传的效率。</p>
+<h3 id="tcp和udp的区别"><a href="#tcp和udp的区别" class="headerlink" title="tcp和udp的区别"></a>tcp和udp的区别</h3><p>UDP 不提供复杂的控制机制，利用 IP 提供面向「无连接」的通信服务。UDP 协议真的非常简，头部只有 8 个字节( 64 位)。<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230319214251423.png" alt="image-20230319214251423"></p>
+<ul>
+<li>目标和源端口：主要是告诉 UDP 协议应该把报文发给哪个进程。</li>
+<li>包⻓度：该字段保存了 UDP 首部的⻓度跟数据的⻓度之和。</li>
+<li>校验和：校验和是为了提供可靠的 UDP 首部和数据而设计。</li>
+</ul>
+<p>TCP 和 UDP 区别：</p>
+<ol>
+<li>连接<ul>
+<li>TCP 是面向连接的传输层协议，传输数据前先要建立连接。</li>
+<li>UDP 是不需要连接，即刻传输数据。</li>
+</ul>
+</li>
+<li>服务对象<ul>
+<li>TCP 是一对一的两点服务，即一条连接只有两个端点。</li>
+<li>UDP 支持一对一、一对多、多对多的交互通信</li>
+</ul>
+</li>
+<li>可靠性<ul>
+<li>TCP 是可靠交付数据的，数据可以无差错、不丢失、不重复、按需到达。 </li>
+<li>UDP 是尽最大努力交付，不保证可靠交付数据。</li>
+</ul>
+</li>
+<li>拥塞控制、流量控制<ul>
+<li>TCP 有拥塞控制和流量控制机制，保证数据传输的安全性。</li>
+<li>UDP 则没有，即使网络非常拥堵了，也不会影响 UDP 的发送速率。</li>
+</ul>
+</li>
+<li>首部开销<ul>
+<li>TCP 首部⻓度较⻓，会有一定的开销，首部在没有使用「选项」字段时是20个字节，如果使用了「选项」字段则会变⻓的。</li>
+<li>UDP 首部只有 8 个字节，并且是固定不变的，开销较小。</li>
+</ul>
+</li>
+<li>传输方式<ul>
+<li>TCP 是流式传输，没有边界，但保证顺序和可靠。</li>
+<li>UDP 是一个包一个包的发送，是有边界的，但可能会丢包和乱序。</li>
+</ul>
+</li>
+<li>分片不同<ul>
+<li>TCP 的数据大小如果大于 MSS 大小，则会在传输层进行分片，目标主机收到后，也同样在传输层组装 TCP数据包，如果中途丢失了一个分片，只需要传输丢失的这个分片。</li>
+<li>UDP 的数据大小如果大于 MTU 大小，则会在 IP 层进行分片，目标主机收到后，在 IP 层组装完数据，接着再传给传输层，但是如果中途丢了一个分片，在实现可靠传输的 UDP 时则就需要重传所有的数据包，这样 传输效率非常差，所以通常 UDP 的报文应该小于 MTU。</li>
+</ul>
+</li>
+</ol>
+<p>tcp为什么是可靠的协议？</p>
+<ul>
+<li>三次握手和四次挥手保证连接是可靠的。</li>
+<li>基于序列号的确认应答机制，保证数据包的有序性。</li>
+<li>对于没有收到数据包，提供重传机制。</li>
+<li>为了协调发送方的发送包和接收方的接收包的速度，提供流量控制机制。</li>
+<li>为了维护网络环境的稳定，提供拥塞控制机制。</li>
+</ul>
+<h2 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h2><p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606232951407.png" alt="image-20230606232951407"></p>
+<ul>
+<li>一开始，客户端和服务端都处于 <code>CLOSED</code> 状态。先是服务端主动监听某个端口，处于 <code>LISTEN</code> 状态。</li>
+</ul>
+<p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233026823.png" alt="image-20230606233026823"></p>
+<ul>
+<li>客户端会随机初始化序号( <code>client_isn</code> )，将此序号置于 TCP 首部的「序号」字段中，同时把 <code>SYN</code> 标志 位置为 <code>1</code> ，表示 <code>SYN</code> 报文。接着把第一个 SYN 报文发送给服务端，表示向服务端发起连接，该报文不 包含应用层数据，之后客户端处于 <code>SYN-SENT</code> 状态。</li>
+</ul>
+<p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233048027.png" alt="image-20230606233048027"></p>
+<ul>
+<li>服务端收到客户端的 <code>SYN</code> 报文后，首先服务端也随机初始化自己的序号( <code>server_isn</code> )，将此序号填入 TCP 首部的「序号」字段中，其次把 TCP 首部的「确认应答号」字段填入 <code>client_isn + 1</code> , 接着把 <code>SYN</code> 和 <code>ACK</code> 标志位置为 <code>1</code> 。最后把该报文发给客户端，该报文也不包含应用层数据，之后服务端处于 <code>SYN-RCVD</code> 状态。</li>
+</ul>
+<p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233101407.png" alt="image-20230606233101407"></p>
+<ul>
+<li>客户端收到服务端报文后，还要向服务端回应最后一个应答报文，首先该应答报文 TCP 首部 <code>ACK</code> 标志位 置为 <code>1</code> ，其次「确认应答号」字段填入 <code>server_isn + 1</code> ，最后把报文发送给服务端，这次报文可以携带客 户到服务器的数据，之后客户端处于 <code>ESTABLISHED</code> 状态。</li>
+<li>服务器收到客户端的应答报文后，也进入 <code>ESTABLISHED</code> 状态。</li>
+</ul>
+<p>一旦完成三次握手，双方都处于 ESTABLISHED 状态，此时连接就已建立完成，客户端和服务端就可以相互发送 数据了。<br>注意：第三次握手是可以携带数据的，前两次握手是不可以携带数据的。</p>
+<h3 id="为什么握手是三次，不是两次，四次？"><a href="#为什么握手是三次，不是两次，四次？" class="headerlink" title="为什么握手是三次，不是两次，四次？"></a>为什么握手是三次，不是两次，四次？</h3><p>三次握手的主要原因：<code>为了防止旧的重复连接初始化造成混乱</code>。<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233129431.png" alt="image-20230606233129431"></p>
+<p>假如网络拥堵，客户端发送的 <code>SYN</code> 报文，或者服务器返回的 <code>SYN+ACK</code> 报文都有可能发生拥堵或者丢失，客户端特定时间内收不到报文触发超时重传，会再次发送SYN报文。</p>
+<p>假如客户端已经发送了多个 <code>SYN</code> 报文，目前收到了一个 <code>SYN+ACK</code> 报文。使用三次握手的机制，客户端有足够的上下文来判断这个报文是否属于历史连接：</p>
+<ul>
+<li>如果是历史连接(序列号过期或超时)，则第三次握手发送的报文是 <code>RST</code> 报文，以此中止历史连接。</li>
+<li>如果不是历史连接，则第三次发送的报文是 <code>ACK</code> 报文，通信双方就会成功建立连接。</li>
+</ul>
+<p>为什么不是两次？<br>两次握手连接不能判断当前连接是否是历史连接。假如双方正常通信已经完成了，过了一段时间后客户端突然收到一个 <code>SYN+ACK</code> 旧报文。如果是两次握手的话这时候双方会建立起通信，但事实上双方通信已经完成了，这个报文属于脏数据，这次通信不应该被建立。</p>
+<p>为什么不是四次？<br>在第二次握手里面，服务器已经把<code>确认客户端序列号</code>和<code>发送自己的序列号</code>合并为一个步骤，所以相当于四次握手简化为三次握手了。<br>在第三次握手之后，就已经理论上最少可靠连接建立，所以不需要使用更多的通信次数。</p>
+<h3 id="半连接队列和全连接队列"><a href="#半连接队列和全连接队列" class="headerlink" title="半连接队列和全连接队列"></a>半连接队列和全连接队列</h3><p>在 TCP 三次握手的时候，Linux 内核会维护两个队列，分别是：</p>
+<ul>
+<li>半连接队列，也称 SYN 队列</li>
+<li>全连接队列，也称 accepet 队列</li>
+</ul>
+<p>服务端收到客户端发起的 SYN 请求后，<code>内核会把该连接存储到半连接队列</code>，并向客户端响应 SYN+ACK，接着客户端会返回 ACK，服务端收到第三次握手的 ACK 后，<code>内核会把连接从半连接队列移除，然后创建新的完全的连 接，并将其添加到 accept 队列，等待进程调用 accept 函数时把连接取出来</code>。</p>
+<p>不管是半连接队列还是全连接队列，都有最大⻓度限制，超过限制时，内核会直接丢弃，或返回 RST 包。</p>
+<p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233247296.png" alt="image-20230606233247296"></p>
+<h3 id="SYN攻击"><a href="#SYN攻击" class="headerlink" title="SYN攻击"></a>SYN攻击</h3><p>假设攻击者短时间伪造不同 IP 地址的 SYN 报文，服务端每接收到 一个 SYN 报文，就进入 SYN_RCVD 状态，但服务端发送出去的 ACK + SYN 报文，无法得到未知 IP 主机的 ACK 应答，久而久之就会占满服务端的 SYN 接收队列，使得服务器不能为正常用户服务。</p>
+<p>避免SYN攻击的策略：启用 <code>net.ipv4.tcp_syncookies</code> 参数。</p>
+<p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233310097.png" alt="image-20230606233310097"></p>
+<ul>
+<li>当 「 SYN 队列」满之后，后续服务器收到 SYN 包，不进入「 SYN 队列」</li>
+<li>计算出一个 cookie 值，再以 SYN + ACK 中的「序列号」返回客户端，</li>
+<li>服务端接收到客户端的应答报文时，服务器会检查这个 ACK 包的合法性。如果合法，直接放入到「 Accept 队列」。</li>
+<li>最后应用通过调用 accpet() socket 接口，从「 Accept 队列」取出的连接。</li>
+</ul>
+<h3 id="tcp的保活机制"><a href="#tcp的保活机制" class="headerlink" title="tcp的保活机制"></a>tcp的保活机制</h3><p>已经建立好的 TCP 连接，如果长时间没有数据交互，就会触发<code>保活机制</code>。这个机制的原理是这样的：</p>
+<p>定义一个时间段，在这个时间段内，如果没有任何连接相关的活动，TCP 保活机制会开始作用，每隔一个时间间隔，发送一个探测报文，该探测报文包含的数据非常少，如果连续几个探测报文都没有得到响应，则认为当前的 TCP 连接已经死亡，系统内核将错误信息通知给上层应用程序。</p>
+<p>在 Linux 内核可以有对应的参数可以设置保活时间、保活探测的次数、保活探测的时间间隔，以下都为默认值：</p>
+<ul>
+<li>tcp_keepalive_time&#x3D;7200：表示保活时间是 7200 秒(2小时)，也就 2 小时内如果没有任何连接相关的活动，则会启动保活机制</li>
+<li>tcp_keepalive_intvl&#x3D;75：表示每次检测间隔 75 秒;</li>
+<li>tcp_keepalive_probes&#x3D;9：表示检测 9 次无响应，认为对方是不可达的，从而中断本次的连接。</li>
+</ul>
+<p>也就是说在 Linux 系统中，最少需要经过 2 小时 11 分 15 秒才可以发现一个「死亡」连接。</p>
+<h2 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h2><p>tcp连接断开通过四次挥手完成。注意和三次挥手不同，三次挥手只能由客户端发起，而四次挥手双方都可以主动断开连接，断开连接后主机中的「资源」将被释放。<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233329185.png" alt="image-20230606233329185"></p>
+<ul>
+<li>客户端打算关闭连接，此时会发送一个 TCP 首部 FIN 标志位被置为 1 的报文，也即 FIN 报文，之后客户端进入 FIN_WAIT_1 状态。</li>
+<li>服务端收到该报文后，就向客户端发送 ACK 应答报文，接着服务端进入 CLOSED_WAIT 状态。</li>
+<li>客户端收到服务端的 ACK 应答报文后，之后进入 FIN_WAIT_2 状态。 </li>
+<li>等待服务端处理完数据后，也向客户端发送 FIN 报文，之后服务端进入 LAST_ACK 状态。</li>
+<li>客户端收到服务端的 FIN 报文后，回一个 ACK 应答报文，之后进入 TIME_WAIT 状态。</li>
+<li>服务器收到了 ACK 应答报文后，就进入了 CLOSED 状态，至此服务端已经完成连接的关闭。</li>
+<li>客户端在经过 2MSL 一段时间后，自动进入 CLOSED 状态，至此客户端也完成连接的关闭。</li>
+</ul>
+<h3 id="为什么挥手是四次？"><a href="#为什么挥手是四次？" class="headerlink" title="为什么挥手是四次？"></a>为什么挥手是四次？</h3><ul>
+<li>关闭连接时，客户端向服务端发送 FIN 时，仅仅表示客户端不再发送数据了但是还能接收数据。</li>
+<li>服务器收到客户端的 FIN 报文时，先回一个 ACK 应答报文，而服务端可能还有数据需要处理和发送，等服务端不再发送数据时，才发送 FIN 报文给客户端来表示同意现在关闭连接。</li>
+</ul>
+<p>所以每个方向都需要一个 FIN 和一个 ACK，而服务端的 ACK 和 FIN 一般都会分开发送，从而比三次握手导致多了一次。</p>
+<h3 id="为什么需要TIME-WAIT？"><a href="#为什么需要TIME-WAIT？" class="headerlink" title="为什么需要TIME_WAIT？"></a>为什么需要TIME_WAIT？</h3><p>主动发起关闭连接的一方，才会有 <code>TIME-WAIT</code> 状态。<br>需要 <code>TIME-WAIT</code> 状态的原因：</p>
+<ul>
+<li>防止旧的数据包被接收。如果 TIME-WAIT 过短或者没有，假如网络拥堵，关闭本次连接再重新打开连接之后，旧连接的数据包才到达，就会造成数据混乱。而足够长的 TIME-WAIT 足以<code>让两个方向上的数据包都被丢弃，使得原来连接的数据包在网络中都自然消失，再出现的数据包一定都是新建立连接所产生的</code>。<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233417173.png" alt="image-20230606233417173"></li>
+<li>防止数据包丢失导致被动关闭方不能正常关闭。四次挥手的最后一个 ACK 报文如果在网络中被丢失了，此时如果客户端 TIME-WAIT 过短或没有，则就直接进入了 CLOSED 状态了，那么服务端则会一直处在 LASE_ACK 状态。后面客户端和服务端就不能正常建立连接。而足够长的 TIME-WAIT 可以保证<code>服务端没有收到四次挥手的最后一个 ACK 报文时，则会重发 FIN 关闭连接报文并等待新的 ACK 报文，从而帮助双方都正确关闭</code>。<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233436577.png" alt="image-20230606233436577"></li>
+</ul>
+<h3 id="为什么TIME-WAIT的时间是2MSL？"><a href="#为什么TIME-WAIT的时间是2MSL？" class="headerlink" title="为什么TIME_WAIT的时间是2MSL？"></a>为什么TIME_WAIT的时间是2MSL？</h3><p>MSL 是 Maximum Segment Lifetime，报文最大生存时间，它是<code>任何报文在网络上存在的最⻓时间，超过这个时 间报文将被丢弃</code>。在 Linux 系统里 2MSL 默认是 60 秒，那么一个 MSL 也就是 30 秒。Linux 系统停留在 TIME_WAIT 的时 间为固定的 60 秒。</p>
+<p>为什么TIME_WAIT的时间是2MSL？比较合理的解释是: 网络中可能存在来自发送方的数据包，当这些发送方的数据包被接收方处理后又会向对方发送响应，所以一来一回需要等待 2 倍的时间。设置2MSL的时间，可以保证发送方发出去的数据都收到响应。</p>
+<p>2MSL 的时间是从客户端接收到 FIN 后发送 ACK 开始计时的。如果在 TIME-WAIT 时间内，因为客户端的 ACK 没有传输到服务端，客户端又接收到了服务端􏰁发的 FIN 报文，那么 2MSL 时间将重新计时。</p>
+<h3 id="TIME-WAIT过多的危害和优化"><a href="#TIME-WAIT过多的危害和优化" class="headerlink" title="TIME_WAIT过多的危害和优化"></a>TIME_WAIT过多的危害和优化</h3><p>发送方过多的 TIME-WAIT 状态的 TCP 连接会占用有限的端口资源，一般可以开启的端口为 <code>32768~61000</code>。如果发起连接一方的 TIME_WAIT 状态过多，占满了所有端口资源，则会导致无法创建新连接。</p>
+<p>优化 TIME_WAIT 的方法：</p>
+<ul>
+<li>复用处于 TIME_WAIT 的 socket 为新的连接所用。客户端在调用 connect() 函数时，内核会随机找一个 time_wait 状态超过 1 秒的连接给新的连接复用。使用 net.ipv4.tcp_tw_reuse 和 net.ipv4.tcp_timestamps 参数。</li>
+</ul>
+<h2 id="重传机制"><a href="#重传机制" class="headerlink" title="重传机制"></a>重传机制</h2><p>TCP 针对数据包丢失的情况，会用<code>重传机制</code>解决。<br>常⻅的重传机制:</p>
+<ul>
+<li>超时重传</li>
+<li>快速重传</li>
+<li>选择重传</li>
+</ul>
+<h3 id="超时重传"><a href="#超时重传" class="headerlink" title="超时重传"></a>超时重传</h3><p>发送数据时，设定一个定时器，当超过指定的时间后，没有收到对方的 ACK 确认应答报文，就会重发该数据，这就是<code>超时重传</code>。</p>
+<p>超时重传有两个重要概念：</p>
+<ul>
+<li><code>RTT</code> (Round-Trip Time)：往返时间，也就是从数据发出去到接收响应所需的时间。</li>
+<li><code>RTO</code> (Retransmission Timeout)：超时重传时间。</li>
+</ul>
+<p>RTO 的值会影响重传机制的效率：</p>
+<ul>
+<li>当超时时间 RTO 较大时，􏰁发就慢，丢了老半天才重发，没有效率，性能差;</li>
+<li>当超时时间 RTO 较小时，会导致可能并没有丢就重发，于是重发的就快，会增加网络拥塞，导致更多的超时，更多的超时导致更多的重发。</li>
+</ul>
+<p>理论上<code>超时重传时间 RTO 的值应该略大于报文往返 RTT 的值</code>。</p>
+<p>实际上「报文往返 RTT 的值」是经常变化的，因为我们的网络也是时常变化的。也就因为「报文往返 RTT 的值」是经常波动变化的，所以「超时重传时间 RTO 的值」应该是一个动态变化的值。</p>
+<h3 id="快速重传"><a href="#快速重传" class="headerlink" title="快速重传"></a>快速重传</h3><p>如果丢失的数据包都等超时时间到了才进行重传，有时候未免太慢了。所以还有另外一套重传机制：<code>快速重传</code>。<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233456890.png" alt="image-20230606233456890"></p>
+<p>快速重传机制的核心思想就是：<code>发送方当收到三个相同的 ACK 报文时，会在定时器过期之前，重传丢失的报文段</code>。</p>
+<h3 id="选择重传"><a href="#选择重传" class="headerlink" title="选择重传"></a>选择重传</h3><p>快速重传虽然解决了重传缓慢的问题，但是面临重传什么包的问题。例如收到三个同样的ACK，只能说明这个ACK对应的包丢失了，但是并不知道这三个ACK是哪些发出去的包返回的，也就是不知道服务器已经收到了哪些包。<code>在快速重传的基础上，返回最近收到的报文段的序列号范围，这样客户端就知道哪些数据包已经到达服务器了</code>，这就是<code>选择重传</code>。</p>
+<h4 id="SACK机制"><a href="#SACK机制" class="headerlink" title="SACK机制"></a>SACK机制</h4><p>选择重传基于 <code>SACK(Selective Acknowledgment)</code> 机制。SACK 机制需要双方支持。<br>在 TCP 头部「选项」字段里加一个 SACK 的东⻄，它可以将缓存的地图发送给发送方，这样发送方就可以知道哪些数据收到了，哪些数据没收到，知道了这些信息，就可以只重传丢失的数据。</p>
+<p><img src="evernotecid://1A77DB63-CEBF-4C5E-B653-7DD2D90B3827/appyinxiangcom/9108333/ENResource/p6912" alt="f10efb2279852cda09e3f820464f8d3e.png"></p>
+<p>例如发送方收到了三次同样的 ACK 确认报文，于是就会触发快速重发机制，通过 SACK 信息发现只有 200~299 这段数据丢失，则重发时，就只选择了这个 TCP 段进行重复。</p>
+<h4 id="D-SACK机制"><a href="#D-SACK机制" class="headerlink" title="D-SACK机制"></a>D-SACK机制</h4><p>D-SACK，即重复SACK，对SACK机制进行扩展，使得扩展后的SACK可以告知发送方有哪些数据包自己重复接收了。引入D-SACK的目的是使TCP进行更好的流控：</p>
+<ul>
+<li>让发送方知道，是发送的包丢了，还是返回的ACK包丢了；</li>
+<li>网络上是否出现了包失序；</li>
+<li>数据包是否被网络上的路由器复制并转发了</li>
+<li>是不是自己的timeout太小了，导致重传</li>
+</ul>
+<p>D-SACK的规则如下：</p>
+<ol>
+<li>第一个段将包含重复收到的报文段的序号</li>
+<li>跟在D-SACK之后的SACK将按照SACK的方式工作</li>
+<li>如果有多个被重复接收的报文段，则D-SACK只包含其中第一个</li>
+</ol>
+<p>如何判断是普通SACK还是D-SACK？D-SACK使用了<code>SACK的第一个段</code>来作为判断标准：</p>
+<ol>
+<li>如果SACK的第一个段的范围被ACK所覆盖，那么就是D-SACK</li>
+<li>如果SACK的第一个段的范围被SACK的第二个段覆盖，那么就是D-SACK</li>
+</ol>
+<p>例如：<br>1、满足第一个判断标准<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233541767.png" alt="image-20230606233541767"><br>由于ACK 4000大于[3000,3500]，因此[4000, SACK&#x3D;3000-3500]是D-SACK。发送端首先向接收端发送了3000-3499,3500-3999报文，接收端都收到了，但是接收端返回的ACK 3500及4000都丢失，导致发送端重传了3000-3499报文。接收端收到发送端重新发送的3000-3499报文，通过[4000，SACK&#x3D;3000-3500]告知发送端，发送端就知道第一次的3000-3499报文接收端是收到了，由于当前ACK到了4000，那么4000之前的数据也都收到了。</p>
+<p>2、满足第二个判断标准<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233618052.png" alt="image-20230606233618052"></p>
+<p>由于第一个段[5000-5500]被第二个段[4500-5500]所覆盖，所以[4000, SACK&#x3D;5000-5500, 4500-5500]是D-SACK，而前面的[4000, SACK&#x3D;4500-5000]及[4000, SACK&#x3D;4500-5500]都是普通的SACK。含义是4000前的包收到，5000-5499包重复收到，4500-5500的包都收到，4000-4499的包丢失。</p>
+<h2 id="流量控制"><a href="#流量控制" class="headerlink" title="流量控制"></a>流量控制</h2><p>发送方不能无脑的发数据给接收方，要考虑接收方处理能力。<br>如果一直无脑的发数据给对方，但对方处理不过来，那么就会导致触发重发机制，从而导致网络流量的无端的浪费。</p>
+<p>为了解决这种现象发生，<code>TCP 提供一种机制可以让「发送方」根据「接收方」的实际接收能力控制发送的数据量</code>，这就是所谓的<code>流量控制</code>。</p>
+<p>流量控制基于<code>滑动窗口</code>。</p>
+<h3 id="滑动窗口"><a href="#滑动窗口" class="headerlink" title="滑动窗口"></a>滑动窗口</h3><p>如果 TCP 每发送一个数据，都要进行一次确认应答。当上一个数据包收到了应答了，再发送下一个，这种发送效率会很低。所以我们可以<code>定义一个窗口，窗口大小就是指无需等待确认应答，而可以继续发送数据的最大值</code>，这就是<code>滑动窗口</code>。</p>
+<p>TCP 头里有一个字段叫 <code>Window</code>，也就是<code>窗口大小</code>。 这个字段是接收端告诉发送端自己还有多少缓冲区可以接收数据。于是发送端就可以根据这个接收端的处理能力来发送数据，而不会导致接收端处理不过来。</p>
+<p>所以，<code>通常窗口的大小是由接收方的窗口大小来决定的</code>。发送方发送的数据大小不能超过接收方的窗口大小，否则接收方就无法正常接收到数据。</p>
+<h4 id="滑动窗口的实现"><a href="#滑动窗口的实现" class="headerlink" title="滑动窗口的实现"></a>滑动窗口的实现</h4><p>发送方和接收方分别有两个缓冲区，一个是 buffer，指的是内核缓冲区，另外一个是 application，指的是应用层的缓冲区。</p>
+<p>对于发送方来说，当要发送数据的时候，需要从 application 拷贝数据到 buffer，而对于接收方来说，当接收到数据的时候，会先缓存到 buffer，然后再由应用程序从 buffer 读取数据。</p>
+<h4 id="发送方的滑动窗口"><a href="#发送方的滑动窗口" class="headerlink" title="发送方的滑动窗口"></a>发送方的滑动窗口</h4><p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233646633.png" alt="image-20230606233646633"></p>
+<p>发送方的滑动窗口方案使用三个指针来跟踪在四个传输类别中的每一个类别中的字节。其中两个指针是绝对指针(指特定的序列号)，一个是相对指针(需要做偏移)。</p>
+<ul>
+<li><code>SND.WND</code>：表示发送窗口的大小(大小是由接收方指定的);</li>
+<li><code>SND.UNA</code>：是一个绝对指针，它指向的是已发送但未收到确认的第一个字节的序列号，也就是 #2 的第一个字节。</li>
+<li><code>SND.NXT</code>：也是一个绝对指针，它指向未发送但可发送范围的第一个字节的序列号，也就是 #3 的第一个 字节。</li>
+<li>指向 #4 的第一个字节是个相对指针，它需要 SND.UNA 指针加上 SND.WND 大小的偏移􏰀，就可以指向 #4 的第一个字节了。</li>
+</ul>
+<p>那么可用窗口大小的计算：<code>可用窗口大小 = SND.WND -(SND.NXT - SND.UNA)</code></p>
+<h4 id="接收方的滑动窗口"><a href="#接收方的滑动窗口" class="headerlink" title="接收方的滑动窗口"></a>接收方的滑动窗口</h4><p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233702008.png" alt="image-20230606233702008"></p>
+<p>其中三个接收部分，使用两个指针进行划分：</p>
+<ul>
+<li><code>RCV.WND</code>：表示接收窗口的大小，它会通告给发送方。</li>
+<li><code>RCV.NXT</code>：是一个指针，它指向期望从发送方发送来的下一个数据字节的序列号，也就是 #3 的第一个字 节。</li>
+<li>指向 #4 的第一个字节是个相对指针，它需要 RCV.NXT 指针加上 RCV.WND 大小的偏移􏰀，就可以指向 #4 的第一个字节了。</li>
+</ul>
+<blockquote>
+<p>接收窗口和发送窗口的大小是相等的吗？</p>
+<p>并不是完全相等，接收窗口的大小是约等于发送窗口的大小的。<br>因为滑动窗口并不是一成不变的。比如，当接收方的应用进程读取数据的速度非常快的话，这样的话接收窗口可以 很快的就空缺出来。那么新的接收窗口大小，是通过 TCP 报文中的 Windows 字段来告诉发送方。那么这个传输过 程是存在时延的，所以接收窗口和发送窗口是约等于的关系。</p>
+</blockquote>
+<h3 id="流量控制的实现"><a href="#流量控制的实现" class="headerlink" title="流量控制的实现"></a>流量控制的实现</h3><ul>
+<li>客户端是接收方，服务端是发送方</li>
+<li>假设接收窗口和发送窗口相同，都为 200，整个传输过程中都保持相同的窗口大小，不受外界影响<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233723745.png" alt="image-20230606233723745"></li>
+</ul>
+<ol>
+<li>客户端向服务端发送请求数据报文。这里要说明下，本次例子是把服务端作为发送方，所以没有画出服务端 的接收窗口。</li>
+<li>服务端收到请求报文后，发送确认报文和 80 字节的数据，于是可用窗口 Usable 减少为 120 字节，同时 SND.NXT 指针也向右偏移 80 字节后，指向 321，这意味着下次发送数据的时候，序列号是 321。</li>
+<li>客户端收到 80 字节数据后，于是接收窗口往右移动 80 字节， RCV.NXT 也就指向 321，这意味着客户端期 望的下一个报文的序列号是 321，接着发送确认报文给服务端。</li>
+<li>服务端再次发送了 120 字节数据，于是可用窗口耗尽为 0，服务端无再继续发送数据。</li>
+<li>客户端收到 120 字节的数据后，于是接收窗口往右移动 120 字节， RCV.NXT 也就指向 441，接着发送确认报文给服务端。</li>
+<li>服务端收到对 80 字节数据的确认报文后， SND.UNA 指针往右偏移后指向 321，于是可用窗口 Usable 增大到 80。</li>
+<li>服务端收到对 120 字节数据的确认报文后， SND.UNA 指针往右偏移后指向 441，于是可用窗口 Usable 增大到 200。</li>
+<li>服务端可以继续发送了，于是发送了 160 字节的数据后， SND.NXT 指向 601，于是可用窗口 Usable 减少到 40。</li>
+<li>客户端收到 160 字节后，接收窗口往右移动了 160 字节， RCV.NXT 也就是指向了 601，接着发送确认报文给服务端。</li>
+<li>服务端收到对 160 字节数据的确认报文后，发送窗口往右移动了 160 字节，于是 SND.UNA 指针偏移了 160 后指向 601，可用窗口 Usable 也就增大至了 200。</li>
+</ol>
+<h3 id="零窗口和窗口探测"><a href="#零窗口和窗口探测" class="headerlink" title="零窗口和窗口探测"></a>零窗口和窗口探测</h3><p>当接收方的 buffer 堆积了大量数据但 application 还没来得及读取，最终导致 buffer 满了，这时<code>接收方就会给发送方通报一个接收窗口为0的报文，表示不能再接收数据</code>，这就是<code>零窗口</code>。</p>
+<p>当接收方处理完数据后，会向发送方通告一个窗口非 0 的 ACK 报文，如果这个通告窗口的 ACK 报文在网络中丢失了，那就会造成死锁：</p>
+<ul>
+<li>发送方一直等待非 0 窗口通知。</li>
+<li>接收方一直等待发送方发送数据。</li>
+</ul>
+<p>为了解决死锁问题，TCP <code>为每个连接设有一个持续定时器，只要发送方收到对方的零窗口通知，就启动持续计时器</code>。如果持续计时器超时，就会发送<code>窗口探测</code> (Window probe) 报文，而对方在确认这个探测报文时，给出自己现在的接收窗口大小。<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233742771.png" alt="image-20230606233742771"></p>
+<ul>
+<li>如果接收窗口仍然为 0，那么收到这个报文的一方就会重新启动持续计时器。</li>
+<li>如果接收窗口不是 0，那么死锁的局面就可以被打破了。</li>
+</ul>
+<h3 id="延迟确认和Nagle算法"><a href="#延迟确认和Nagle算法" class="headerlink" title="延迟确认和Nagle算法"></a>延迟确认和Nagle算法</h3><p>虽然滑动窗口可以发送多个数据包提高了通信效率，但是如果频繁的进行 TCP 小包通信, 通信效率还是是非常低下的。为了提高网络传输效率；</p>
+<ul>
+<li>对于发送方来说可以使用 <code>Nagle算法</code></li>
+<li>对于接收方来说可以使用 <code>延迟确认</code>。</li>
+</ul>
+<h4 id="Nagle算法"><a href="#Nagle算法" class="headerlink" title="Nagle算法"></a>Nagle算法</h4><p>Nagle 算法的策略:</p>
+<ul>
+<li>没有已发送未确认报文时，立刻发送数据。</li>
+<li>存在未确认报文时，直到「收到所有未确认报文的ACK报文」或「数据⻓度达到 MSS 大小」时，再发送数据。</li>
+</ul>
+<p>只有满足上面的其中一条发送方才会发送数据，否则发送方一直在囤积数据。<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233801771.png" alt="image-20230606233801771"></p>
+<p>右侧启用了 Nagle 算法，它的发送数据的过程：</p>
+<ul>
+<li>一开始由于没有已发送未确认的报文，所以就立刻发了 H 字符。</li>
+<li>接着，在还没收到对 H 字符的确认报文时，发送方就一直在囤积数据，直到收到了确认报文后，此时没有已发送未确认的报文，于是就把囤积后的 ELL 字符一起发给了接收方。</li>
+<li>待收到对 ELL 字符的确认报文后，于是把最后一个 O 字符发送了出去。</li>
+</ul>
+<p>可以看出，Nagle 算法一定会有一个小报文，也就是在最开始的时候。</p>
+<p>Nagle 算法默认是打开的，如果对于一些需要小数据包交互的场景的程序，比如，telnet 或 ssh 这样的交互 性比较强的程序，则需要关闭 Nagle 算法。在 Socket 设置 <code>TCP_NODELAY</code> 选项来关闭这个算法。</p>
+<h4 id="延迟确认"><a href="#延迟确认" class="headerlink" title="延迟确认"></a>延迟确认</h4><p>如果接收方每次一收到数据就回复没有携带数据的 ACK，它的网络效率也是很低的，因为它也有 40 个字节的 IP 头 和 TCP 头，但却没有携带数据报文。为了提高效率就需要接收方<code>延迟确认</code>。</p>
+<p>TCP 延迟确认的策略：</p>
+<ul>
+<li>当有响应数据要发送时，ACK 会随着响应数据一起立刻发送给对方。</li>
+<li>当没有响应数据要发送时，ACK 将会延迟一段时间，以等待是否有响应数据可以一起发送</li>
+<li>如果在延迟等待发送 ACK 期间，对方的第二个数据报文又到达了，这时就会立刻发送 ACK<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233828155.png" alt="image-20230606233828155"></li>
+</ul>
+<p>注意：Nagle算法和延迟确认不能同时开启。当 TCP 延迟确认 和 Nagle 算法混合使用时，会导致时耗增⻓。</p>
+<ul>
+<li>发送方先发出一个小报文，接收方收到后，由于延迟确认机制，自己又没有要发送的数据，只能干等着发送方的下一个报文到达;</li>
+<li>而发送方由于 Nagle 算法机制，在未收到第一个报文的确认前，是不会发送后续的数据。所以接收方只能等待最大时间 200 ms 后，才回 ACK 报文，发送方收到第一个报文的确认报文后，也才可以发送后续的数据。<br><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233844756.png" alt="image-20230606233844756"></li>
+</ul>
+<h2 id="拥塞控制"><a href="#拥塞控制" class="headerlink" title="拥塞控制"></a>拥塞控制</h2><p><code>流量控制是避免「发送方」的数据填满「接收方」的缓存</code>。但是在实际网络传输的过程中，网络传输还会受到网络环境的影响。在网络出现拥堵时，如果继续发送大量数据包，可能会导致数据包时延、丢失等，这时 TCP 就会重传数据，但是一重传就会导致网络的负担更重，于是会导致更大的延迟以及更多的丢包，这个情况就会进入恶性循环。所以就出现了拥塞控制，<code>拥塞控制的目的就是避免「发送方」的数据填满整个网络</code>。</p>
+<p>为了在「发送方」调节所要发送数据的量，定义了一个叫做「<code>拥塞窗口</code>」的概念。拥塞窗口 <code>cwnd</code> 是发送方维护的一个的状态变量，它会根据网络的拥塞程度动态变化的。拥塞窗口 <code>cwnd</code> 变化的规则:</p>
+<ul>
+<li>只要网络中没有出现拥塞， cwnd 就会增大。</li>
+<li>但网络中出现了拥塞， cwnd 就减少。</li>
+</ul>
+<p>拥塞窗口 <code>cwnd</code> 、发送窗口 <code>swnd</code> 和接收窗口 <code>rwnd</code> 的关系：<code>swnd = min(cwnd, rwnd)</code>，也就是说发送窗口是拥塞窗口和接收窗口中的最小值。但是 rwnd 是由对端确定的，网络环境对其没有影响，所以在考虑拥塞的时候我们一般不考虑 <code>rwnd</code> 的值。只要「发送方」没有在规定时间内接收到 ACK 应答报文，也就是发生了超时重传，就会认为网络出现了拥塞。</p>
+<p>TCP拥塞控制算法有三个版本（Tahoe&#x2F;Reno&#x2F;Newreno），Tahoe是TCP的最早版本，包含三个算法：</p>
+<ul>
+<li><code>慢启动</code>（Slow Start）</li>
+<li><code>拥塞避免</code>（Congestion Avoidance）</li>
+<li><code>快速重传</code>（Fast Retransmit）</li>
+</ul>
+<p>Reno 包含 Tahoe 的三个算法，还多了一个<code>快速恢复</code>（Fast Recovery）算法。Reno是目前使用最广泛的算法。<br>NewReno 是基于 Reno 的改进版本，主要是改进了快速恢复算法。</p>
+<h3 id="慢启动"><a href="#慢启动" class="headerlink" title="慢启动"></a>慢启动</h3><p>TCP 在刚建立连接完成后，首先是有个慢启动的过程，这个慢启动的意思就是一点一点的提高发送数据包的数量。慢启动的规则是：<code>当发送方每收到一个 ACK，拥塞窗口 cwnd 的大小就会加 1，直到 cwnd 大小达到 ssthresh</code> 。</p>
+<p>慢启动⻔限 <code>ssthresh</code> 是拥塞控制算法定义的一个阈值变量：</p>
+<ul>
+<li>当 <code>cwnd</code> &lt; <code>ssthresh</code> 时，使用「慢启动算法」。</li>
+<li>当 <code>cwnd</code> &gt;&#x3D; <code>ssthresh</code> 时，就会使用「拥塞避免算法」。</li>
+</ul>
+<p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233904584.png" alt="image-20230606233904584"></p>
+<ul>
+<li>连接建立完成后，一开始初始化 cwnd &#x3D; 1 ，表示可以传一个 MSS 大小的数据。</li>
+<li>当收到一个 ACK 确认应答后，cwnd 增加 1，于是一次能够发送 2 个</li>
+<li>当收到 2 个的 ACK 确认应答后， cwnd 增加 2，于是就可以比之前多发2 个，所以这一次能够发送 4 个</li>
+<li>当这 4 个的 ACK 确认到来的时候，每个确认 cwnd 增加 1， 4 个确认 cwnd 增加 4，于是就可以比之前多发 4 个，所以这一次能够发送 8 个。</li>
+</ul>
+<p>由此可以看出<code>慢启动算法发包的个数是指数性的增⻓</code>。</p>
+<h3 id="拥塞避免"><a href="#拥塞避免" class="headerlink" title="拥塞避免"></a>拥塞避免</h3><p>当拥塞窗口 <code>cwnd</code> 「超过」慢启动⻔限 <code>ssthresh</code> 就会进入拥塞避免算法。一般来说 <code>ssthresh</code> 的大小是 65535 字节。</p>
+<p>拥塞避免算法的规则是：<code>每当收到一个 ACK 时，cwnd 增加 1/cwnd</code>。换而言之，<code>当收到 cwnd 数量的 ACK 时，cwnd 的大小就会加1</code>。</p>
+<p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233919277.png" alt="image-20230606233919277"></p>
+<ul>
+<li>因为 ssthresh 为 8，当 8 个 ACK 应答确认到来时，每个确认增加 1&#x2F;8，8 个 ACK 确认 cwnd 一共增加 1，于是这一次能够发送 9个 MSS 大小的数据，变成了线性增⻓。</li>
+</ul>
+<p><code>拥塞避免算法就是将原本慢启动算法的指数增⻓变成了线性增⻓</code>。</p>
+<h3 id="快速重传-1"><a href="#快速重传-1" class="headerlink" title="快速重传"></a>快速重传</h3><p>拥塞避免算法虽然把发送包的增长速度变成了线性增长，但毕竟还在增⻓阶段。就这么一直增⻓着后，网络就会慢慢进入了拥塞的状况了，于是就会出现丢包现象，这时就需要对丢失的数据包进行重传。</p>
+<p>重传机制主要有两种：</p>
+<ul>
+<li>超时重传</li>
+<li>快速重传</li>
+</ul>
+<blockquote>
+<p>选择重传只是在快速重传的基础上进行改进，本质上还是快速重传。</p>
+</blockquote>
+<p>这两种重传机制里面 <code>ssthresh</code> 和 <code>cwnd</code> 的值的变化是不同的。</p>
+<h4 id="超时重传对应的拥塞控制算法"><a href="#超时重传对应的拥塞控制算法" class="headerlink" title="超时重传对应的拥塞控制算法"></a>超时重传对应的拥塞控制算法</h4><p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233936925.png" alt="image-20230606233936925"></p>
+<p><code>ssthresh</code> 和 <code>cwnd</code> 的变化：</p>
+<ul>
+<li><code>ssthresh = cwnd/2</code>。</li>
+<li><code>cwnd</code> 重置为 1。</li>
+<li>进入慢启动算法。</li>
+</ul>
+<p>慢启动会突然减少数据流，导致网络剧烈抖动，这种方式太激进了，并不推荐日常使用。所以Reno算法提出了更温和的快速重传+快速恢复算法。</p>
+<h4 id="快速重传对应的拥塞发生算法"><a href="#快速重传对应的拥塞发生算法" class="headerlink" title="快速重传对应的拥塞发生算法"></a>快速重传对应的拥塞发生算法</h4><p>快速重传算法下，当接收方发现丢了一个中间包的时候，发送三次前一个包的 ACK，于是发送端就会快速地重传，不必等待超时再重传。快速恢复算法是认为，你还能收到 3 个重复的 ACK 说明网络也不那么糟糕，没必要像超时重传那么激烈。<code>ssthresh</code> 和 <code>cwnd</code> 的变化：</p>
+<ul>
+<li><code>ssthresh = cwnd/2</code>。</li>
+<li><code>cwnd = ssthresh + 3</code>(3 的意思是确认有 3 个数据包被收到了)。</li>
+<li>进入快速恢复算法。</li>
+</ul>
+<h3 id="快速恢复"><a href="#快速恢复" class="headerlink" title="快速恢复"></a>快速恢复</h3><p>快速重传和快速恢复算法一般同时使用</p>
+<p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606233951694.png" alt="image-20230606233951694"></p>
+<ul>
+<li>重传丢失的数据包。</li>
+<li>如果再收到重复的 ACK，那么 cwnd 增加 1。</li>
+<li>如果收到新数据的 ACK 后，把 cwnd 设置为 ssthresh 的值，然后再次进入拥塞避免状态。原因是该 ACK 确认了新的数据，说明从 duplicated ACK 时的数据都已收到，该恢复过程已经结束，可以回到恢复之前的拥塞避免状态了。</li>
+</ul>
+<h3 id="拥塞避免算法过程"><a href="#拥塞避免算法过程" class="headerlink" title="拥塞避免算法过程"></a>拥塞避免算法过程</h3><p><img src="/2021/03/27/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E8%B7%AF%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9Atcp%E7%AF%87/image-20230606234004574.png" alt="image-20230606234004574"></p>
+<ol>
+<li>当新建连接时，cwnd初始化为1个最大报文段(MSS)大小，发送端开始按照拥塞窗口大小发送数据，每当有一个报文段被确认，cwnd就增加1个MSS大小。这样cwnd的值就随着网络往返时间(Round Trip Time,RTT)呈指数级增长。</li>
+<li>当cwnd超过慢启动门限(ssthresh)后，慢启动过程结束，进入拥塞避免算法。当窗口中所有的报文段都被确认时，cwnd的大小加1。cwnd的值就随着RTT开始线性增加。</li>
+<li>当检测到拥塞状态（判断拥塞的依据是TCP对每一个报文段都有一个定时器，称为重传定时器(RTO)，当RTO超时且还没有得到ack报文，或者连续三次收到相同的ack报文，就判断出现了拥塞情况。），进入快读重传阶段，把cwnd设置为ssthresh的值加3，然后重传丢失的报文段，进入快速恢复阶段。</li>
+<li>再收到重复的ACK时，拥塞窗口增加1。当收到新的数据包的ACK时，把cwnd设置为第3步中的ssthresh的值。原因是因为该ACK确认了新的数据，说明从重复ACK时的数据都已收到，该恢复过程已经结束，可以回到恢复之前的状态了，也即再次进入拥塞避免状态。</li>
+</ol>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><h3 id="解决time-wait过多的问题"><a href="#解决time-wait过多的问题" class="headerlink" title="解决time_wait过多的问题"></a>解决time_wait过多的问题</h3><p>解决方案很简单，通过修改&#x2F;etc&#x2F;sysctl.conf文件，服务器能够快速回收和重用那些TIME_WAIT的资源</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#表示开启重用。允许将TIME-WAIT sockets重新用于新的TCP连接，默认为0，表示关闭</span><br><span class="line">net.ipv4.tcp_tw_reuse = 1</span><br><span class="line"></span><br><span class="line">#表示开启TCP连接中TIME-WAIT sockets的快速回收，默认为0，表示关闭    </span><br><span class="line">net.ipv4.tcp_tw_recycle = 1</span><br><span class="line"></span><br><span class="line">#一般需要配合上面两个参数使用</span><br><span class="line">net.ipv4.tcp_timestamps = 1</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决CLOSE-WAIT过多的问题"><a href="#解决CLOSE-WAIT过多的问题" class="headerlink" title="解决CLOSE_WAIT过多的问题"></a>解决CLOSE_WAIT过多的问题</h3><p>CLOSE_WAIT很多，表示说要么是你的应用程序写的有问题，没有合适的关闭socket；要么是说，你的服务器CPU处理不过来（CPU太忙）或者你的应用程序一直睡眠到其它地方(锁，或者文件I&#x2F;O等等)，你的应用程序获得不到合适的调度时间，造成你的程序没法真正的执行close操作。</p>
+<h3 id="泛洪攻击"><a href="#泛洪攻击" class="headerlink" title="泛洪攻击"></a>泛洪攻击</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#表示SYN队列的长度，默认为1024，加大队列长度为8192，可以容纳更多等待连接的网络连接数。</span><br><span class="line">net.ipv4.tcp_max_syn_backlog = 8192 </span><br><span class="line"></span><br><span class="line">#表示开启SYN Cookies。当出现SYN等待队列溢出时，启用cookies来处理，可防范少量SYN攻击，默认为0，表示关闭    </span><br><span class="line">net.ipv4.tcp_syncookies = 1</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag"># 计算机网络</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/25/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9Ahttp%E7%AF%87/" rel="prev" title="计算机网络系列（二）：http篇">
+      <i class="fa fa-chevron-left"></i> 计算机网络系列（二）：http篇
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9Aip%E7%AF%87/" rel="next" title="计算机网络系列（四）：ip篇">
+      计算机网络系列（四）：ip篇 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#tcp%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">tcp是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tcp%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">tcp格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MTU%E5%92%8CMSS"><span class="nav-number">2.1.</span> <span class="nav-text">MTU和MSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tcp%E5%92%8Cudp%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">2.2.</span> <span class="nav-text">tcp和udp的区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="nav-number">3.</span> <span class="nav-text">三次握手</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%8F%A1%E6%89%8B%E6%98%AF%E4%B8%89%E6%AC%A1%EF%BC%8C%E4%B8%8D%E6%98%AF%E4%B8%A4%E6%AC%A1%EF%BC%8C%E5%9B%9B%E6%AC%A1%EF%BC%9F"><span class="nav-number">3.1.</span> <span class="nav-text">为什么握手是三次，不是两次，四次？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%8A%E8%BF%9E%E6%8E%A5%E9%98%9F%E5%88%97%E5%92%8C%E5%85%A8%E8%BF%9E%E6%8E%A5%E9%98%9F%E5%88%97"><span class="nav-number">3.2.</span> <span class="nav-text">半连接队列和全连接队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SYN%E6%94%BB%E5%87%BB"><span class="nav-number">3.3.</span> <span class="nav-text">SYN攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tcp%E7%9A%84%E4%BF%9D%E6%B4%BB%E6%9C%BA%E5%88%B6"><span class="nav-number">3.4.</span> <span class="nav-text">tcp的保活机制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="nav-number">4.</span> <span class="nav-text">四次挥手</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%8C%A5%E6%89%8B%E6%98%AF%E5%9B%9B%E6%AC%A1%EF%BC%9F"><span class="nav-number">4.1.</span> <span class="nav-text">为什么挥手是四次？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81TIME-WAIT%EF%BC%9F"><span class="nav-number">4.2.</span> <span class="nav-text">为什么需要TIME_WAIT？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88TIME-WAIT%E7%9A%84%E6%97%B6%E9%97%B4%E6%98%AF2MSL%EF%BC%9F"><span class="nav-number">4.3.</span> <span class="nav-text">为什么TIME_WAIT的时间是2MSL？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TIME-WAIT%E8%BF%87%E5%A4%9A%E7%9A%84%E5%8D%B1%E5%AE%B3%E5%92%8C%E4%BC%98%E5%8C%96"><span class="nav-number">4.4.</span> <span class="nav-text">TIME_WAIT过多的危害和优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E4%BC%A0%E6%9C%BA%E5%88%B6"><span class="nav-number">5.</span> <span class="nav-text">重传机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B6%85%E6%97%B6%E9%87%8D%E4%BC%A0"><span class="nav-number">5.1.</span> <span class="nav-text">超时重传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E9%87%8D%E4%BC%A0"><span class="nav-number">5.2.</span> <span class="nav-text">快速重传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E9%87%8D%E4%BC%A0"><span class="nav-number">5.3.</span> <span class="nav-text">选择重传</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SACK%E6%9C%BA%E5%88%B6"><span class="nav-number">5.3.1.</span> <span class="nav-text">SACK机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#D-SACK%E6%9C%BA%E5%88%B6"><span class="nav-number">5.3.2.</span> <span class="nav-text">D-SACK机制</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6"><span class="nav-number">6.</span> <span class="nav-text">流量控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="nav-number">6.1.</span> <span class="nav-text">滑动窗口</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">6.1.1.</span> <span class="nav-text">滑动窗口的实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E6%96%B9%E7%9A%84%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="nav-number">6.1.2.</span> <span class="nav-text">发送方的滑动窗口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%A5%E6%94%B6%E6%96%B9%E7%9A%84%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="nav-number">6.1.3.</span> <span class="nav-text">接收方的滑动窗口</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">6.2.</span> <span class="nav-text">流量控制的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%B6%E7%AA%97%E5%8F%A3%E5%92%8C%E7%AA%97%E5%8F%A3%E6%8E%A2%E6%B5%8B"><span class="nav-number">6.3.</span> <span class="nav-text">零窗口和窗口探测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%B6%E8%BF%9F%E7%A1%AE%E8%AE%A4%E5%92%8CNagle%E7%AE%97%E6%B3%95"><span class="nav-number">6.4.</span> <span class="nav-text">延迟确认和Nagle算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nagle%E7%AE%97%E6%B3%95"><span class="nav-number">6.4.1.</span> <span class="nav-text">Nagle算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%B6%E8%BF%9F%E7%A1%AE%E8%AE%A4"><span class="nav-number">6.4.2.</span> <span class="nav-text">延迟确认</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6"><span class="nav-number">7.</span> <span class="nav-text">拥塞控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%85%A2%E5%90%AF%E5%8A%A8"><span class="nav-number">7.1.</span> <span class="nav-text">慢启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%A5%E5%A1%9E%E9%81%BF%E5%85%8D"><span class="nav-number">7.2.</span> <span class="nav-text">拥塞避免</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E9%87%8D%E4%BC%A0-1"><span class="nav-number">7.3.</span> <span class="nav-text">快速重传</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B6%85%E6%97%B6%E9%87%8D%E4%BC%A0%E5%AF%B9%E5%BA%94%E7%9A%84%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6%E7%AE%97%E6%B3%95"><span class="nav-number">7.3.1.</span> <span class="nav-text">超时重传对应的拥塞控制算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E9%87%8D%E4%BC%A0%E5%AF%B9%E5%BA%94%E7%9A%84%E6%8B%A5%E5%A1%9E%E5%8F%91%E7%94%9F%E7%AE%97%E6%B3%95"><span class="nav-number">7.3.2.</span> <span class="nav-text">快速重传对应的拥塞发生算法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E6%81%A2%E5%A4%8D"><span class="nav-number">7.4.</span> <span class="nav-text">快速恢复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%A5%E5%A1%9E%E9%81%BF%E5%85%8D%E7%AE%97%E6%B3%95%E8%BF%87%E7%A8%8B"><span class="nav-number">7.5.</span> <span class="nav-text">拥塞避免算法过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">8.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3time-wait%E8%BF%87%E5%A4%9A%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">8.1.</span> <span class="nav-text">解决time_wait过多的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3CLOSE-WAIT%E8%BF%87%E5%A4%9A%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">8.2.</span> <span class="nav-text">解决CLOSE_WAIT过多的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%9B%E6%B4%AA%E6%94%BB%E5%87%BB"><span class="nav-number">8.3.</span> <span class="nav-text">泛洪攻击</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

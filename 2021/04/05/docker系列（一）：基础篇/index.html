@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="docker系列（一）：基础篇">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker系列（一）：基础篇">
+<meta property="og:url" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="docker系列（一）：基础篇">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164144837.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164208066.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164226208.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164247113.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164320169.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164341213.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164413976.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164500393.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164517131.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164536887.png">
+<meta property="article:published_time" content="2021-04-05T08:32:39.000Z">
+<meta property="article:modified_time" content="2023-07-05T08:48:02.476Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164144837.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>docker系列（一）：基础篇 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          docker系列（一）：基础篇
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-05 16:32:39" itemprop="dateCreated datePublished" datetime="2021-04-05T16:32:39+08:00">2021-04-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-05 16:48:02" itemprop="dateModified" datetime="2023-07-05T16:48:02+08:00">2023-07-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/" class="post-meta-item leancloud_visitors" data-flag-title="docker系列（一）：基础篇" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>docker系列（一）：基础篇</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="一、基本概念"><a href="#一、基本概念" class="headerlink" title="一、基本概念"></a>一、基本概念</h2><h3 id="docker是什么"><a href="#docker是什么" class="headerlink" title="docker是什么"></a>docker是什么</h3><p>Docker 是 一种容器化技术。Docker 使用 Google 公司推出的 Go 语言 进行开发实现，基于 Linux 内核的 cgroup，namespace，以及 OverlayFS 类的 Union FS 等技术，对进程进行封装隔离，属于 操作系统层面的虚拟化技术。由于隔离的进程独立于宿主和其它的隔离的进程，因此也称其为容器。最初实现是基于 LXC，从 0.7 版本以后开始去除 LXC，转而使用自行开发的 libcontainer，从 1.11 版本开始，则进一步演进为使用 runC 和 containerd。<br><img src="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164144837.png" alt="image-20230705164144837"></p>
+<p>docker 的本质是一个 linux 用户进程，在创建进程的过程中：</p>
+<ol>
+<li>在 clone 调用时传入 namespace 参数，实现资源隔离。</li>
+<li>对进程配置 cgroups 参数，控制资源使用。</li>
+<li>使用 chroot&#x2F;pivot_root 切换进程的根目录。</li>
+<li>使用 unionfs 技术合并文件读写层和只读层。</li>
+</ol>
+<p>所以，docker 底层的核心三大技术是：</p>
+<ul>
+<li><code>Namespaces</code></li>
+<li><code>Cgroups</code></li>
+<li><code>Unionfs</code></li>
+</ul>
+<blockquote>
+<p>docker 和虚拟机的区别？</p>
+</blockquote>
+<p><img src="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164208066.png" alt="image-20230705164208066"></p>
+<p>传统虚拟机技术是虚拟出一套硬件后，在其上运行一个完整操作系统，在该系统上再运行所需应用进程；而容器内的应用进程直接运行于宿主的内核，容器内没有自己的内核，而且也没有进行硬件虚拟。因此容器要比传统虚拟机更为轻便。</p>
+<h3 id="docker架构"><a href="#docker架构" class="headerlink" title="docker架构"></a>docker架构</h3><p><img src="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164226208.png" alt="image-20230705164226208"></p>
+<ul>
+<li><code>Docker守护进程(docker daemon)</code>是运行在你的操作系统上的一个服务。目前，它只能运行在Linux上，因为它依赖于一些Linux内核特性(比如Cgroup与Namespace)。 但是，也有一些特殊的办法让Docker运行在MacOS与Windows上(运行在Linux虚拟机中)。</li>
+<li><code>Docker守护进程提供了REST API</code>。许多工具(Docker命令行，Docker Compose等)都可以通过REST API与Docker守护进程进行交互，例如创建容器，构建镜像等。</li>
+<li><code>Docker命令行(docker CLI)</code>是与Docker守护进程进行交互的主要工具。</li>
+</ul>
+<p><code>Docker是Client/Server架构</code>。其中Docker守护进程是服务端，Docker命令行是众多客户端之一。事实上，还有很多第三方的Docker客户端。对于各种流行的编程语言，它们都有对应的Docker客户端。感兴趣的话，你也可以开发一个，使用REST API与Docker守护进程进行交互就好了。</p>
+<p>docker有三个非常重要的基础概念：</p>
+<ul>
+<li><code>镜像（Image）</code></li>
+<li><code>容器（Container）</code></li>
+<li><code>仓库（Repository）</code></li>
+</ul>
+<h3 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h3><p>镜像是一个为进程提供隔离后执行环境的文件系统，也就是所谓的 <code>rootfs</code>。<code>rootfs 只是操作系统一个操作系统所包含的文件、配置和目录，并不包含操作系统内核</code>。镜像运行起来后（变成容器）依赖宿主机的操作系统内核。</p>
+<p><code>镜像并非是像一个 ISO 那样的打包文件，镜像只是一个虚拟的概念，其实际而是由一组文件系统组成</code>。镜像使用了 Unionfs 技术，把多层文件系统联合在一起。</p>
+<p>镜像是一组静态的文件，不包含任何动态数据，其内容在构建之后也不会被改变。</p>
+<h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><p>容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。</p>
+<p><code>容器的实质是 clone 调用的进程，该进程运行在namespace隔离的环境里，拥有自己独立的 root 文件系统、网络配置、进程空间甚至用户 ID 空间</code>。</p>
+<p>容器运行时，是以镜像为基础层，在其上增加了init层和可读写层。所以容器的 rootfs 分为三层：<br><img src="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164247113.png" alt="image-20230705164247113"></p>
+<ul>
+<li><code>只读层(ro+wh)</code>：只读层是容器的 rootfs 的下五层，它们的挂载方式都是只读的，这些层都以增量的方式叠加。</li>
+<li><code>Init层(ro+wh)</code>：是 Docker 项目单独生成的一个内部层，专门用来存放 &#x2F;etc&#x2F;hosts、&#x2F;etc&#x2F;resolv.conf 这些系统文件。我们修改系统文件后只对当前的容器有效，docker commit 不会提交 Init 层的内容，只会提交可读写层。</li>
+<li><code>可读写层(rw)</code>：是容器的 rootfs 的最上面一层，用于保存对 rootfs 的增删查改。在没有写入文件之前，这个目录是空的。如果是做了增查改操作，改变产生的内容就会以增量的方式出现在这个层中；如果是删除操作，<code>会在可读写层创建一个 whiteout 文件</code>，把只读层里的文件遮挡起来。比如，你要删除只读层里一个名叫 foo 的文件，那么这个删除操作实际上是在可读写层创建了一个名叫.wh.foo 的文件。这样，当这两个层被联合挂载之后，foo 文件就会被.wh.foo 文件遮挡起来，只读层里的内容则不会有任何变化。</li>
+</ul>
+<h3 id="仓库"><a href="#仓库" class="headerlink" title="仓库"></a>仓库</h3><p>Docker Registry 提供集中存储、分发镜像的服务。</p>
+<ul>
+<li>一个 Docker Registry 中可以包含多个仓库（Repository）。</li>
+<li>一个仓库可以包含多个 Image。</li>
+<li>Image 用 GUID 表示，有一个或多个 Tag 与之关联。</li>
+</ul>
+<p>Docker Registry 中镜像的完整命名为:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DOCKER_REGISTRY/repo/name:tag</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>DOCKER_REGISTRY：公司统一的Docker Registry地址。</li>
+<li>repo：镜像仓库，用来管理一类镜像。</li>
+<li>name：镜像名称。</li>
+<li>tag：镜像标签。</li>
+</ul>
+<p>Docker Hub 是默认的官方 Registry，也可以修改 <code>/etc/docker/daemon.json</code> 文件，修改默认 Registry 地址。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 增加一句</span><br><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://docker.mirrors.ustc.edu.cn&quot;]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 然后重启</span><br><span class="line">$ sudo service docker restart</span><br></pre></td></tr></table></figure>
+
+<p>一般情况下我们常使用的 <code>repo/name:tag</code> 这种格式，就会去默认的 Registry 地址拉取镜像。</p>
+<p>docker hub 中有两种类型的仓库：</p>
+<ul>
+<li>顶层仓库（top-leveled repository），由docker公司内部创建，命名只有 <code>repo</code>，例如<code>redis</code>。</li>
+<li>用户仓库（user repository），由docker用户创建，命名为 <code>username/repo</code>，例如<code>fedora/redis</code>。</li>
+</ul>
+<h2 id="二、docker原理"><a href="#二、docker原理" class="headerlink" title="二、docker原理"></a>二、docker原理</h2><p>上面提到 Docker 的核心三大技术：</p>
+<ul>
+<li><code>Namespaces</code>：资源隔离，保证两个进程之间的独立性。</li>
+<li><code>Cgroups</code>：资源控制，分配一个进程最大限度可以使用的硬件资源。</li>
+<li><code>Unionfs</code>：合并多层文件，合并多层文件只读层和读写层。</li>
+</ul>
+<h3 id="Namespace"><a href="#Namespace" class="headerlink" title="Namespace"></a>Namespace</h3><p>Linux Namespace 是 Linux 提供的一种内核级别环境隔离的方法。使用 Linux Namespace 创造出的进程可以充分利用宿主机的资源，宿主机有的资源容器进程都可以享有，但彼此之间是隔离的，互不干扰。</p>
+<p>Linux namespace 实现了 6 项资源隔离，基本上涵盖了一个小型操作系统的运行要素，包括主机名、用户权限、文件系统、网络、进程号、进程间通信。</p>
+<table>
+<thead>
+<tr>
+<th>namespace</th>
+<th>系统调用参数</th>
+<th>隔离内容</th>
+<th>内核版本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>UTS</td>
+<td>CLONE_NEWUTS</td>
+<td>主机名和域名</td>
+<td>2.6.19</td>
+</tr>
+<tr>
+<td>IPC</td>
+<td>CLONE_NEWIPC</td>
+<td>信号量、消息队列和共享内存</td>
+<td>2.6.19</td>
+</tr>
+<tr>
+<td>PID</td>
+<td>CLONE_NEWPID</td>
+<td>进程编号</td>
+<td>2.6.24</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>CLONE_NEWNET</td>
+<td>网络设备、网络栈、端口等</td>
+<td>2.6.29</td>
+</tr>
+<tr>
+<td>Mount</td>
+<td>CLONE_NEWNS</td>
+<td>挂载点（文件系统）</td>
+<td>2.4.19</td>
+</tr>
+<tr>
+<td>User</td>
+<td>CLONE_NEWUSER</td>
+<td>用户和用户组</td>
+<td>3.8</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>User namespace的内核完成版本：3.8，这也是很多时候为什么我们说Docker只能在centos7中运行的原因</p>
+</blockquote>
+<p>Namespace的实现主要是下面三个系统调用：</p>
+<ul>
+<li><code>clone()</code> – 实现线程的系统调用，用来创建一个新的进程，并可以通过设计上述参数达到隔离。</li>
+<li><code>setns()</code> – 把某进程加入到某个namespace，在docker exec进入容器的时候使用。</li>
+<li><code>unshare()</code> – 使某进程脱离某个namespace。</li>
+</ul>
+<p>主要来看下 clone 调用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int clone(int (*child_func)(void *), void *child_stack, int flags, void *arg);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数child_func传入子进程运行的程序主函数</li>
+<li>参数child_stack传入子进程使用的栈空间</li>
+<li>参数flags表示使用哪些CLONE_*标志位</li>
+<li>参数args则可用于传入用户参数</li>
+</ul>
+<p>在调用 clone() 在 flags 参数时候传入以上系统调用参数，就可以控制进程的隔离内容。一个容器进程也可以再 clone() 出一个容器进程，这是容器的嵌套。</p>
+<p>例如最简单的 clone() 调用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">#define _GNU_SOURCE </span><br><span class="line">#include &lt;sys/mount.h&gt; </span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/wait.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;sched.h&gt;</span><br><span class="line">#include &lt;signal.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#define STACK_SIZE (1024 * 1024)</span><br><span class="line">static char container_stack[STACK_SIZE];</span><br><span class="line">char* const container_args[] = &#123;</span><br><span class="line">  &quot;/bin/bash&quot;,</span><br><span class="line">  NULL</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line">int container_main(void* arg)</span><br><span class="line">&#123;  </span><br><span class="line">  printf(&quot;Container - inside the container!\n&quot;);</span><br><span class="line">  execv(container_args[0], container_args);</span><br><span class="line">  printf(&quot;Something&#x27;s wrong!\n&quot;);</span><br><span class="line">  return 1;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;Parent - start a container!\n&quot;);</span><br><span class="line">  int container_pid = clone(container_main, container_stack+STACK_SIZE, SIGCHLD , NULL);</span><br><span class="line">  waitpid(container_pid, NULL, 0);</span><br><span class="line">  printf(&quot;Parent - container stopped!\n&quot;);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的功能非常简单：在 main 函数里，我们通过 clone() 系统调用创建了一个新的子进程 container_main 执行了一个&#x2F;bin&#x2F;bash。clone() 第二个参数指定了子进程运行的栈空间大小，第三个参数即为创建不同 namespace 隔离的关键。</p>
+<p>但是对于上面的程序，父子进程的进程空间是没有什么差别的，父进程能访问到的子进程也能。</p>
+<p>使用了 Linux Namespace 隔离技术后：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">#define _GNU_SOURCE </span><br><span class="line">#include &lt;sys/mount.h&gt; </span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/wait.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;sched.h&gt;</span><br><span class="line">#include &lt;signal.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#define STACK_SIZE (1024 * 1024)</span><br><span class="line">static char container_stack[STACK_SIZE];</span><br><span class="line">char* const container_args[] = &#123;</span><br><span class="line">  &quot;/bin/bash&quot;,</span><br><span class="line">  NULL</span><br><span class="line">&#125;; </span><br><span class="line">int container_main(void* arg)</span><br><span class="line">&#123;  </span><br><span class="line">  printf(&quot;Container - inside the container!\n&quot;);</span><br><span class="line">  sethostname(&quot;test&quot;,10); /* 设置hostname */</span><br><span class="line">  execv(container_args[0], container_args);</span><br><span class="line">  printf(&quot;Something&#x27;s wrong!\n&quot;);</span><br><span class="line">  return 1;</span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;Parent - start a container!\n&quot;);</span><br><span class="line">  int container_pid = clone(container_main, container_stack+STACK_SIZE, CLONE_NEWUTS | CLONE_NEWPID | SIGCHLD , NULL);</span><br><span class="line">  waitpid(container_pid, NULL, 0);</span><br><span class="line">  printf(&quot;Parent - container stopped!\n&quot;);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的clone系统调用中，我们新增了2个参数：<code>CLONE_NEWUTS</code>、<code>CLONE_NEWPID</code>；也就是新增了UTS和PID两种Namespace。为了能够看出容器内和容器外主机名的变化，我们子进程执行函数中加入：<code>sethostname(&quot;test&quot;, 9);</code></p>
+<p>运行以上程序，发现子进程的hostname变成了 container，同时查看当前的进程号变成了1：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ vi test.c</span><br><span class="line">$ gcc -o test test.c</span><br><span class="line">$ ./test</span><br><span class="line">Parent - start a container!</span><br><span class="line">Container - inside the container!</span><br><span class="line">$ hostname</span><br><span class="line">test</span><br><span class="line">$ echo $$</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+
+<p>这就是 Linux Namespace 技术的隔离效果。</p>
+<p>事实上，作为一个普通用户，我们希望的情况是：每当创建一个新容器时，容器进程看到的文件系统就是一个独立的隔离环境，而不是继承自宿主机的文件系统，这里可以通过容器进程启动之前重新挂载它的整个根目录“&#x2F;”。而由于 Mount Namespace 的存在，这个挂载对宿主机不可见，所以容器进程就可以在里面随便折腾了。</p>
+<p>在 Linux 操作系统里，有一个名为 <code>chroot</code> 的命令可以帮助你在 shell 中方便地完成这个工作。它的作用就是帮你“change root file system”，即改变进程的根目录到你指定的位置。</p>
+<p><code>使用 Namespace + chroot，我们就可以创造出一个隔离的容器环境</code>。</p>
+<h3 id="Cgroups"><a href="#Cgroups" class="headerlink" title="Cgroups"></a>Cgroups</h3><p>虽然通过 Namespace 创造出隔离的容器环境，但事实上仍是所有容器进程共享宿主机上的硬件资源。如果某个进程占用资源过高，就会影响宿主机上其他进程的稳定性，所以有必要限制单个进程可以占用的最大程度的硬件资源。</p>
+<p><code>cgroups(Control Groups) 是 linux 内核提供的一种机制，用来统一将进程进行分组，并在分组的基础上对进程进行监控和资源控制管理等</code>。</p>
+<p>cgroup主要包括下面两部分结构：</p>
+<ul>
+<li>subsystem：一个 subsystem 就是一个内核模块，用来限制某一类资源的使用。目前 linux 支持 12 种 subsystem：<ul>
+<li>blkio 对块设备的 IO 进行限制。</li>
+<li>cpu 限制 CPU 时间片的分配，与 cpuacct 挂载在同一目录。</li>
+<li>cpuacct 生成 cgroup 中的任务占用 CPU 资源的报告，与 cpu 挂载在同一目录。</li>
+<li>cpuset 给 cgroup 中的任务分配独立的 CPU(多处理器系统) 和内存节点。</li>
+<li>devices 允许或禁止 cgroup 中的任务访问设备。</li>
+<li>freezer 暂停&#x2F;恢复 cgroup 中的任务。</li>
+<li>hugetlb 限制使用的内存页数量。</li>
+<li>memory 对 cgroup 中的任务的可用内存进行限制，并自动生成资源占用报告。</li>
+<li>net_cls 使用等级识别符（classid）标记网络数据包，这让 Linux 流量控制器（tc 指令）可以识别来自特定 cgroup 任务的数据包，并进行网络限制。</li>
+<li>net_prio 允许基于 cgroup 设置网络流量(netowork traffic)的优先级。</li>
+<li>perf_event 允许使用 perf 工具来监控 cgroup。</li>
+<li>pids 限制任务的数量。</li>
+</ul>
+</li>
+<li>hierarchy：一个 hierarchy 可以理解为一棵 cgroup 树，系统中可以有很多颗 cgroup 树，每棵树可以和一到多个 subsystem 关联，但一个 subsystem 只能关联到一颗 cgroup 树，一旦关联并在这颗树上创建了子 cgroup，subsystems 和这棵 cgroup 树就成了一个整体。在一颗树里面，会包含 Linux 系统中的所有进程，树的每个节点就是一个进程组。一个进程可以属于多颗树，但一个进程不能同属于同一棵树下的多个节点。</li>
+</ul>
+<p><img src="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164320169.png" alt="image-20230705164320169"><br>cgroup 结构体是一个树状结构，树的每个节点是一个进程组，而每颗树又和一个或者多个subsystem关联。树的作用是将进程分组，subsystem 的作用就是对这些组进行资源限制。</p>
+<p>最下面的P代表一个进程。每一个进程的描述符中有一个指针指向了一个辅助数据结构css_set（cgroups subsystem set）。 指向某一个css_set的进程会被加入到当前css_set的进程链表中。一个进程只能隶属于一个css_set，一个css_set可以包含多个进程，隶属于同一css_set的进程受到同一个css_set所关联的资源限制。</p>
+<p>”M×N Linkage”说明的是css_set通过辅助数据结构可以与 cgroups 节点进行多对多的关联。但是 cgroups 的实现不允许css_set同时关联同一个cgroups层级结构下多个节点。 这是因为 cgroups 对同一种资源不允许有多个限制配置。</p>
+<p>cgrou p相关的所有操作都是基于内核中的 cgroup virtual filesystem。使用 cgroup 很简单，<code>使用 mount 命令挂载需要限制资源的文件系统到 /sys/fs/cgroup 目录下</code>。在 &#x2F;sys&#x2F;fs&#x2F;cgroup 目录下创建文件夹，也会自动创建好各种资源文件。</p>
+<ol>
+<li>挂载和所有subsystem关联的cgroup树到&#x2F;sys&#x2F;fs&#x2F;cgroup</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mount -t cgroup xxx /sys/fs/cgroup</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>挂载一颗和cpuset subsystem关联的cgroup树到&#x2F;sys&#x2F;fs&#x2F;cgroup&#x2F;cpuset</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir /sys/fs/cgroup/cpuset</span><br><span class="line">mount -t cgroup -o cpuset xxx /sys/fs/cgroup/cpuset</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>挂载一颗与cpu和cpuacct subsystem关联的cgroup树到&#x2F;sys&#x2F;fs&#x2F;cgroup&#x2F;cpu,cpuacct</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir /sys/fs/cgroup/cpu,cpuacct</span><br><span class="line">mount -t cgroup -o cpu,cpuacct xxx /sys/fs/cgroup/cpu,cpuacct</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>查看系统上的所有cgroup</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mount | grep cgroup</span><br></pre></td></tr></table></figure>
+
+<p>创建并挂载好一颗 cgroup 树之后，就有了树的根节点，也即根cgroup，这时候就可以通过创建文件夹的方式创建子cgroup，然后再往每个子cgroup中添加进程。</p>
+<p>可以通过查看 <code>/proc/[pid]/cgroup(since Linux 2.6.24)</code> 知道指定进程属于哪些cgroup。</p>
+<h3 id="Unionfs"><a href="#Unionfs" class="headerlink" title="Unionfs"></a>Unionfs</h3><p>UnionFS（Union File System）是把其他文件系统联合到一个联合挂载点的文件系统服务。它使用 branch 把不同文件系统的文件和目录覆盖，形成一个一致的文件系统。</p>
+<p>UnionFS 使用 <code>COW</code>（copy-on-write，写时复制）的技术：如果一个资源是重复的，并且没有任何修改，这时并不需要立即创建一个新的资源，这个资源可以被新旧实例共享；当对资源进行修改后的时候，写到一个新的文件中，并没有改变原来的文件。通过这种资源共享的方式可以显著地减少未修改资源复制带来的消耗。</p>
+<p><code>AUFS</code> 是 Docker 使用的第一种存储驱动，目前 Docker 默认的存储驱动已经变为了 <code>overlay2</code>。可以使用 <code>docker info</code> 查看 docker 使用的 storage driver。</p>
+<h4 id="AUFS"><a href="#AUFS" class="headerlink" title="AUFS"></a>AUFS</h4><p>AUFS 是 Docker 最先使用的 storage driver，它技术很成熟，社区支持也很好，它的特性使得它成为 storage driver 的一个好选择。但仍有一些Linux发行版不支持AUFS，主要是它没有被并入Linux内核。AUFS通过写时复制策略来实现镜像镜像的共享和最小化磁盘开销。</p>
+<p>AUFS 的读写过程：第一次修改文件的时候，意味着它当前不在最顶层的读写层AUFS就会在下面的读写层中查找它，查找是自顶向下，逐层查找的。找到之后，就把整个文件拷贝到读写层，再对它进行修改。哪怕只是文件的一小部分被改变，也需要复制整个文件。</p>
+<p>AUFS 的删除过程：AUFS 通过在最顶层(读写层)生成一个 whiteout 文件来删除文件。whiteout 文件会掩盖下面只读层相应文件的存在，但它事实上没有被删除。</p>
+<h4 id="Overlay2"><a href="#Overlay2" class="headerlink" title="Overlay2"></a>Overlay2</h4><p>Overlay2 是 Docker 目前默认的存储驱动。Overlay2 与 AUFS 相似，但分层命名有所不同。<br><img src="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164341213.png" alt="image-20230705164341213"></p>
+<p>overlay2包括 lowerdir，upperdir 和 merged 三个层次：</p>
+<ul>
+<li>lowerdir：表示较为底层的目录，修改联合挂载点不会影响到lowerdir。</li>
+<li>upperdir：表示较为上层的目录，修改联合挂载点会在upperdir同步修改。</li>
+<li>merged：是lowerdir和upperdir合并后的联合挂载点。</li>
+<li>workdir：用来存放挂载后的临时文件与间接文件。</li>
+</ul>
+<p>在运行容器后，可以通过 mount 命令查看其具体挂载信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@staight chmdocker]# mount | grep overlay</span><br><span class="line">overlay on /var/lib/docker/overlay2/16361198b12618b2234306c6998cd8eb1c55f577a02144913da60dba4ca0c6e5/merged type overlay (rw,relatime,lowerdir=/var/lib/docker/overlay2/l/INEXQHCNWBDKYZLHC42SH33R43:/var/lib/docker/overlay2/l/H47VNXLFUBUVMHEAEGXMC6S3QJ,upperdir=/var/lib/docker/overlay2/16361198b12618b2234306c6998cd8eb1c55f577a02144913da60dba4ca0c6e5/diff,workdir=/var/lib/docker/overlay2/16361198b12618b2234306c6998cd8eb1c55f577a02144913da60dba4ca0c6e5/work)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>联合挂载点：<code>/var/lib/docker/overlay2/16361198b12618b2234306c6998cd8eb1c55f577a02144913da60dba4ca0c6e5/merged</code></li>
+<li>lowerdir：<code>/var/lib/docker/overlay2/l/INEXQHCNWBDKYZLHC42SH33R43:/var/lib/docker/overlay2/l/H47VNXLFUBUVMHEAEGXMC6S3QJ</code>，冒号分隔多个lowerdir，从左到右层次越低。</li>
+<li>upperdir：<code>/var/lib/docker/overlay2/16361198b12618b2234306c6998cd8eb1c55f577a02144913da60dba4ca0c6e5/diff</code></li>
+<li>workdir：<code>/var/lib/docker/overlay2/16361198b12618b2234306c6998cd8eb1c55f577a02144913da60dba4ca0c6e5/work</code></li>
+</ul>
+<p>overlay2 读文件的过程：</p>
+<ul>
+<li>要读的文件不在container layer中，那就从lowerdir中读。</li>
+<li>要读的文件之存在于container layer中：直接从upperdir中读。</li>
+<li>要读的文件在container layer和image layer中都存在，从upperdir中读文件。</li>
+</ul>
+<p>overlay2 写文件的过程：第一次修改时，文件不在container layer(upperdir)中，overlay driver调用 copy-up 操作将文件从 lowerdir 读到upperdir中，对文件的读写都直接在 upperdir 中进行。overlayfs 中仅有两层，这使得文件的查找效率很高(相对于aufs)。</p>
+<p>overlay2 新建文件的过程：对 merged 目录新增文件，会同步到 upper 目录，底下 lower 目录不会受影响。</p>
+<p>overlay2 删除文件的过程：删除文件和aufs一样，相应的whiteout文件被创建在upperdir。并不删除容器层(lowerdir)中的文件，whiteout文件屏蔽了它的存在。删除目录的时候，会建立一个 opaque 目录，作用同上。</p>
+<p>可以通过 <code>docker inspect CONTAINER_ID</code> 查看容器的文件系统：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">$ docker inspect 4d23ac2876e4e2c71c6789e3e</span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;Id&quot;: &quot;4d23ac2876e4e2c71c6789e3ed85359c34ee333a7edb3ff798a5e9ada4e1994a&quot;,</span><br><span class="line"></span><br><span class="line">        &quot;Image&quot;: &quot;sha256:0e901e68141fd02f237cf63eb842529f8a9500636a9419e3cf4fb986b8fe3d5d&quot;,</span><br><span class="line"></span><br><span class="line">        ......</span><br><span class="line"></span><br><span class="line">        &quot;GraphDriver&quot;: &#123;</span><br><span class="line">            &quot;Data&quot;: &#123;</span><br><span class="line">                &quot;LowerDir&quot;: &quot;/var/lib/docker/overlay2/da23c8758079677a3c4ecf066959dfecd1ce0da6e4fcdf361aa2ecf52b399a2f-init/diff:/var/lib/docker/overlay2/2dd80634d16dfeea21deb784951b8c1ba624e87818ad8d5ac76fbd2ae8889b52/diff:/var/lib/docker/overlay2/8b812a5acf0a7f5492b3b16a7e7e8c4f24ae8f70e12edc64eb9b1aca3abd9191/diff:/var/lib/docker/overlay2/17f0ddd048f1f50a683c9c457ac211aa522b00b8401eb126ebee0aa2a5f5010b/diff:/var/lib/docker/overlay2/ff6d59331669f3d7378caf593354b57f8818987238ac0f903e10171ab2ae3b79/diff:/var/lib/docker/overlay2/0d0ca9fbfc0df2efcee37649a9da72e573b2781b10d85d52566be73588bb2033/diff:/var/lib/docker/overlay2/9731f15d91e25117bb3105fb91bd3f1dfc8b11ee2a06102288ed33b4ff2ac3ff/diff&quot;,</span><br><span class="line">                &quot;MergedDir&quot;: &quot;/var/lib/docker/overlay2/da23c8758079677a3c4ecf066959dfecd1ce0da6e4fcdf361aa2ecf52b399a2f/merged&quot;,</span><br><span class="line">                &quot;UpperDir&quot;: &quot;/var/lib/docker/overlay2/da23c8758079677a3c4ecf066959dfecd1ce0da6e4fcdf361aa2ecf52b399a2f/diff&quot;,</span><br><span class="line">                &quot;WorkDir&quot;: &quot;/var/lib/docker/overlay2/da23c8758079677a3c4ecf066959dfecd1ce0da6e4fcdf361aa2ecf52b399a2f/work&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;Name&quot;: &quot;overlay2&quot;</span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line">        ......</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>ID：容器ID，这里的容器ID是da23cxxx</li>
+<li>Image：镜像ID</li>
+<li>GraphDriver：overlay2分层信息，这里详细列出了四种目录指向的具体目录：<ul>
+<li>LowerDir：指向 da23cxxx 的 Init 目录和 LowerDir 层的 diff 目录。</li>
+<li>MergedDir：指向 da23cxxx 的 merged 目录。</li>
+<li>UpperDir：指向 da23cxxx 的 diff 目录。</li>
+<li>WorkDir：指向 da23cxxx 的 work 目录。</li>
+</ul>
+</li>
+</ul>
+<h2 id="三、数据卷"><a href="#三、数据卷" class="headerlink" title="三、数据卷"></a>三、数据卷</h2><p>在Docker中，要想实现数据的持久化（即数据不随着Container的结束而结束），需要将数据从宿主机挂载到容器中。目前Docker提供了三种不同的方式将数据从宿主机挂载到容器中：</p>
+<ul>
+<li><code>volume</code>：存于主机文件系统中的指定区域（<code>/var/lib/docker/volumes/</code>），由Docker进行管理。非Docker进程不应该修改这些数据。卷是Docker中持久化数据的最好方式。</li>
+<li><code>bind mount</code>：可以存储在宿主机系统的任意位置。非 Docker 的进程或者 Docker 容器可能随时对其进行修改，存在潜在的安全风险。bind mount在不同的宿主机系统时不可移植的，比如Windows和Linux的目录结构是不一样的，bind mount所指向的host目录也不能一样。</li>
+<li><code>tmpfs</code>：存于内存中，并不是持久化到磁盘。在容器的生命周期中，可以被容器用来存放非持久化的状态或敏感信息，比较少用。</li>
+</ul>
+<p>绑定数据卷可以使用参数<code>-v</code>或者<code>--volume</code>，Docker 17.06 之后，可以统一使用参数<code>--mount</code>。</p>
+<blockquote>
+<p>-v和–mount的区别：</p>
+<ul>
+<li>使用-v的时候，如果在 Docker Host 不存在要挂载的文件或者目录，Docker 将会自动进行创建，通常是一个目录;</li>
+<li>使用–mount的时候，如果在 Docker Host 不存在要挂载的文件或者目录，Docker 不会自动创建目录，并生成一个错误;</li>
+</ul>
+</blockquote>
+<p>-v 语法：分为三部分，使用冒号进行分割。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-v 宿主机目录地址:容器目录地址:ro</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>映射到宿主机文件的目录的地址或数据卷名称</li>
+<li>挂载到容器上的文件目录的地址</li>
+<li>可选字段，用来增加附加项目，比如ro，rw等等</li>
+</ul>
+<p>–mount语法：由一组键值对组成，用逗号进行分割。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--mount type=bind,source=宿主机目录地址,target=容器目录地址,readonly</span><br></pre></td></tr></table></figure>
+
+<p>各部分含义同上。</p>
+<h3 id="使用bind-mount挂载数据卷"><a href="#使用bind-mount挂载数据卷" class="headerlink" title="使用bind mount挂载数据卷"></a>使用bind mount挂载数据卷</h3><p>把宿主机的&#x2F;app&#x2F;wwwroot目录挂载到容器的&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html&#x2F;目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d -it --name my_nginx -p 80:80 -v /app/wwwroot:/usr/share/nginx/html/ nginx:latest</span><br><span class="line"></span><br><span class="line">或者</span><br><span class="line"></span><br><span class="line">$ docker run -d -it --name my_nginx -p 80:80 --mount type=bind,source=/app/wwwroot,target=/usr/share/nginx/html/ nginx:latest</span><br></pre></td></tr></table></figure>
+
+<p>也可以设置<code>只读挂载，设置后容器中无法对数据进行修改。只有宿主机可以进行数据修改</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d -it --name my_nginx -p 80:80 -v /app/wwwroot:/usr/share/nginx/html/:ro nginx:latest</span><br><span class="line"></span><br><span class="line">或者</span><br><span class="line"></span><br><span class="line">$ docker run -d -it --name my_nginx -p 80:80 --mount type=bind,source=/app/wwwroot,target=/usr/share/nginx/html/,readonly nginx:latest</span><br></pre></td></tr></table></figure>
+
+<p>注意，<code>bind mounts的方式会隐藏掉容器被挂载目录里面的内容（如果非空的话）</code>。以上&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html 目录下的内容被隐藏掉了，因此我们看不到。</p>
+<h3 id="使用volume挂载数据卷"><a href="#使用volume挂载数据卷" class="headerlink" title="使用volume挂载数据卷"></a>使用volume挂载数据卷</h3><p>volume由Docker来进行管理，在打包的时候可以把volume的内容一起打包，所以有良好的迁移性。volume的默认目录为<code>/var/lib/docker/volumes</code>，所有volume的数据内容都保存在该目录下，每一个目录对应一个volume。在创建volume的时候如果没有指定名称，docker就会生成一个随机字符串命名。<br><img src="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164413976.png" alt="image-20230705164413976"></p>
+<p>创建volume数据卷有三种方式：</p>
+<ul>
+<li>使用 <code>docker volume create volume_name</code> 创建，会在&#x2F;var&#x2F;lib&#x2F;docker&#x2F;volumes下生成一个volume_name命名的目录。</li>
+<li>在 <code>docker run</code> 中使用 <code>-v</code> 或者 <code>--mount</code> 参数进行创建。</li>
+<li>匿名创建。如果 <code>docker volume create</code> 或者 <code>docker run</code> 中都没有指定 volume 的名称，docker 就会生成一个随机字符串作为命名。</li>
+</ul>
+<p>此外volume支持使用 volume drivers，允许将数据存储挂载到远程主机上。</p>
+<p>volume 使用 -v 或者 –mount 参数挂载数据卷的用法和 bind mount 类似。<br>-v语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-v 数据卷名称:容器目录地址:ro</span><br></pre></td></tr></table></figure>
+
+<p>–mount语法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--mount type=bind,source=数据卷名称,target=容器目录地址,readonly</span><br></pre></td></tr></table></figure>
+
+<p>例如把容器的&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html&#x2F;目录挂载到宿主机上一个名为test的卷</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d -it --name my_nginx -p 80:80 -v test:/usr/share/nginx/html/ nginx:latest</span><br><span class="line"></span><br><span class="line">或者</span><br><span class="line"></span><br><span class="line">$ docker run -d -it --name my_nginx -p 80:80 --mount type=bind,source=test,target=/usr/share/nginx/html/ nginx:latest</span><br></pre></td></tr></table></figure>
+
+<p>然后在&#x2F;var&#x2F;lib&#x2F;docker&#x2F;volumes目录下发现生成一个test的目录。</p>
+<h3 id="查看数据卷"><a href="#查看数据卷" class="headerlink" title="查看数据卷"></a>查看数据卷</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># 查看所有容器卷</span><br><span class="line">$ docker volume ls</span><br><span class="line"></span><br><span class="line"># 查看指定容器卷详情信息</span><br><span class="line">$ docker volume inspect volume_name</span><br><span class="line"></span><br><span class="line"># 查看指定容器的数据卷</span><br><span class="line">$ docker inspect containerID</span><br><span class="line">&#123;</span><br><span class="line">......</span><br><span class="line">        &quot;Mounts&quot;: [</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;Type&quot;: &quot;volume&quot;,</span><br><span class="line">                &quot;Name&quot;: &quot;3e680b6c7eeb1965a71cb23a0032934fa5b731b57b9b02bea213c6f82819764f&quot;,</span><br><span class="line">                &quot;Source&quot;: &quot;/var/lib/docker/volumes/3e680b6c7eeb1965a71cb23a0032934fa5b731b57b9b02bea213c6f82819764f/_data&quot;,</span><br><span class="line">                &quot;Destination&quot;: &quot;/usr/share/nginx/html&quot;,</span><br><span class="line">                &quot;Driver&quot;: &quot;local&quot;,</span><br><span class="line">                &quot;Mode&quot;: &quot;&quot;,</span><br><span class="line">                &quot;RW&quot;: true,</span><br><span class="line">                &quot;Propagation&quot;: &quot;&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除数据卷"><a href="#删除数据卷" class="headerlink" title="删除数据卷"></a>删除数据卷</h3><p>数据卷是被设计用来持久化数据的，它的生命周期独立于容器。所以Docker 不会在容器被删除后自动删除数据卷，并且也不存在垃圾回收这样的机制来处理没有任何容器引用的数据卷。我们需要手动删除数据卷。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 删除指定数据卷</span><br><span class="line">$ docker volume rm volume_name</span><br><span class="line"></span><br><span class="line"># 清理所有无用数据卷</span><br><span class="line">$ docker volume prune</span><br></pre></td></tr></table></figure>
+
+<p>如果需要在删除容器的同时移除数据卷。可以在删除容器的时候使用 <code>docker rm -v</code> 这个命令。</p>
+<h2 id="四、网络"><a href="#四、网络" class="headerlink" title="四、网络"></a>四、网络</h2><p>docker为容器间通信设置了四种网络模式：</p>
+<table>
+<thead>
+<tr>
+<th>网络模式</th>
+<th>简介</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bridge</td>
+<td>为每一个容器分配、设置 IP 等，并将容器连接到一个 docker0 虚拟网桥，默认为该模式。</td>
+</tr>
+<tr>
+<td>host</td>
+<td>容器将不会虚拟出自己的网卡，配置自己的 IP 等，而是使用宿主机的 IP 和端口。</td>
+</tr>
+<tr>
+<td>none</td>
+<td>容器有独立的 Network namespace，但并没有对其进行任何网络设置，如分配 veth pair 和网桥连接，IP 等。</td>
+</tr>
+<tr>
+<td>container</td>
+<td>新创建的容器不会创建自己的网卡和配置自己的 IP，而是和一个指定的容器共享 IP、端口范围等。</td>
+</tr>
+</tbody></table>
+<p>安装 Docker 以后，会默认创建三种网络，可以通过 <code>docker network ls</code> 查看。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# docker network ls</span><br><span class="line">NETWORK ID          NAME                DRIVER              SCOPE</span><br><span class="line">688d1970f72e        bridge              bridge              local</span><br><span class="line">885da101da7d        host                host                local</span><br><span class="line">f4f1b3cf1b7f        none                null                local</span><br></pre></td></tr></table></figure>
+
+<h3 id="bridge模式"><a href="#bridge模式" class="headerlink" title="bridge模式"></a>bridge模式</h3><p>Docker 的默认网络模式。守护进程创建了一个虚拟以太网桥 docker0，新建的容器会自动桥接到这个接口，附加在其上的任何网卡之间都能自动转发数据包。</p>
+<p>然后守护进程会创建一对对等虚拟设备接口 veth pair，将其中一个接口设置为容器的 eth0 接口（容器的网卡），另一个接口放置在宿主机的命名空间中，以类似 vethxxx 这样的名字命名，从而将宿主机上的所有容器都连接到这个内部网络上。</p>
+<p>同时，守护进程还会从网桥 docker0 的私有地址空间中分配一个 IP 地址和子网给该容器，并设置 docker0 的 IP 地址为容器的默认网关。<br><img src="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164500393.png" alt="image-20230705164500393"></p>
+<p>Bridge 桥接模式的实现步骤主要如下：</p>
+<ul>
+<li>Docker Daemon 利用 veth pair 技术，在宿主机上创建一对对等虚拟网络接口设备，假设为 veth0 和 veth1。而 veth pair 技术的特性可以保证无论哪一个 veth 接收到网络报文，都会将报文传输给另一方。</li>
+<li>Docker Daemon 将 veth0 附加到 Docker Daemon 创建的 docker0 网桥上。保证宿主机的网络报文可以发往 veth0；</li>
+<li>Docker Daemon 将 veth1 添加到 Docker Container 所属的 namespace 下，并被改名为 eth0。如此一来，宿主机的网络报文若发往 veth0，则立即会被 Container 的 eth0 接收，实现宿主机到 Docker Container 网络的联通性；同时，也保证 Docker Container 单独使用 eth0，实现容器网络环境的隔离性。</li>
+</ul>
+<p>使用 bridge 网络模式：<br>在创建容器时通过参数 <code>--net bridge</code> 或者 <code>--network bridge</code> 指定即可，当然这也是创建容器默认使用的网络模式，也就是说这个参数是可以省略的。</p>
+<p>查看 bridge 网络模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker network inspect bridge</span><br></pre></td></tr></table></figure>
+
+<h3 id="host模式"><a href="#host模式" class="headerlink" title="host模式"></a>host模式</h3><p>采用 host 网络模式的 Docker Container，可以直接使用宿主机的 IP 地址与外界进行通信，若宿主机的 eth0 是一个公有 IP，那么容器也拥有这个公有 IP。同时容器内服务的端口也可以使用宿主机的端口，无需额外进行 NAT 转换。</p>
+<p>host 网络模式可以让容器共享宿主机网络栈，这样的好处是外部主机与容器直接通信，但是容器的网络缺少隔离性。<br><img src="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164517131.png" alt="image-20230705164517131"></p>
+<p>使用 host 网络模式：<br>创建容器时通过参数 <code>--net host</code> 或者 <code>--network host</code> 指定。</p>
+<p>查看 host 网络模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker network inspect host</span><br></pre></td></tr></table></figure>
+
+<h3 id="none模式"><a href="#none模式" class="headerlink" title="none模式"></a>none模式</h3><p>none 网络模式即不为 Docker Container 创建任何的网络环境，容器内部就只能使用 loopback 网络设备，不会再有其他的网络资源。即只有 lo 接口 local 的简写，代表 127.0.0.1，即 localhost 本地环回接口。</p>
+<p>使用 none 网络模式：<br>在创建容器时通过参数 <code>--net none</code> 或者 <code>--network none</code> 指定。<br>查看 none 网络模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker network inspect none</span><br></pre></td></tr></table></figure>
+
+<h3 id="container模式"><a href="#container模式" class="headerlink" title="container模式"></a>container模式</h3><p>处于 Container 网络模式下的 Docker 容器会共享一个网络栈，这样两个容器之间可以使用 localhost 高效快速通信。即新创建的容器不会创建自己的网卡，配置自己的 IP，而是和一个指定的容器共享 IP、端口范围等。同样两个容器除了网络方面相同之外，其他的如文件系统、进程列表等还是隔离的。<br><img src="/2021/04/05/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87/image-20230705164536887.png" alt="image-20230705164536887"></p>
+<p>使用 container 网络模式：<br>在创建容器时通过参数 <code>--net container:已运行的容器名称|ID</code> 或者 <code>--network container:已运行的容器名称|ID</code> 指定。</p>
+<p>处于 Container 网络模式下的容器，如果所依赖的容器停止运行了，本容器就只剩下 lo 接口了。</p>
+<h3 id="link"><a href="#link" class="headerlink" title="link"></a>link</h3><p><code>docker run --link</code> 可以用来链接两个容器，使得源容器（被链接的容器）和接收容器（主动去链接的容器）之间可以互相通信，并且接收容器可以获取源容器的一些数据，如源容器的环境变量。</p>
+<p>这种方式官方已不推荐使用，并且在未来版本可能会被移除，所以这里不作为重点讲解，感兴趣可自行了解。</p>
+<h3 id="自定义网络"><a href="#自定义网络" class="headerlink" title="自定义网络"></a>自定义网络</h3><p>处于同一网络下的两个容器可以直接通过 ip 地址进行通信。但是 IP 地址可能是不固定的，有被更改的情况发生，那容器内所有通信的 IP 地址也需要进行更改。</p>
+<p>从 Docker 1.10 版本开始，docker daemon 实现了一个内嵌的 DNS server，<code>使容器可以直接通过容器名称通信</code>。方法很简单，只要在创建容器时使用 –name 为容器命名即可。</p>
+<p>但是使用 Docker DNS 有个限制：<code>只能在 user-defined 网络中使用。也就是说，默认的 bridge 网络是无法使用 DNS 的</code>。</p>
+<p>为了启用容器名称到 IP 地址的自动 DNS 解析，以及提高容器的安全性，我们就需要自定义网络。</p>
+<h4 id="创建网络"><a href="#创建网络" class="headerlink" title="创建网络"></a>创建网络</h4><p>创建一个基于 bridge 网络模式的自定义网络模式 custom_network。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker network create custom_network</span><br></pre></td></tr></table></figure>
+
+<p>查看网络模式，确认生成 custom_network 模式。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ docker network ls</span><br><span class="line">NETWORK ID          NAME                DRIVER              SCOPE</span><br><span class="line">b3634bbd8943        bridge              bridge              local</span><br><span class="line">062082493d3a        custom_network      bridge              local</span><br><span class="line">885da101da7d        host                host                local</span><br><span class="line">f4f1b3cf1b7f        none                null                local</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用自定义网络创建容器"><a href="#使用自定义网络创建容器" class="headerlink" title="使用自定义网络创建容器"></a>使用自定义网络创建容器</h4><p>使用 custom_network 网络模式创建两个容器 custom_bbox01 和 custom_bbox02</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -di --name custom_bbox01 --net custom_network busybox</span><br><span class="line">$ docker run -di --name custom_bbox02 --net custom_network busybox</span><br></pre></td></tr></table></figure>
+
+<p>这时候进入容器 custom_bbox01，直接执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ping custom_bbox02</span><br></pre></td></tr></table></figure>
+
+<p>通过容器名字已经可以 ping 通。</p>
+<h4 id="加入自定义网络模式"><a href="#加入自定义网络模式" class="headerlink" title="加入自定义网络模式"></a>加入自定义网络模式</h4><p>已经存在的容器custom_bbox03，可以加入自定义网络模式custom_network</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker network connect custom_network custom_bbox03</span><br></pre></td></tr></table></figure>
+
+<h4 id="断开自定义网络模式"><a href="#断开自定义网络模式" class="headerlink" title="断开自定义网络模式"></a>断开自定义网络模式</h4><p>custom_bbox03也可以退出自定义网络模式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker network disconnect custom_network custom_bbox03</span><br></pre></td></tr></table></figure>
+
+<h4 id="删除自定义网络模式"><a href="#删除自定义网络模式" class="headerlink" title="删除自定义网络模式"></a>删除自定义网络模式</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker network rm custom_network</span><br></pre></td></tr></table></figure>
+
+<p>注意：如果通过某个自定义网络模式创建了容器，则该网络模式无法删除。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9Aip%E7%AF%87/" rel="prev" title="计算机网络系列（四）：ip篇">
+      <i class="fa fa-chevron-left"></i> 计算机网络系列（四）：ip篇
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">一、基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#docker%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.1.</span> <span class="nav-text">docker是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker%E6%9E%B6%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">docker架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%95%9C%E5%83%8F"><span class="nav-number">1.3.</span> <span class="nav-text">镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8"><span class="nav-number">1.4.</span> <span class="nav-text">容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%93%E5%BA%93"><span class="nav-number">1.5.</span> <span class="nav-text">仓库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81docker%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">二、docker原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Namespace"><span class="nav-number">2.1.</span> <span class="nav-text">Namespace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cgroups"><span class="nav-number">2.2.</span> <span class="nav-text">Cgroups</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Unionfs"><span class="nav-number">2.3.</span> <span class="nav-text">Unionfs</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AUFS"><span class="nav-number">2.3.1.</span> <span class="nav-text">AUFS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Overlay2"><span class="nav-number">2.3.2.</span> <span class="nav-text">Overlay2</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%95%B0%E6%8D%AE%E5%8D%B7"><span class="nav-number">3.</span> <span class="nav-text">三、数据卷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8bind-mount%E6%8C%82%E8%BD%BD%E6%95%B0%E6%8D%AE%E5%8D%B7"><span class="nav-number">3.1.</span> <span class="nav-text">使用bind mount挂载数据卷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8volume%E6%8C%82%E8%BD%BD%E6%95%B0%E6%8D%AE%E5%8D%B7"><span class="nav-number">3.2.</span> <span class="nav-text">使用volume挂载数据卷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%95%B0%E6%8D%AE%E5%8D%B7"><span class="nav-number">3.3.</span> <span class="nav-text">查看数据卷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE%E5%8D%B7"><span class="nav-number">3.4.</span> <span class="nav-text">删除数据卷</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%BD%91%E7%BB%9C"><span class="nav-number">4.</span> <span class="nav-text">四、网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#bridge%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.1.</span> <span class="nav-text">bridge模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#host%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.2.</span> <span class="nav-text">host模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#none%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.3.</span> <span class="nav-text">none模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#container%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.4.</span> <span class="nav-text">container模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#link"><span class="nav-number">4.5.</span> <span class="nav-text">link</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C"><span class="nav-number">4.6.</span> <span class="nav-text">自定义网络</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%BD%91%E7%BB%9C"><span class="nav-number">4.6.1.</span> <span class="nav-text">创建网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E5%88%9B%E5%BB%BA%E5%AE%B9%E5%99%A8"><span class="nav-number">4.6.2.</span> <span class="nav-text">使用自定义网络创建容器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A0%E5%85%A5%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.6.3.</span> <span class="nav-text">加入自定义网络模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%AD%E5%BC%80%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.6.4.</span> <span class="nav-text">断开自定义网络模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.6.5.</span> <span class="nav-text">删除自定义网络模式</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
