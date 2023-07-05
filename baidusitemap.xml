@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://yoursite.com/2018/06/13/Hexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</loc>
+    <lastmod>2023-07-05</lastmod>
+  </url>
+  <url>
     <loc>http://yoursite.com/2021/04/06/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9ADockerfile/</loc>
     <lastmod>2023-07-05</lastmod>
   </url>
@@ -70,10 +74,6 @@
   </url>
   <url>
     <loc>http://yoursite.com/2018/06/17/Hexo%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE/</loc>
-    <lastmod>2023-02-12</lastmod>
-  </url>
-  <url>
-    <loc>http://yoursite.com/2018/06/13/Hexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</loc>
     <lastmod>2023-02-12</lastmod>
   </url>
   <url>

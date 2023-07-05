@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2018/06/13/Hexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</loc>
+    
+    <lastmod>2023-07-05</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2021/04/06/docker%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9ADockerfile/</loc>
     
     <lastmod>2023-07-05</lastmod>
@@ -156,15 +165,6 @@
   
   <url>
     <loc>http://yoursite.com/2018/06/17/Hexo%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE/</loc>
-    
-    <lastmod>2023-02-12</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2018/06/13/Hexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</loc>
     
     <lastmod>2023-02-12</lastmod>
     
@@ -453,14 +453,14 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/Maven/</loc>
+    <loc>http://yoursite.com/tags/Hadoop/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/Hadoop/</loc>
+    <loc>http://yoursite.com/tags/Maven/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -539,13 +539,6 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E5%B7%A5%E5%85%B7/Hexo/</loc>
-    <lastmod>2023-07-05</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>http://yoursite.com/categories/%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
@@ -553,7 +546,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E5%B7%A5%E5%85%B7/Maven/</loc>
+    <loc>http://yoursite.com/categories/%E5%B7%A5%E5%85%B7/Hexo/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -567,14 +560,21 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/Java/</loc>
+    <loc>http://yoursite.com/categories/%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/</loc>
+    <loc>http://yoursite.com/categories/%E5%B7%A5%E5%85%B7/Maven/</loc>
+    <lastmod>2023-07-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/categories/Java/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -623,7 +623,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/Java/Java%E5%B9%B6%E5%8F%91/</loc>
+    <loc>http://yoursite.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -637,21 +637,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</loc>
-    <lastmod>2023-07-05</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>http://yoursite.com/categories/Java/Java%E9%9B%86%E5%90%88/</loc>
-    <lastmod>2023-07-05</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/categories/docker/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -673,6 +659,20 @@
   
   <url>
     <loc>http://yoursite.com/categories/javax/log4j/</loc>
+    <lastmod>2023-07-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/categories/Java/Java%E5%B9%B6%E5%8F%91/</loc>
+    <lastmod>2023-07-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/categories/docker/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
