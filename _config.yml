@@ -81,9 +81,12 @@ theme: next-reloaded
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
- type: git
- repo: https://github.com/mcbilla/mcbilla.github.io.git
- branch: master
+  type: git
+  repo:
+    github:
+      url: https://github.com/mcbilla/mcbilla.github.io.git
+      branch: master
+      token: $GITHUB_TOKEN
 
 # 本地搜索
 search:
