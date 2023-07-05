@@ -453,14 +453,14 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/Hadoop/</loc>
+    <loc>http://yoursite.com/tags/Maven/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/Maven/</loc>
+    <loc>http://yoursite.com/tags/Hadoop/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -553,7 +553,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/</loc>
+    <loc>http://yoursite.com/categories/%E5%B7%A5%E5%85%B7/Maven/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -567,7 +567,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E5%B7%A5%E5%85%B7/Maven/</loc>
+    <loc>http://yoursite.com/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -609,13 +609,6 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop/</loc>
-    <lastmod>2023-07-05</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>http://yoursite.com/categories/Linux/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
@@ -623,7 +616,21 @@
   </url>
   
   <url>
+    <loc>http://yoursite.com/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop/</loc>
+    <lastmod>2023-07-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</loc>
+    <lastmod>2023-07-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/categories/Java/Java%E5%B9%B6%E5%8F%91/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -659,13 +666,6 @@
   
   <url>
     <loc>http://yoursite.com/categories/javax/log4j/</loc>
-    <lastmod>2023-07-05</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/categories/Java/Java%E5%B9%B6%E5%8F%91/</loc>
     <lastmod>2023-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
