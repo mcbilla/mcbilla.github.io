@@ -82,7 +82,7 @@ theme: next-reloaded
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
  type: git
- repo: https://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@github.com/mcbilla/mcbilla.github.io.git
+ repo: https://github.com/mcbilla/mcbilla.github.io.git
  branch: master
 
 # 本地搜索
