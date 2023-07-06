@@ -1,0 +1,408 @@
+---
+title: docker系列（二）：docker命令
+date: 2021-04-05 16:15:53
+categories:
+- docker
+tags:
+- docker
+---
+
+> docker系列（二）：docker命令
+
+<!--more-->
+
+## 一、系统概况
+### 查看docker信息
+```
+$ docker info
+
+$ docker version
+```
+
+### 查看docker事件
+```
+docker events [OPTIONS]
+```
+OPTIONS说明：
+* -f ：根据条件过滤事件
+* --since ：从指定的时间戳后显示所有事件
+* --until ：流水时间显示到指定的时间为止
+
+### 重启整个docker服务
+```
+$ service docker restart
+```
+
+### 使用代理
+官方默认：`/etc/docker/daemon.json`
+
+```
+# 例如使用科大的加速地址
+$ sudo vim /etc/default/docker
+
+# 增加一句
+{
+  "registry-mirrors": ["https://docker.mirrors.ustc.edu.cn"]
+}
+
+# 然后重启
+$ sudo service docker restart
+```
+ubuntu：`/etc/default/docker`
+
+```
+# 例如使用科大的加速器
+$ sudo vim /etc/docker/daemon.json
+
+# 在最后添加一句
+DOCKER_OPTS="--registry-mirror=https://docker.mirrors.ustc.edu.cn"
+
+# 然后重启
+$ sudo service docker restart
+```
+
+## 二、容器
+### 启动全新容器
+```
+docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+```
+options说明：
+* -d：后台运行容器，并返回容器ID；
+* -i保证容器的STDIN是开启的，-t为容器创建一个伪tty终端，两者结合使用创建一个交互式容器
+* -p：指定端口映射，格式为：主机(宿主)端口:容器端口
+* --name：为容器指定一个名称
+* -e：设置环境变量
+* --net="bridge": 指定容器的网络连接类型，支持bridge/host/none/container四种类型
+* --link=[]：添加链接到另一个容器；
+* --expose=[]：开放一个端口或一组端口；
+* -v，--volume：绑定一个卷
+* --rm：容器退出后会自动清理，--rm 不能与 -d 同时使用（或者说同时使用没有意义）
+* -c：容器运行起来后要执行的命令
+
+示例
+```
+$ docker run -d \ #以后台形式运行，如果是-i -t就是以交互形式运行
+--name mynginx \ #自定义容器名字
+-p 8000:80 \ #主机端口:容器端口
+-e "ENV_OPTS=test" \ #环境参数
+-v /test:/usr/share/nginx/html \ #挂载目录，主机文件目录:容器文件目录
+-c bash \ #容器运行起来后要执行的命令
+nginx:1.17
+```
+
+### 操作容器
+
+#### 启动已存在的容器
+
+```
+$ docker start [NAME]/[CONTAINER ID]
+```
+
+#### 重启正在运行的容器
+
+```
+$ docker restart [NAME]/[CONTAINER ID]
+```
+
+#### 暂停容器中所有的进程
+
+```
+$ docker pause [NAME]/[CONTAINER ID]
+```
+
+#### 恢复容器中所有的进程
+
+```
+$ docker unpause [NAME]/[CONTAINER ID]
+```
+
+#### 停止容器
+
+```
+$ docker stop [NAME]/[CONTAINER ID]
+```
+
+#### 强制停止容器
+
+```
+$ docker kill [NAME]/[CONTAINER ID]
+```
+
+#### 停止所有容器
+
+```
+$ docker stop $(docker ps -aq)
+```
+
+### 进入容器
+
+有两种方式，第一种是使用 `docker attach`。
+
+```
+$ docker attach [NAME]/[CONTAINER ID]
+```
+第二种是使用 `docker exec`
+
+```
+$ docker exec [OPTIONS] [NAME]/[CONTAINER ID] COMMAND [ARG...]
+```
+options说明：
+* -d：分离模式，在后台运行
+* -i：即使没有附加也保持STDIN 打开
+* -t：分配一个伪终端
+
+示例
+
+```
+docker exec -it daemon_dave /bin/bash
+```
+
+>attach 和 exec 的区别：
+>* attach把标准输出输入连接到容器内的PID1，所有的窗口都会同步显示。如果有一个窗口阻塞了，那么其他窗口也无法再进行操作；使用attach连接容器，退出的时候容器也会被关闭。所以attach太适合于生产环境。
+>* exec：不同终端连接到不同的tty，使用exec连接容器，退出的时候容器不会被关闭。
+
+### 查看容器信息
+#### 查看当前运行的所有容器
+
+```
+$ docker ps [options]
+```
+options说明：
+* -a：显示所有的容器，包括未运行的。
+* -f：根据条件过滤显示的内容。
+* --format：指定返回值的模板文件。
+* -l：显示最近创建的容器。
+* -n：列出最近创建的n个容器。
+* --no-trunc：不截断输出。
+* -q：静默模式，只显示容器编号。
+* -s：显示总的文件大小。
+
+示例
+
+```
+# 列出所有的容器 ID
+$ docker ps -aq
+```
+
+#### 查看指定容器详细信息
+
+```
+$ docker inspect [NAME]/[CONTAINER ID]
+```
+#### 查看容器内部进程
+
+```
+$ docker top [NAME]/[CONTAINER ID]
+```
+
+#### 统计容器信息
+
+```
+$ docker stats [NAME]/[CONTAINER ID]
+```
+#### 查看容器日志
+
+```
+$ docker logs [OPTIONS] [NAME]/[CONTAINER ID]
+```
+options说明：
+* -f：跟踪日志输出
+* --since：显示某个开始时间的所有日志
+* -t：显示时间戳
+* --tail：仅列出最新N条容器日志
+
+示例
+
+```
+# 查看容器mynginx从2016年7月1日后的最新10条日志。
+$ docker logs --since="2016-07-01" --tail=10 mynginx
+```
+
+### 删除容器
+
+#### 删除未停止的容器
+
+删除一个或多个容器，在删除需要先停止容器
+```
+$ docker rm [OPTIONS] [NAME]/[CONTAINER ID]
+```
+OPTIONS说明：
+* -f：通过 SIGKILL 信号强制删除一个运行中的容器。
+* -l：移除容器间的网络连接，而非容器本身。
+* -v：删除与容器关联的卷。
+
+#### 删除所有已停止容器
+
+```
+$ docker container prune -f
+或
+$ docker rm $(docker ps -aq)
+```
+
+### 容器和宿主机间传递文件
+
+不管容器有没有启动，拷贝命令都会生效。
+
+#### 从容器拷贝文件到宿主机
+
+```
+docker cp mycontainer:/opt/testnew/file.txt /opt/test/
+```
+#### 从宿主机拷贝文件到容器
+
+```
+docker cp /opt/test/file.txt mycontainer:/opt/testnew/
+```
+## 三、镜像
+### 查看镜像列表
+```
+$ docker images [OPTIONS] [REPOSITORY[:TAG]]
+```
+options说明：
+* -a：列出本地所有的镜像（含中间映像层，默认情况下，过滤掉中间映像层）；
+* --digests：显示镜像的摘要信息；
+* -f：显示满足条件的镜像；
+* --format：指定返回值的模板文件；
+* --no-trunc：显示完整的镜像信息；
+* -q：只显示镜像ID。
+
+### 创建镜像
+
+#### 使用 `docker commit` 创建镜像
+
+```
+$ docker commit [OPTIONS] [NAME]/[CONTAINER ID] [REPOSITORY[:TAG]]
+```
+options说明：
+* -a：提交的镜像作者
+* -c：使用Dockerfile指令来创建镜像
+* -m：提交时的说明文字
+* -p：在commit时，将容器暂停
+
+示例
+
+```
+# 基于当前运行的容器 my_ubuntu 创建镜像 ubuntu:v1.0
+$ docker commit my_ubuntu ubuntu:v1.0
+```
+
+#### 使用 `docker build` 创建镜像
+
+```
+$ docker build [OPTIONS] PATH | URL | -
+```
+可以使用本地或者远程 Dockerfile 文件来创建镜像：
+* PATH：本地路径，包括`.`表示当前目录。例如基于当前目录上下文：`docker build .`
+* URL：远程路径。例如使用github仓库地址：`docker build github.com/creack/docker-firefox`
+* -：不使用指定上下文，从 STDIN 读取 Dockerfile，也可以把 Dockerfile 通过 STDIN 传入：`docker build - < Dockerfile`。
+
+options说明：
+* --build-arg=[]	设置镜像创建时的变量
+* --cpu-shares	设置 cpu 使用权重
+* --cpu-period	限制 CPU CFS周期
+* --cpu-quota	限制 CPU CFS配额
+* --cpuset-cpus	指定使用的CPU id
+* --cpuset-mems	指定使用的内存 id
+* --disable-content-trust	忽略校验，默认开启
+* -f	指定要使用的Dockerfile路径
+* --force-rm	设置镜像过程中删除中间容器
+* --isolation	使用容器隔离技术
+* --label=[]	设置镜像使用的元数据
+* -m	设置内存最大值
+* --memory-swap	设置 Swap 的最大值为内存 +swap，"-1"表示不限 swap
+* --no-cache	创建镜像的过程不使用缓存
+* --pull	尝试去更新镜像的新版本
+* -q	安静模式，成功后只输出镜像ID
+* --rm	设置镜像成功后删除中间容器
+* --shm-size	设置/dev/shm的大小，默认值是64M
+* --ulimit	Ulimit配置
+* --tag, -t 镜像的名字及标签，通常 name:tag 或者 name 格式；可以在一次构建中为一个镜像设置多个标签。
+
+示例
+
+```
+# 使用当前目录的 Dockerfile 创建镜像，标签为 runoob/ubuntu:v1。
+$ docker build -t runoob/ubuntu:v1 .
+
+# 指定Dockerfile 文件的位置，但还是基于当前目录上下文
+$ docker build -f /path/to/a/Dockerfile .
+
+# 使用URL github.com/creack/docker-firefox 的 Dockerfile 创建镜像
+$ docker build github.com/creack/docker-firefox
+```
+
+### 重命名镜像
+```
+$ docker tag IMAGE[:TAG] [REGISTORY/][USERNAME/]NAME[:TAG]
+```
+示例
+
+```
+# 将镜像ubuntu:15.10标记为 runoob/ubuntu:v3 镜像
+$ docker tag ubuntu:15.10 runoob/ubuntu:v3
+```
+
+### 查看镜像历史
+```
+$ docker history [OPTIONS] REPOSITORY[:TAG]
+```
+OPTIONS说明：
+* -H：以可读的格式打印镜像大小和日期，默认为true；
+* --no-trunc：显示完整的提交记录；
+* -q：仅列出提交记录ID。
+
+### 删除镜像
+```
+$ docker rmi [OPTIONS] REPOSITORY[:TAG]
+```
+options说明：
+* -f：强制删除
+* --no-prune：不移除该镜像的过程镜像，默认移除
+
+#### 删除所有镜像
+
+```
+$ docker rmi $(docker images -q)
+或
+$ docker image prune -af
+```
+
+## 四、仓库
+### 登陆远程仓库
+登陆到一个Docker镜像仓库，如果未指定镜像仓库地址，默认为官方仓库 Docker Hub
+
+```
+$ docker login [OPTIONS] [SERVER]
+```
+OPTIONS说明：
+* -u：登陆的用户名
+* -p：登陆的密码
+
+### 登出远程仓库
+
+```
+$ docker logout
+```
+
+### 在仓库中查找镜像
+默认从Docker Hub查找镜像
+```
+$ docker search [OPTIONS] TERM
+```
+* --automated：只列出 automated build类型的镜像；
+* --no-trunc：显示完整的镜像描述；
+* -f <过滤条件>：列出收藏数不小于指定值的镜像。
+
+### 从仓库拉取镜像
+从镜像仓库拉取镜像，如果不加 tag 默认拉取 latest 镜像。
+```
+$ docker pull [OPTIONS] REPOSITORY[:TAG]
+```
+options说明：
+* -a：拉取所有 tagged 镜像
+* --disable-content-trust：忽略镜像的校验,默认开启
+
+### 上传镜像到仓库
+```
+$ docker push REPOSITORY[:TAG]
+```
