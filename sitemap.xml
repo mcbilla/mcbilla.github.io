@@ -517,14 +517,14 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/%E9%9B%86%E5%90%88/</loc>
+    <loc>http://yoursite.com/tags/javascript/</loc>
     <lastmod>2023-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/javascript/</loc>
+    <loc>http://yoursite.com/tags/%E9%9B%86%E5%90%88/</loc>
     <lastmod>2023-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -666,13 +666,6 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</loc>
-    <lastmod>2023-07-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>http://yoursite.com/categories/Java/Java%E5%BC%82%E5%B8%B8/</loc>
     <lastmod>2023-07-07</lastmod>
     <changefreq>weekly</changefreq>
@@ -680,14 +673,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/Java/Java%E5%B9%B6%E5%8F%91/</loc>
-    <lastmod>2023-07-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/categories/Java/Java%E9%9B%86%E5%90%88/</loc>
+    <loc>http://yoursite.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</loc>
     <lastmod>2023-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -708,6 +694,13 @@
   </url>
   
   <url>
+    <loc>http://yoursite.com/categories/Java/Java%E9%9B%86%E5%90%88/</loc>
+    <lastmod>2023-07-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/categories/Java/Java%E5%9F%BA%E7%A1%80/</loc>
     <lastmod>2023-07-07</lastmod>
     <changefreq>weekly</changefreq>
@@ -716,6 +709,13 @@
   
   <url>
     <loc>http://yoursite.com/categories/javax/log4j/</loc>
+    <lastmod>2023-07-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/categories/Java/Java%E5%B9%B6%E5%8F%91/</loc>
     <lastmod>2023-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
