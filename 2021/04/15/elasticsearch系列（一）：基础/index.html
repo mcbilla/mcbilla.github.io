@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="elasticsearch系列（一）：基础">
+<meta property="og:type" content="article">
+<meta property="og:title" content="elasticsearch系列（一）：基础">
+<meta property="og:url" content="http://yoursite.com/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="elasticsearch系列（一）：基础">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/F415A5F0-B924-443F-88B2-30D89112254E.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/6A837C36-3517-428B-B124-F36DC6DA8FA0.png">
+<meta property="article:published_time" content="2021-04-15T11:02:43.000Z">
+<meta property="article:modified_time" content="2023-07-07T11:43:11.004Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/F415A5F0-B924-443F-88B2-30D89112254E.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>elasticsearch系列（一）：基础 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          elasticsearch系列（一）：基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-15 19:02:43" itemprop="dateCreated datePublished" datetime="2021-04-15T19:02:43+08:00">2021-04-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-07 19:43:11" itemprop="dateModified" datetime="2023-07-07T19:43:11+08:00">2023-07-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticsearch/" itemprop="url" rel="index"><span itemprop="name">elasticsearch</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/" class="post-meta-item leancloud_visitors" data-flag-title="elasticsearch系列（一）：基础" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>elasticsearch系列（一）：基础</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="一、elastisearch-是什么"><a href="#一、elastisearch-是什么" class="headerlink" title="一、elastisearch 是什么"></a>一、elastisearch 是什么</h2><p>ElasticSearch 是一款非常强大的、基于Lucene的开源搜索及分析引擎，具备<strong>全文检索</strong>、<strong>结构化搜索</strong>和<strong>分析</strong>等功能。ElasticSearch  <strong>隐藏 Lucene 的复杂性，取而代之的提供一套简单一致的 RESTful API</strong>，让全文搜索变得简单。</p>
+<p>除了搜索，结合Kibana、Logstash、Beats开源产品，Elastic Stack（简称ELK）还被广泛运用在大数据近实时分析领域，包括：<strong>日志分析</strong>、<strong>指标监控</strong>、<strong>信息安全</strong>等。它可以帮助你<strong>探索海量结构化、非结构化数据，按需创建可视化报表，对监控数据设置报警阈值，通过使用机器学习，自动识别异常状况</strong>。</p>
+<p>主要功能：</p>
+<ol>
+<li>海量数据的分布式存储以及集群管理，达到了服务与数据的高可用以及水平扩展。</li>
+<li>近实时搜索，性能卓越。对结构化、全文、地理位置等类型数据的处理。</li>
+<li>海量数据的近实时分析（聚合功能）。</li>
+</ol>
+<p>应用场景：</p>
+<ol>
+<li>网站搜索、垂直搜索、代码搜索。</li>
+<li>日志管理与分析、安全指标监控、应用性能监控、Web抓取舆情分析。</li>
+</ol>
+<h2 id="二、elasticsearch-安装启动"><a href="#二、elasticsearch-安装启动" class="headerlink" title="二、elasticsearch 安装启动"></a>二、elasticsearch 安装启动</h2><p>下载地址 <code>https://www.elastic.co/cn/downloads/elasticsearch</code>，选择对应系统的版本，下载解压即可。一般需要搭配 kibana 使用，所以需要另外安装 kibana。</p>
+<p>然后切换到安装目录，执行下面命令启动。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ bin/elasticsearch</span><br></pre></td></tr></table></figure>
+
+<p>也可以选择 docker 安装和启动，参考 <a target="_blank" rel="noopener" href="http://localhost:4000/2021/04/10/docker%E7%B3%BB%E5%88%97%EF%BC%9A%E5%AE%89%E8%A3%85%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6/">docker安装</a></p>
+<p>访问地址：<code>http://localhost:9200</code></p>
+<h2 id="三、elasticsearch-架构"><a href="#三、elasticsearch-架构" class="headerlink" title="三、elasticsearch 架构"></a>三、elasticsearch 架构</h2><p><img src="/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/F415A5F0-B924-443F-88B2-30D89112254E.png" alt="F415A5F0-B924-443F-88B2-30D89112254E"></p>
+<ul>
+<li>数据存储层：Gateway 是 Elasticsearch 索引的持久化存储方式，ES 默认是先把索引存放到内存中，当内存满了之后，再持久化到硬盘里。当这个 Elasticsearch 集群关闭或者再次重新启动时就会从 Gateway 中读取索引数据。 Gateway支持多种类型：本地文件系统（默认）、分布式文件系统 Hadoop 以及 AMZ 的 S3 云存储服务。ES目前主要使用 Local FileSystem，主要利用本机节点、本地文件系统存储索引和文档，其他三个都废弃掉了。</li>
+<li>核心架构层：Elasticsearch 是基于 Lucene 架构实现的，所以其核心层为 Lucene。Lucene 是一个开源的全文检索引擎工具包和编程库，提供了原始接口调用，直接使用 Lucene，你需要覆盖大量的集成框架工作，复杂性较高，而且只能支持单体架构的搜索。Elasticsearch 底层是基于这些包，对其进行了扩展和集成，隐藏了 Lucene 的复杂性，取而代之的提供一套简单一致的 RESTful API，实现了 Lucene 的分布式架构，提供了比 Lucene 更为丰富的查询语言，可以非常方便的通过 Elasticsearch 的 HTTP 接口与底层 Lucene 交互。</li>
+<li>数据处理层：包含四个模块：<ul>
+<li>Index Module：索引模块，就是对数据建立索引也就是通常所说的建立一些倒排索引等。</li>
+<li>Search Module：搜索模块，就是对数据进行查询搜索。</li>
+<li>Mapping Module：数据映射与解析模块，就是你的数据的每个字段可以根据你建立的表结构通过mapping进行映射解析，如果你没有建立表结构，es就会根据你的数据类型推测你的数据结构之后自己生成一个mapping，然后都是根据这个mapping进行解析你的数据。</li>
+<li>River Module 在es2.0之后应该是被取消了，它的意思表示是第三方插件，例如可以通过一些自定义的脚本将传统的数据库（mysql）等数据源通过格式化转换后直接同步到es集群里，这个River大部分是自己写的，写出来的东西质量参差不齐，将这些东西集成到es中会引发很多内部bug，严重影响了es的正常应用，所以在es2.0之后考虑将其去掉。</li>
+</ul>
+</li>
+<li>发现&#x2F;脚本层：包含三个模块：<ul>
+<li>Discovery：Discovery 是集群中节点之间发现的组件。es是一个集群包含很多节点，很多节点需要互相发现对方，然后组成一个集群包括选主的，这些节点互相发现依赖 discovery 模块，默认使用的是 Zen。Zen 包含多播和单播两种方式。多播指一个节点可以向多台机器发送请求。生产环境中ES不建议使用这种方式，对于一个大规模的集群，组播会产生大量不必要的通信。单播指当一个节点加入一个现有集群，或者组建一个新的集群时，请求发送到一台机器。当一个节点联系到单播列表中的成员时，它就会得到整个集群所有节点的状态，然后它会联系Master节点并加入集群。单播也是ES 默认配置方式。</li>
+<li>Scripting：Scripting 是支持一些脚本语言的组件，包括mvel、js、python等等。但由于存在性能和使用场景少的问题，目前实际生产中使用比较少。</li>
+<li>3rd Plugins：支持第三方插件的整合，留了入口，例如 ik 分词器。</li>
+</ul>
+</li>
+<li>协议层：包含两个模块：<ul>
+<li>Transport：Transport 是 es 内部节点或集群与客户端的交互方式组件。默认是使用tcp协议进行交互，同时它支持http协议（json格式）、thrift、servlet、memcached、zeroMQ等的传输协议（通过插件方式集成）。</li>
+<li>JMX：使用 Java 提供的 JMX 框架，日常ES中使用比较少，作为了解部分即可。</li>
+</ul>
+</li>
+<li>应用层：包含两个模块<ul>
+<li>RestFul API：官方推荐使用的提供给客户端的访问方式，直接发送http请求，可以方便做负载均衡和权限管理。</li>
+<li>Java API：如果是使用 Java 客户端，可以选择 Java API 的访问方式，利用 Netty，通过 JMX 协议，但是不好做负载均衡和权限管理。</li>
+</ul>
+</li>
+</ul>
+<h2 id="四、elasticsearch-基础概念"><a href="#四、elasticsearch-基础概念" class="headerlink" title="四、elasticsearch 基础概念"></a>四、elasticsearch 基础概念</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>描述</th>
+<th>注意事项</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>cluster</td>
+<td>cluster 是由具有相同 cluster.name （默认值为elasticsearch）的一个或多个 Elasticsearch 节点组成的。一个节点通过指定 cluster.name 来加入某个集群。</td>
+<td>使用ElasticSearch集群时，需要选择一个合适的名字来代替cluster.name(默认值)。默认值是为了防止一个新启动的节点加入相同网络中的另一个相同的集群中。</td>
+</tr>
+<tr>
+<td>node</td>
+<td>node 是一个运行的 Elasticsearch 实例，是组成 ElasticSearch 集群的基本服务单元，一个 cluster 包含一到多个 node。node 负责完成集群管理、数据存储和索引搜索等功能。</td>
+<td>注意一个 node 不一定就是一台服务器，因为一个服务器上可以部署多个 node。</td>
+</tr>
+<tr>
+<td>index</td>
+<td>index 是是 es 组织文档的方式，是拥有相结构 document 的集合，类似于关系型数据库的一张数据表。可以把已经创建好的某个索引的参数设置(settings)和索引映射(mapping)保存下来作为 index template，在创建新 index 时，指定要使用的 index template，就可以直接重用已经定义好的模板中的settings和mappings（这点是关键）。修改模板不会影响已创建的 index。</td>
+<td>6.0之前 index 是被设计成数据库的概念，后面逐渐向设计成表的概念发展。index 名称必须全部小写，所以不建议写成驼峰式。</td>
+</tr>
+<tr>
+<td>alias</td>
+<td>alias 是 index 的别名。index 创建后就不可以更新名称，如果需要更新名称，就需要 alias 的功能。alias 类似于一个快捷方式或软连接，可以指向一个或多个 index，也可以给任何一个需要 index 的API来使用。alias 的作用：在运行的集群中可以无缝的从一个 index 切换到另一个 index。给多个 index 分组 (例如， last_three_months)。给 index 的一个子集创建视图。</td>
+<td>假如已经建了很多周的索引，有个需求是查询最新一周的索引，我们每周查询的索引名称可能都是不同的。我们可以建一个索引别名为this_week，每周只需要修改这个索引别名指向本周的新建索引，就是保证查询索引别名不变的情况下，查询到每周的新数据。</td>
+</tr>
+<tr>
+<td>type</td>
+<td>type 是 index 内部的逻辑分区，使用 type 允许我们在一个 index 里存储多种类型的数据，这样就可以减少 index 的数量了。但是使用 type 的限制较多：不同 type 里的字段需要保持一致。例如，一个 index 下的不同 type 里有两个名字相同的字段，他们的类型（string, date 等等）和配置也必须相同。只在某个 type 里存在的字段，在其他没有该字段的 type 中也会消耗资源。得分是由 index 内的统计数据来决定的。也就是说，一个 type 中的文档会影响另一个 type 中的文档的得分。这意味着，只有同一个 index 的中的 type 都有类似的映射 (mapping) 时，才应该使用 type。否则，使用多个 type 可能比使用多个 index 消耗的资源更多。所以后面 type 逐渐被废弃。</td>
+<td>6.x版本，一个 Index 可以拥有多个 type。7.x版本，一个索引只能拥有一个type，默认的type 就是_doc，但已经建议删除。8.x版本，彻底删除。</td>
+</tr>
+<tr>
+<td>mapping</td>
+<td>mapping 定义了 index 中 filed 的存储类型、分词方式、是否存储等信息，类似于关系型数据库中的表结构信息。</td>
+<td>ElasticSearch 会根据数据格式自动识别 index 中字段的类型，如无特殊需求，则不需要手动创建 Mapping。当需要对某些字段添加特殊属性时，就需要手动设置Mapping（如是否分词、是否存储、定义使用其他分词器）。一个 index 的 Mapping 一旦创建，若已经存储了数据，就不可以修改</td>
+</tr>
+<tr>
+<td>document</td>
+<td>document 是指 es 的一条数据。用 JSON 作为 document 序列化的格式。每个 document 都有一个 Uid，一个 index 由多个 document 组成。</td>
+<td>6.x版本以前，一个 type 由多个 document 组成，逐渐废弃了 type，index 代替了 type 的概念。</td>
+</tr>
+<tr>
+<td>field</td>
+<td>filed 是指 document 中的某一个属性，一个 document 由多个 field 组成，类似于关系型数据库中的列。</td>
+<td></td>
+</tr>
+<tr>
+<td>shard</td>
+<td>shard 是将一个 index 拆分成几个部分，每部分数据称为一个 shard，shard 分布在不同的 node 上，类似于 mysq l中的分表。shard 可以避免单个 node 的物理限制，增加吞吐量。</td>
+<td>创建 shard 时需要指定 shard 的数量，并且 shard 的数量一旦确定就不能更改。向设有多个 shard 的 index 中写入数据时，是通过路由来确定具体写入哪个 shard 中。</td>
+</tr>
+<tr>
+<td>replica</td>
+<td>replica 是对主 shard 的备份。每个主 shard 都可以有零或者多个 replica，主 shard 和备份 replica 分散在不同的节点上，都可以对外提供数据查询服务。replica 可以提高系统容错性。当构建 index 进行写入操作时，首先在主 shard 上完成数据的索引，然后数据会从主 shard 分发到 replica 上进行索引。当主 shard 不可用时，ElasticSearch会在 replica 中选举一个作为主 shard，从而避免数据丢失。</td>
+<td>replica 即可以提升 ElasticSearch 系统的高可用性能，又可以提升搜索时的并发性能。但如果 replica 数量设置太多，会在写操作时增加数据同步的负担。</td>
+</tr>
+</tbody></table>
+<h3 id="关系图"><a href="#关系图" class="headerlink" title="关系图"></a>关系图</h3><p><img src="/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/6A837C36-3517-428B-B124-F36DC6DA8FA0.png" alt="6A837C36-3517-428B-B124-F36DC6DA8FA0"></p>
+<ul>
+<li>一个 ES Index 在集群模式下，有多个Node（节点）组成，每个节点就是ES的 instance（实例）</li>
+<li>每个节点上会有多个 shard（分片），P1 P2 是主分片，R1 R2 是副本分片。</li>
+<li>每个分片上对应着就是一个 Lucene Index （底层索引文件）</li>
+<li>一个 Lucene Index 包含的内容：<ul>
+<li>由多个 Segment（段文件，就是倒排索引）组成，每个段文件存储着的就是 Doc 文档。</li>
+<li>commit point 记录了所有的 segments 的信息</li>
+</ul>
+</li>
+</ul>
+<h3 id="elasticsearch-和-mysql-的概念对比"><a href="#elasticsearch-和-mysql-的概念对比" class="headerlink" title="elasticsearch 和 mysql 的概念对比"></a>elasticsearch 和 mysql 的概念对比</h3><table>
+<thead>
+<tr>
+<th>elasticsearch概念</th>
+<th>mysql概念</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>filed</td>
+<td>属性(列)</td>
+</tr>
+<tr>
+<td>document</td>
+<td>记录(行)</td>
+</tr>
+<tr>
+<td>type（已废弃）</td>
+<td>表</td>
+</tr>
+<tr>
+<td>index</td>
+<td>数据库(表)</td>
+</tr>
+<tr>
+<td>mapping</td>
+<td>schema</td>
+</tr>
+<tr>
+<td>shard</td>
+<td>分表</td>
+</tr>
+<tr>
+<td>SQL</td>
+<td>DSL（Domain Specific Language）</td>
+</tr>
+<tr>
+<td>select * from xxx</td>
+<td>GET http:&#x2F;&#x2F;…</td>
+</tr>
+<tr>
+<td>update xx set xx &#x3D; xxx</td>
+<td>PUT http:&#x2F;&#x2F;…</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>DELETE http:&#x2F;&#x2F;…</td>
+</tr>
+</tbody></table>
+<h2 id="五、elasticsearch-版本变化"><a href="#五、elasticsearch-版本变化" class="headerlink" title="五、elasticsearch 版本变化"></a>五、elasticsearch 版本变化</h2><h3 id="去除-type-概念"><a href="#去除-type-概念" class="headerlink" title="去除 type 概念"></a>去除 type 概念</h3><p>ElasticSearch 从 6.x 版本开始着手去除 type 概念，目的是为了提高处理数据的效率。</p>
+<ul>
+<li>关系型数据库中两个数据表示是独立的，即使他们里面有相同名称的列也不影响使用，但ES中不是这样的。elasticsearch是基于Lucene开发的搜索引擎，而ES中不同type下名称相同的filed最终在Lucene中的处理方式是一样的。</li>
+<li>两个不同type下的两个user_name，在ES同一个索引下其实被认为是同一个filed，你必须在两个不同的type中定义相同的filed映射。否则，不同type中的相同字段名称就会在处理中出现冲突的情况，导致Lucene处理效率下降。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>version</th>
+<th>pattern</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>5.6.x</td>
+<td>可手动启用“index.mapping.single_type: true”，使用 join 字段进行替换</td>
+</tr>
+<tr>
+<td>6.x</td>
+<td>允许索引使用单一类型，有且仅有一个名称，首选_doc 类型；5.x 版本的索引可延续使用，新版本的索引不再支持父&#x2F;子方式和 join 类型；6.8中需要在索引创建、模板时需要显示指定 include _ type _ name，不显示申明会默认为 name _ doc</td>
+</tr>
+<tr>
+<td>7.x</td>
+<td>_doc 是路径中的永久部分，并且表示的是 endpoint 类型，而不是 doc 类型；include _ type _ name 参数默认为 false；移除 <em>default</em> mapping 类型</td>
+</tr>
+<tr>
+<td>8.x</td>
+<td>不再支持URL中的 type 参数。移除 include_type_name 参数</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/10/docker%E7%B3%BB%E5%88%97%EF%BC%9A%E5%AE%89%E8%A3%85%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6/" rel="prev" title="docker系列：安装常用软件">
+      <i class="fa fa-chevron-left"></i> docker系列：安装常用软件
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81elastisearch-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">一、elastisearch 是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81elasticsearch-%E5%AE%89%E8%A3%85%E5%90%AF%E5%8A%A8"><span class="nav-number">2.</span> <span class="nav-text">二、elasticsearch 安装启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81elasticsearch-%E6%9E%B6%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">三、elasticsearch 架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81elasticsearch-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number">4.</span> <span class="nav-text">四、elasticsearch 基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB%E5%9B%BE"><span class="nav-number">4.1.</span> <span class="nav-text">关系图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#elasticsearch-%E5%92%8C-mysql-%E7%9A%84%E6%A6%82%E5%BF%B5%E5%AF%B9%E6%AF%94"><span class="nav-number">4.2.</span> <span class="nav-text">elasticsearch 和 mysql 的概念对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81elasticsearch-%E7%89%88%E6%9C%AC%E5%8F%98%E5%8C%96"><span class="nav-number">5.</span> <span class="nav-text">五、elasticsearch 版本变化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%BB%E9%99%A4-type-%E6%A6%82%E5%BF%B5"><span class="nav-number">5.1.</span> <span class="nav-text">去除 type 概念</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
