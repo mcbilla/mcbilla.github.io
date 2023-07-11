@@ -103,6 +103,7 @@ action.auto_create_index: false
 ### 显式映射（Explicit mapping）
 因为被动映射的字段可能不太符合我们的需求，所以我们需要显式映射自定义 mapping 的结构。可以使用下面的语法
 ```
+# 索引不存在，第一次创建索引
 PUT /indexname
 {
     "mappings":{ // 表示定义映射规则
@@ -114,6 +115,19 @@ PUT /indexname
                 "type":"字段类型"
             }
             ......
+        }
+    }
+}
+
+# 索引已存在，修改索引
+PUT /user9/_mapping
+{
+    "properties":{
+        "字段名1":{
+            "type":"字段类型"
+        },
+        "字段名2":{
+            "type":"字段类型"
         }
     }
 }
