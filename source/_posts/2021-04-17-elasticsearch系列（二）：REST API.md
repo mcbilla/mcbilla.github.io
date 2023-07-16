@@ -13,7 +13,7 @@ tags:
 
 ## 一、命令简介
 可以使用 RESTful API 通过端口 9200 和 Elasticsearch 进行通信，甚至可以使用 curl 命令来和 Elasticsearch 交互。
-> 旧版的 Elasticsearch Clients 可以使用 9300 端口和 Elasticsearch 进行 tcp 通信，现在已经不推荐这种方式，建议统一使用 9200 端口以 http 请求的方式和 Elasticsearch 通讯。
+> 旧版的 Elasticsearch Clients 可以使用 9300 端口和 Elasticsearch 进行 tcp 通信，例如 spring-data-elasticsearch:transport-api.jar 包，7.x 已经不建议使用，8 以后就要废弃。建议统一使用 9200 端口以 http 请求的方式和 Elasticsearch 通讯。
 ```
 curl -X<VERB> '<PROTOCOL>://<HOST>:<PORT>/<PATH>?<QUERY_STRING>' -d '<BODY>'
 ```
