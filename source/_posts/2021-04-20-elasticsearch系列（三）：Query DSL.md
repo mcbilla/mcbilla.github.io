@@ -35,28 +35,66 @@ GET /indexname/_search
     ]
 }
 ```
-`Query DSL` 是日常最常用的查询方式，是我们的学习重点。使用参考 [Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)
 
-DSL 的语法结构如下：
+
+`Query DSL` 是日常最常用的查询方式，是我们的学习重点。一个最简单的 `Query DSL` 语法如下：
+
 ```
+GET indexname/_search
 {
-	QUERY_NAME:{
-   		ARGUMENT:VALUE,
-  		ARGUMENT:VALUE,...
-	}
+    "query":{
+        "match_all":{
+
+        }
+    }
 }
 ```
-如果针对于某个字段，那么它的结构如下：
+
+返回结果：
+
 ```
 {
-	QUERY_NAME:{
-     	FIELD_NAME:{
-       		ARGUMENT:VALUE,
-       		ARGUMENT:VALUE,...
-      	}   
-   	}
+    "took":6729,
+    "timed_out":false,
+    "num_reduce_phases":6,
+    "_shards":{
+        "total":2611,
+        "successful":2611,
+        "skipped":0,
+        "failed":0
+    },
+    "hits":{
+        "total":7662397664,
+        "max_score":1,
+        "hits":[
+            {
+                "_index":".kibana",
+                "_type":"doc",
+                "_id":"url:ec540365d822e8955cf2fa085db189c2",
+                "_score":1,
+                "_source":{
+                    "type":"url",
+                    "updated_at":"2018-05-09T07:19:46.075Z",
+                    "url":{
+                        "url":"/app/kibana",
+                        "accessCount":0,
+                        "createDate":"2018-05-09T07:19:46.075Z",
+                        "accessDate":"2018-05-09T07:19:46.075Z"
+                    }
+                }
+            }
+        ]
+    }
 }
 ```
+
+* **took**： 表示我们执行整个搜索请求消耗了多少毫秒
+* **timed_out**： 表示本次查询是否超时这里需要注意当timed_out为True时也会返回结果，这个结果是在请求超时时ES已经获取到的数据，所以返回的这个数据可能不完整。且当你收到timed_out为True之后，虽然这个连接已经关闭，但在后台这个查询并没有结束，而是会继续执行
+* **_shards**： 显示查询中参与的分片信息，成功多少分片失败多少分片等_
+* **hits**： 匹配到的文档的信息
+  * total表示匹配到的文档总数
+  * max_score为文档中所有_score的最大值_
+  * hits数组为查询到的文档结果，默认包含查询结果的前十个文档，每个文档都包含文档的_index、_type、_id、_score和_source数据。结果文档默认情况下是按照相关度（_score）进行降序排列，也就是说最先返回的是相关度最高的文档。
 
 
 ### 二、全文检索
@@ -376,6 +414,8 @@ GET /indexname/_search
 * score_mode：（可选）匹配子对象的分数相关性分数。默认 avg，使用所有匹配子对象的平均相关性分数。
 * ignore_unmapped （可选）是否忽略 path 未映射，不返回任何文档而不是错误。默认为 false，如果 path 不对就报错。
 
-
 ### 参考
+
+ [Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)
+
 [Elasticsearch（es） 查询语句语法详解 ](https://www.cnblogs.com/Gaimo/p/16036853.html)

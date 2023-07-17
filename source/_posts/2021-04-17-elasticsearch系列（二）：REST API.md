@@ -457,3 +457,88 @@ POST /_bulk
 {"doc":{"title":"my updated blog post"}}
 ```
 可以导入官方示例数据进行测试 https://www.elastic.co/guide/cn/kibana/current/tutorial-load-dataset.html
+
+
+
+#### 文档操作的并发控制
+
+如果我们同时修改一个文档，Elasticsearch 通过乐观锁确保文档的原子性。Elasticsearch的乐观锁是基于版本号实现的，前面的章节介绍文档 CRUD 的时候，提到文档的元数据中`_seq_no`、`version`，都代表当前文档的版本号，每次更新、删除文档的时候，版本号都会加1，ES就是借着这个版本号实现乐观锁。
+
+> Elasticsearch 7.x 的版本已经不再使用 _version 字段作为乐观锁判断的依据，主要使用_seq_no作为版本号，结合_primary_term字段实现乐观锁控制。
+
+下面介绍如何使用Elasticsearch的乐观锁机制确保数据的原子性。
+
+首先插入一个文档
+
+```
+PUT /order/_doc/2
+{
+  "id": 1,
+  "status": 1,
+  "total_price": 100,
+  "create_time": "2019-12-12 12:20:22"
+}
+```
+
+然后我们查询下插入的文档，观察下版本号
+
+```
+GET /order/_doc/2
+```
+
+返回
+
+```
+{
+  "_index" : "order",
+  "_type" : "_doc",
+  "_id" : "2",
+  "_version" : 1, 
+  "_seq_no" : 6, // 版本号是6
+  "_primary_term" : 1, // 所在主分区是1
+  "found" : true,
+  "_source" : {
+    "id" : 1,
+    "status" : 1,
+    "total_price" : 100,
+    "create_time" : "2019-12-12 12:20:22"
+  }
+}
+```
+
+然后增加请求参数 `?if_seq_no=6&if_primary_term=1`，指定和文档相同的 `seq_no` 和 `primary_term` 更新数据
+
+```
+PUT /order/_doc/2?if_seq_no=6&if_primary_term=1
+{
+  "id": 1,
+  "status": 2,
+  "total_price": 300,
+  "create_time": "2019-12-12 12:20:22"
+}
+```
+
+ES就会输出下面的错误提示：版本冲突 （version conflict）。
+
+```
+{
+  "error": {
+    "root_cause": [
+      {
+        "type": "version_conflict_engine_exception",
+        "reason": "[2]: version conflict, required seqNo [6], primary term [1]. current document has seqNo [7] and primary term [1]",
+        "index_uuid": "CRQJQH4uTA2ffetowYCMNA",
+        "shard": "0",
+        "index": "order"
+      }
+    ],
+    "type": "version_conflict_engine_exception",
+    "reason": "[2]: version conflict, required seqNo [6], primary term [1]. current document has seqNo [7] and primary term [1]",
+    "index_uuid": "CRQJQH4uTA2ffetowYCMNA",
+    "shard": "0",
+    "index": "order"
+  },
+  "status": 409
+}
+```
+

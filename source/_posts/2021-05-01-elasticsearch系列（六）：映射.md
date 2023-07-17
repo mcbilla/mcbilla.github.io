@@ -258,8 +258,9 @@ GET /user/_search
 ```
 
 ##### nested 类型
-嵌套类型可以看成是一个特殊的 object 对象类型，nested 实际上就是 object 的数组，可以让 object 数组独立检索。例如存在下面的 json 对象
+嵌套类型可以看成是一个特殊的 object 对象类型，nested 实际上就是 object 的数组，可以让 object 数组独立检索。例如创建一个 user 索引
 ```
+PUT indexname/_doc/1
 {
     "user":[
         {
@@ -273,20 +274,31 @@ GET /user/_search
     ]
 }
 ```
-es 如果直接进行扁平化处理，就会变成
+es 会进行扁平化处理，变成
 ```
 {
-    "user.first":[
-        "John",
-        "Alice"
-    ],
-    "user.last":[
-        "Smith",
-        "White"
-    ]
+    "user.first":["John", "Alice"],
+    "user.last":["Smith", "White"]
 }
 ```
-es 没办法直接对数组建立索引，这时候检索 `John Smith` 就查不到数据。nested 就是将数组里面的每个 doc 单独变成子文档进行存储，因此在查询时就可以知道具体的结构信息了。**要使用 nested 类型必须显示定义映射，否则 es 会自动转成 object 类型**。
+`user.first` 和 `user.last` 分别存储多个字段。原来只有两个用户 `John Smith` 和 `Alice White`，现在 John 和 Smith 失去了关联，所以下面直接搜索用户名  `Alice Smith` 也能查询到数据，这就不符合业务预期了。
+
+```
+GET indexname/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "user.first": "Alice" }},
+        { "match": { "user.last":  "Smith" }}
+      ]
+    }
+  }
+}
+```
+
+nested 就是将数组里面的每个 doc 单独变成子文档进行存储，因此在查询时就可以知道具体的结构信息了。**要使用 nested 类型必须显示定义映射，否则 es 会自动转成 object 类型**。
+
 ```
 PUT /user
 {
