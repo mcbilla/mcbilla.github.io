@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="elasticsearch系列（二）：REST API">
+<meta property="og:type" content="article">
+<meta property="og:title" content="elasticsearch系列（二）：REST API">
+<meta property="og:url" content="http://yoursite.com/2021/04/17/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9AREST%20API/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="elasticsearch系列（二）：REST API">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-17T03:44:55.000Z">
+<meta property="article:modified_time" content="2023-07-17T13:03:30.280Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="elasticsearch">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/04/17/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9AREST%20API/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>elasticsearch系列（二）：REST API | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/04/17/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9AREST%20API/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          elasticsearch系列（二）：REST API
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-17 11:44:55" itemprop="dateCreated datePublished" datetime="2021-04-17T11:44:55+08:00">2021-04-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-17 21:03:30" itemprop="dateModified" datetime="2023-07-17T21:03:30+08:00">2023-07-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticsearch/" itemprop="url" rel="index"><span itemprop="name">elasticsearch</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/04/17/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9AREST%20API/" class="post-meta-item leancloud_visitors" data-flag-title="elasticsearch系列（二）：REST API" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/04/17/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9AREST%20API/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/04/17/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9AREST%20API/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>elasticsearch系列（二）：REST API</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="一、命令简介"><a href="#一、命令简介" class="headerlink" title="一、命令简介"></a>一、命令简介</h2><h3 id="Java-API"><a href="#Java-API" class="headerlink" title="Java API"></a>Java API</h3><p>Elasticsearch 为 Java 用户提供了两种内置客户端</p>
+<ol>
+<li>节点客户端 ( node client )：以无数据节点 (none data node) 身份加入集群，换言之，它自己不存储任何数据，但是它知道数据在集群中的具体位置，并且能够直接转发请求到对应的节点上。</li>
+<li>传输客户端 ( Transport client )：传输客户端更轻量，且能够发送请求到远程集群。它自己不加入集群，只是简单转发请求给集群中的节点。</li>
+</ol>
+<p>两个 Java 客户端都通过 9300 端口和 Elasticsearch 传输协议 ( Elasticsearch Transport Protocol ) 与 Elasticsearch 进行交互。因为集群中的节点之间也通过 9300 端口进行通信，使用 Java API 可能会造成通讯混乱。现在已经不推荐使用 Java API 这种通讯方式，spring-boot 的高版本也已经移除 <code>spring-data-elasticsearch</code> 依赖。</p>
+<h3 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h3><p>Elasticsearch 的 RESTful API 使用 <a target="_blank" rel="noopener" href="https://www.twle.cn/l/yufei/http/http-basic-index.html">HTTP</a> 作为传输协议，使用 <a target="_blank" rel="noopener" href="https://www.twle.cn/l/yufei/json/json-basic-index.html">JSON</a> 作为数据交换格式所有的语言都可以使用 RESTful API，通过 9200 端口的与 Elasticsearch 进行通信，甚至可以使用 curl 命令来和 Elasticsearch 交互。因为是基于 HTTP 的 RESTFul API，所以向 Elasticsearch 发出的请求的组成部分与其它普通的 HTTP 请求是一样的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X&lt;VERB&gt; &#x27;&lt;PROTOCOL&gt;://&lt;HOST&gt;:&lt;PORT&gt;/&lt;PATH&gt;?&lt;QUERY_STRING&gt;&#x27; -d &#x27;&lt;BODY&gt;&#x27;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>VERB</strong>：HTTP 方法，可以使用下面方法：<ul>
+<li>POST：创建，可以不指定id，es自己生成不会发生碰撞的UUID</li>
+<li>PUT：创建&#x2F;更新，需要指定具体的id，如果id已经存在就会覆盖原来的内容，version会加1。</li>
+<li>GET：查看</li>
+<li>DELETE：删除</li>
+</ul>
+</li>
+<li><strong>PROTOCOL</strong>：http 或者 https（如果你在 Elasticsearch 前面有一个 https 代理）</li>
+<li><strong>HOST</strong>：Elasticsearch 集群中任意节点的主机名，或者用 localhost 代表本地机器上的节点。</li>
+<li><strong>PORT</strong>：运行 Elasticsearch HTTP 服务的端口号，默认是 9200 。</li>
+<li><strong>PATH</strong>：第一部分通常是索引名称，除非它以_开头。例如 <code>/products/_search</code>，其中 products 是索引，_search 是动作。</li>
+<li><strong>QUERY_STRING</strong>：参数选项，常用的有：<ul>
+<li>?v：显示列名，例如 <code>/_cat/master?v</code>。</li>
+<li>?help：显示当前命令的各列含义。例如 <code>/_cat/master?help</code>。</li>
+<li>?bytes：数值列以指定单位显示, 转为以kb&#x2F;mb&#x2F;gb表示，默认为b。例如 <code>/_cat/indices?bytes=b</code>。</li>
+<li>?h：显示指定列的信息，例如 <code>_cat/indices?h=docs.count,store.size</code>。</li>
+<li>?s：用于排序，使用列出的字段作为排序键。例如 <code>/_cat/nodes?v&amp;h=cpu,master,name&amp;s=name</code>。</li>
+<li>?pretty：美化输出成 json 格式，例如 <code>/_cluster/health?pretty</code>。</li>
+</ul>
+</li>
+<li><strong>BODY</strong>：一个 JSON 格式的请求体 (如果请求需要的话)</li>
+</ul>
+<p>例如，计算集群中文档的数量，我们可以用这个:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">curl -XGET &#x27;http://localhost:9200/_count?pretty&#x27; -H &#x27;Content-Type: application/json&#x27; -d &#x27;</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;: &#123;</span><br><span class="line">        &quot;match_all&quot;: &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x27;</span><br></pre></td></tr></table></figure>
+<p>如果是在 Dev Tools 控制台，我们会使用下面的缩写形式。下面的命令也写成缩写形式。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">GET /_count</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;: &#123;</span><br><span class="line">        &quot;match_all&quot;: &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、常用命令"><a href="#二、常用命令" class="headerlink" title="二、常用命令"></a>二、常用命令</h2><h3 id="1、集群-API"><a href="#1、集群-API" class="headerlink" title="1、集群 API"></a>1、集群 API</h3><p>通常使用 <code>/_cluster</code> 来查看集群信息</p>
+<h4 id="查看集群健康状态"><a href="#查看集群健康状态" class="headerlink" title="查看集群健康状态"></a>查看集群健康状态</h4><p>查看集群健康状态，包括集群名称、节点数、数据节点数、分片等的一些统计信息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cluster/health </span><br></pre></td></tr></table></figure>
+<h4 id="查看集群状况"><a href="#查看集群状况" class="headerlink" title="查看集群状况"></a>查看集群状况</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cluster/state</span><br></pre></td></tr></table></figure>
+<h4 id="查看集群统计信息"><a href="#查看集群统计信息" class="headerlink" title="查看集群统计信息"></a>查看集群统计信息</h4><p>查看集群统计信息，有助于基本故障排除</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cluster/stats</span><br></pre></td></tr></table></figure>
+<h4 id="查看集群配置"><a href="#查看集群配置" class="headerlink" title="查看集群配置"></a>查看集群配置</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cluster/settings</span><br></pre></td></tr></table></figure>
+<h4 id="查看索引健康状态"><a href="#查看索引健康状态" class="headerlink" title="查看索引健康状态"></a>查看索引健康状态</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cluster/health?level=indices&amp;pretty</span><br></pre></td></tr></table></figure>
+<h4 id="查看分片健康状态"><a href="#查看分片健康状态" class="headerlink" title="查看分片健康状态"></a>查看分片健康状态</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cluster/health?level=shards&amp;pretty</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、节点-API"><a href="#2、节点-API" class="headerlink" title="2、节点 API"></a>2、节点 API</h3><p>通常使用 <code>/_nodes</code> 来查看节点信息</p>
+<h4 id="查看所有节点的统计信息"><a href="#查看所有节点的统计信息" class="headerlink" title="查看所有节点的统计信息"></a>查看所有节点的统计信息</h4><p>查看所有节点的统计信息，包括堆使用情况等</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_nodes/stats</span><br></pre></td></tr></table></figure>
+<h4 id="查看所有节点的索引信息"><a href="#查看所有节点的索引信息" class="headerlink" title="查看所有节点的索引信息"></a>查看所有节点的索引信息</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_nodes/stats/indices</span><br></pre></td></tr></table></figure>
+<h4 id="查看某个节点的统计信息"><a href="#查看某个节点的统计信息" class="headerlink" title="查看某个节点的统计信息"></a>查看某个节点的统计信息</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_nodes/&lt;node_id&gt;/stats</span><br></pre></td></tr></table></figure>
+<h4 id="查看某个节点的索引信息"><a href="#查看某个节点的索引信息" class="headerlink" title="查看某个节点的索引信息"></a>查看某个节点的索引信息</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_nodes/&lt;node_id&gt;/stats/indices</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、CAT-API"><a href="#3、CAT-API" class="headerlink" title="3、CAT API"></a>3、CAT API</h3><p>CAT API 仅适用于使用 Kibana 控制台或命令行供人类使用，输出以表格的形式的文本，而不是 JSON。可以通过下面命令列出所有可用的 API。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cat</span><br></pre></td></tr></table></figure>
+<p>输出默认是没有表头的，可以在最后加上 <code>?v</code> 参数输出表头。这都是模仿 Linix 工具设计的，因为它假设一旦你对输出熟悉了，你就再也不想看见表头了。</p>
+<h4 id="查看集群健康状态-1"><a href="#查看集群健康状态-1" class="headerlink" title="查看集群健康状态"></a>查看集群健康状态</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cat/health?v</span><br></pre></td></tr></table></figure>
+<h4 id="查看集群节点状态"><a href="#查看集群节点状态" class="headerlink" title="查看集群节点状态"></a>查看集群节点状态</h4><p>查看集群各个节点的当前状态, 包括节点的物理参数(包括os&#x2F;jdk版本, uptime, 当前mem&#x2F;disk&#x2F;fd使用情况等), 请求访问情况(如search&#x2F;index成功和失败的次数)等详细信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cat/nodes?v</span><br></pre></td></tr></table></figure>
+<h4 id="查看所有索引"><a href="#查看所有索引" class="headerlink" title="查看所有索引"></a>查看所有索引</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cat/indices?v </span><br></pre></td></tr></table></figure>
+<h4 id="查看分片情况"><a href="#查看分片情况" class="headerlink" title="查看分片情况"></a>查看分片情况</h4><p>查看分片情况，包括shard的分布, 当前状态(对于分配失败的shard会有失败原因), doc数量, 磁盘占用情况, shard的访问情况(如所有get请求的成功&#x2F;失败次数以及对应耗时等)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 查看所有分片</span><br><span class="line">GET /_cat/shards?v </span><br><span class="line"></span><br><span class="line"># 查看指定分片</span><br><span class="line">GET /_cat/indices/$&#123;index&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="查看master信息"><a href="#查看master信息" class="headerlink" title="查看master信息"></a>查看master信息</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cat/master?v</span><br></pre></td></tr></table></figure>
+<h4 id="查看lucence的段信息"><a href="#查看lucence的段信息" class="headerlink" title="查看lucence的段信息"></a>查看lucence的段信息</h4><p>查看lucence的段信息，包括segment名, 所属shard, 内存&#x2F;磁盘占用大小, 是否刷盘, 是否merge为compound文件等. 可以查看指定index的segment信息()</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 查看所有段信息</span><br><span class="line">GET /_cat/segments?v</span><br><span class="line"></span><br><span class="line"># 查看某个索引的段信息</span><br><span class="line">GET /_cat/segments/$&#123;index&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="查看索引别名"><a href="#查看索引别名" class="headerlink" title="查看索引别名"></a>查看索引别名</h4><p>查看索引别名，包括alias对应的index，路由配置等</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 查看所有alias信息</span><br><span class="line">GET /_cat/aliases?v</span><br><span class="line"></span><br><span class="line"># 查看指定alias的信息</span><br><span class="line">GET /_cat/aliases/$&#123;alias&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="查看分配资源接口"><a href="#查看分配资源接口" class="headerlink" title="查看分配资源接口"></a>查看分配资源接口</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cat/allocation?v</span><br></pre></td></tr></table></figure>
+<h4 id="查看文档数量"><a href="#查看文档数量" class="headerlink" title="查看文档数量"></a>查看文档数量</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 查看所有索引的文档数量</span><br><span class="line">GET /_cat/count?v</span><br><span class="line"></span><br><span class="line"># 查看指定索引的文档数量</span><br><span class="line">GET /_cat/count/$&#123;index&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="查看模板"><a href="#查看模板" class="headerlink" title="查看模板"></a>查看模板</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /_cat/templates?v</span><br></pre></td></tr></table></figure>
+
+<h3 id="4、索引-API"><a href="#4、索引-API" class="headerlink" title="4、索引 API"></a>4、索引 API</h3><h4 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h4><p>有两种方式，第一种是提交数据自动创建索引</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">POST /indexname/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;John Doe&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果你想禁止自动创建索引，你可以通过在 <code>config/elasticsearch.yml</code> 的每个节点下添加下面的配置：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">action.auto_create_index: false</span><br></pre></td></tr></table></figure>
+<p>第二种方式是手动创建索引</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">PUT /indexname</span><br><span class="line">&#123;</span><br><span class="line">    &quot;mappings&quot;:&#123;</span><br><span class="line">        &quot;properties&quot;:&#123;</span><br><span class="line">            &quot;name&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;text&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;blob&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;binary&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="查看索引"><a href="#查看索引" class="headerlink" title="查看索引"></a>查看索引</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 查看索引信息</span><br><span class="line">GET /indexname</span><br></pre></td></tr></table></figure>
+
+<h4 id="修改索引"><a href="#修改索引" class="headerlink" title="修改索引"></a>修改索引</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 修改mapping，新增sex字段</span><br><span class="line">PUT /indexname/_mapping</span><br><span class="line">&#123;</span><br><span class="line">    &quot;properties&quot;:&#123;</span><br><span class="line">        &quot;sex&quot;:&#123;</span><br><span class="line">            &quot;type&quot;:&quot;text&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 修改setting</span><br><span class="line">PUT  /indexname/_settings</span><br><span class="line">&#123;</span><br><span class="line">    &quot;number_of_replicas&quot;:&quot;0&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 删除单个索引</span><br><span class="line">DELETE /indexname </span><br><span class="line"></span><br><span class="line"># 删除多个索引</span><br><span class="line">DELETE /indexname1,/indexname2</span><br><span class="line"></span><br><span class="line"># 删除全部索引</span><br><span class="line">DELETE /_all </span><br><span class="line">或者 </span><br><span class="line">DELETE /*</span><br></pre></td></tr></table></figure>
+
+<h4 id="索引别名"><a href="#索引别名" class="headerlink" title="索引别名"></a>索引别名</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 给索引indexname创建一个别名indexname_alias</span><br><span class="line">PUT /indexname/_alias/indexname_alias</span><br><span class="line"></span><br><span class="line"># 查看索引别名</span><br><span class="line">GET /indexname/_alias</span><br></pre></td></tr></table></figure>
+
+<h4 id="索引模板"><a href="#索引模板" class="headerlink" title="索引模板"></a>索引模板</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 查询所有索引模板</span><br><span class="line">GET _template</span><br><span class="line"></span><br><span class="line"># 查看与通配符相匹配的模板</span><br><span class="line">GET _template/my_template</span><br><span class="line"></span><br><span class="line"># 查看指定模板</span><br><span class="line">GET _template/my_template*</span><br><span class="line"></span><br><span class="line"># 查看多个模板</span><br><span class="line">GET _template/my_template1,my_template2</span><br><span class="line"></span><br><span class="line"># 删除索引模板</span><br><span class="line">DELETE _template/my_template</span><br></pre></td></tr></table></figure>
+
+<h3 id="5、文档"><a href="#5、文档" class="headerlink" title="5、文档"></a>5、文档</h3><h4 id="新增文档"><a href="#新增文档" class="headerlink" title="新增文档"></a>新增文档</h4><p>新增可以使用 PUT 请求或者 POST 请求。</p>
+<ul>
+<li>PUT请求，必须带id。如果 id 不存在，则会新建一个文档。如果 id 存在，则会用当前数据更新原来的文档。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PUT /indexname/_doc/id</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;mcb&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>POST请求，可以带id，也可以不带id。不带id就是新增操作，带id可以为新增或者更新操作。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 不带id，新增文档</span><br><span class="line">POST /indexname/_doc</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;mcb&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 带id，如果 id 不存在，则会新建一个文档。如果 id 存在，则会用当前数据更新原来的文档</span><br><span class="line">POST /indexname/_doc/id</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;John Doe&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+返回数据带有下划线开头的，称为元数据，反映了当前的基本信息。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;_index&quot;:&quot;customer&quot;,</span><br><span class="line">    &quot;_type&quot;:&quot;external&quot;,</span><br><span class="line">    &quot;_id&quot;:&quot;1&quot;,</span><br><span class="line">    &quot;_version&quot;:1,</span><br><span class="line">    &quot;result&quot;:&quot;created&quot;,</span><br><span class="line">    &quot;_shards&quot;:&#123;</span><br><span class="line">        &quot;total&quot;:2,</span><br><span class="line">        &quot;successful&quot;:1,</span><br><span class="line">        &quot;failed&quot;:0</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;_seq_no&quot;:0,</span><br><span class="line">    &quot;_primary_term&quot;:1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>“_index”: “customer” 表明该数据在哪个数据库下；</li>
+<li>“_type”: “external” 表明该数据在哪个类型下；</li>
+<li>“_id”: “1” 表明被保存数据的id；</li>
+<li>“_version”: 1, 被保存数据的版本</li>
+<li>“result”: “created” 这里是创建了一条数据，如果重新put一条数据，则该状态会变为updated，并且版本号也会发生变化。</li>
+</ul>
+<h4 id="更新文档"><a href="#更新文档" class="headerlink" title="更新文档"></a>更新文档</h4><p>PUT&#x2F;POST操作带id，直接更新整个文档，version号会一直增加。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># PUT操作更新</span><br><span class="line">PUT /indexname/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;mcb1&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># POST操作更新</span><br><span class="line">POST /indexname/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;mcb2&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果想增加或者更新某些字段，可以使用 POST 操作的 <code>_update</code> 。<code>_update</code>  会对比元数据，有差异才会更新，然后增加 version 号，否则不进行任何操作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST /indexname/_update/1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;doc&quot;: &#123;</span><br><span class="line">    &quot;age&quot;: 18,</span><br><span class="line">    &quot;address&quot;: &quot;sz&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>更新携带 <code>?if_seq_no=0&amp;if_primary_term=1</code>，还可以实现乐观锁的功能。只有 <code> seq_no</code> 和 <code>primary_term</code> 和当前的文档相同才能更新成功，否则会返回 409 错误。在更新完后 <code> seq_no</code> 会往上叠加。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PUT /indexname/_doc/3?if_seq_no=2&amp;if_primary_term=1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;mcb1&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="查看文档"><a href="#查看文档" class="headerlink" title="查看文档"></a>查看文档</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /indexname/_doc/id</span><br></pre></td></tr></table></figure>
+<p>返回数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;_index&quot;: &quot;customer&quot;,    //在哪个索引</span><br><span class="line">    &quot;_type&quot;: &quot;external&quot;,      //在哪个类型</span><br><span class="line">    &quot;_id&quot;: &quot;1&quot;,                  //记录id</span><br><span class="line">    &quot;_version&quot;: 3,             //版本号</span><br><span class="line">    &quot;_seq_no&quot;: 6,             //并发控制字段，每次更新都会+1，用来做乐观锁</span><br><span class="line">    &quot;_primary_term&quot;: 1,    //同上，主分片重新分配，如重启，就会变化</span><br><span class="line">    &quot;found&quot;: true,           //表示找到了数据，如果没找到就为false</span><br><span class="line">    &quot;_source&quot;: &#123;              //真正的内容</span><br><span class="line">        &quot;name&quot;: &quot;mcb&quot;,</span><br><span class="line">        &quot;author&quot;: &quot;Jobs&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DELETE /indexname/_doc/id</span><br></pre></td></tr></table></figure>
+
+<h4 id="检索文档"><a href="#检索文档" class="headerlink" title="检索文档"></a>检索文档</h4><p>所有的检索都从 <code>_search</code>  开始。如果不带查询条件，会列出某个索引下面的所有的文档内容。如果想使用查询条件，可以使用 URI + 请求参数或者 Query DSL。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /indexname/_search</span><br></pre></td></tr></table></figure>
+<p>返回数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;took&quot;:7,</span><br><span class="line">    &quot;timed_out&quot;:false,</span><br><span class="line">    &quot;_shards&quot;:&#123;</span><br><span class="line">        &quot;total&quot;:1,</span><br><span class="line">        &quot;successful&quot;:1,</span><br><span class="line">        &quot;skipped&quot;:0,</span><br><span class="line">        &quot;failed&quot;:0</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;hits&quot;:&#123;</span><br><span class="line">        &quot;total&quot;:&#123;</span><br><span class="line">            &quot;value&quot;:2,</span><br><span class="line">            &quot;relation&quot;:&quot;eq&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;max_score&quot;:1,</span><br><span class="line">        &quot;hits&quot;:[</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;_index&quot;:&quot;customer&quot;,</span><br><span class="line">                &quot;_id&quot;:&quot;2&quot;,</span><br><span class="line">                &quot;_score&quot;:1,</span><br><span class="line">                &quot;_source&quot;:&#123;</span><br><span class="line">                    &quot;name&quot;:&quot;John Doe1&quot;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;_index&quot;:&quot;customer&quot;,</span><br><span class="line">                &quot;_id&quot;:&quot;1&quot;,</span><br><span class="line">                &quot;_score&quot;:1,</span><br><span class="line">                &quot;_source&quot;:&#123;</span><br><span class="line">                    &quot;name&quot;:&quot;John Doe2&quot;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>took - Elasticsearch 执行搜索的时间（ 毫秒）</li>
+<li>time_out - 告诉我们搜索是否超时</li>
+<li>_shards - 告诉我们多少个分片被搜索了， 以及统计了成功&#x2F;失败的搜索分片</li>
+<li>hits - 搜索结果</li>
+<li>hits.total - 搜索结果</li>
+<li>hits.hits - 实际的搜索结果数组（ 默认为前 10 的文档）</li>
+<li>sort - 结果的排序 key（ 键） （ 没有则按 score 排序）</li>
+<li>score 和 max_score –相关性得分和最高得分（ 全文检索用）</li>
+</ul>
+<h4 id="批量操作"><a href="#批量操作" class="headerlink" title="批量操作"></a>批量操作</h4><p>语法格式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">POST /indexname/_bulk</span><br><span class="line">&#123;action:&#123;metadata&#125;&#125;\n</span><br><span class="line">&#123;request body  &#125;\n</span><br><span class="line">&#123;action:&#123;metadata&#125;&#125;\n</span><br><span class="line">&#123;request body  &#125;\n</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+<p>bulk API 以此按顺序执行所有的 action（动作）。如果一个单个的动作因任何原因而失败，它将继续处理它后面剩余的动作。 当 bulk API 返回， 它将提供每个动作的状态（与发送的顺序相同），所以可以检查是否一个指定的动作是不是失败了。<br>例如批量插入id为5和6的两条数据：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">POST /customer/_bulk</span><br><span class="line">&#123;&quot;index&quot;:&#123;&quot;_id&quot;:&quot;5&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;name&quot;:&quot;John Doe5&quot;&#125;</span><br><span class="line">&#123;&quot;index&quot;:&#123;&quot;_id&quot;:&quot;6&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;name&quot;:&quot;John Doe6&quot;&#125;</span><br></pre></td></tr></table></figure>
+<p>还可以不指定索引，对整个 es 进行整体操作。例如下面一共进行了 delete、create、index和 update 四个操作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">POST /_bulk</span><br><span class="line">&#123;&quot;delete&quot;:&#123;&quot;_index&quot;:&quot;website&quot;,&quot;_type&quot;:&quot;blog&quot;,&quot;_id&quot;:&quot;123&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;create&quot;:&#123;&quot;_index&quot;:&quot;website&quot;,&quot;_type&quot;:&quot;blog&quot;,&quot;_id&quot;:&quot;123&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;title&quot;:&quot;my first blog post&quot;&#125;</span><br><span class="line">&#123;&quot;index&quot;:&#123;&quot;_index&quot;:&quot;website&quot;,&quot;_type&quot;:&quot;blog&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;title&quot;:&quot;my second blog post&quot;&#125;</span><br><span class="line">&#123;&quot;update&quot;:&#123;&quot;_index&quot;:&quot;website&quot;,&quot;_type&quot;:&quot;blog&quot;,&quot;_id&quot;:&quot;123&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;doc&quot;:&#123;&quot;title&quot;:&quot;my updated blog post&quot;&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>可以导入官方示例数据进行测试 <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/cn/kibana/current/tutorial-load-dataset.html">https://www.elastic.co/guide/cn/kibana/current/tutorial-load-dataset.html</a></p>
+<h4 id="文档操作的并发控制"><a href="#文档操作的并发控制" class="headerlink" title="文档操作的并发控制"></a>文档操作的并发控制</h4><p>如果我们同时修改一个文档，Elasticsearch 通过乐观锁确保文档的原子性。Elasticsearch的乐观锁是基于版本号实现的，前面的章节介绍文档 CRUD 的时候，提到文档的元数据中<code>_seq_no</code>、<code>version</code>，都代表当前文档的版本号，每次更新、删除文档的时候，版本号都会加1，ES就是借着这个版本号实现乐观锁。</p>
+<blockquote>
+<p>Elasticsearch 7.x 的版本已经不再使用 _version 字段作为乐观锁判断的依据，主要使用_seq_no作为版本号，结合_primary_term字段实现乐观锁控制。</p>
+</blockquote>
+<p>下面介绍如何使用Elasticsearch的乐观锁机制确保数据的原子性。</p>
+<p>首先插入一个文档</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PUT /order/_doc/2</span><br><span class="line">&#123;</span><br><span class="line">  &quot;id&quot;: 1,</span><br><span class="line">  &quot;status&quot;: 1,</span><br><span class="line">  &quot;total_price&quot;: 100,</span><br><span class="line">  &quot;create_time&quot;: &quot;2019-12-12 12:20:22&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后我们查询下插入的文档，观察下版本号</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /order/_doc/2</span><br></pre></td></tr></table></figure>
+
+<p>返回</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;_index&quot; : &quot;order&quot;,</span><br><span class="line">  &quot;_type&quot; : &quot;_doc&quot;,</span><br><span class="line">  &quot;_id&quot; : &quot;2&quot;,</span><br><span class="line">  &quot;_version&quot; : 1, </span><br><span class="line">  &quot;_seq_no&quot; : 6, // 版本号是6</span><br><span class="line">  &quot;_primary_term&quot; : 1, // 所在主分区是1</span><br><span class="line">  &quot;found&quot; : true,</span><br><span class="line">  &quot;_source&quot; : &#123;</span><br><span class="line">    &quot;id&quot; : 1,</span><br><span class="line">    &quot;status&quot; : 1,</span><br><span class="line">    &quot;total_price&quot; : 100,</span><br><span class="line">    &quot;create_time&quot; : &quot;2019-12-12 12:20:22&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后增加请求参数 <code>?if_seq_no=6&amp;if_primary_term=1</code>，指定和文档相同的 <code>seq_no</code> 和 <code>primary_term</code> 更新数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PUT /order/_doc/2?if_seq_no=6&amp;if_primary_term=1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;id&quot;: 1,</span><br><span class="line">  &quot;status&quot;: 2,</span><br><span class="line">  &quot;total_price&quot;: 300,</span><br><span class="line">  &quot;create_time&quot;: &quot;2019-12-12 12:20:22&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ES就会输出下面的错误提示：版本冲突 （version conflict）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;error&quot;: &#123;</span><br><span class="line">    &quot;root_cause&quot;: [</span><br><span class="line">      &#123;</span><br><span class="line">        &quot;type&quot;: &quot;version_conflict_engine_exception&quot;,</span><br><span class="line">        &quot;reason&quot;: &quot;[2]: version conflict, required seqNo [6], primary term [1]. current document has seqNo [7] and primary term [1]&quot;,</span><br><span class="line">        &quot;index_uuid&quot;: &quot;CRQJQH4uTA2ffetowYCMNA&quot;,</span><br><span class="line">        &quot;shard&quot;: &quot;0&quot;,</span><br><span class="line">        &quot;index&quot;: &quot;order&quot;</span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;type&quot;: &quot;version_conflict_engine_exception&quot;,</span><br><span class="line">    &quot;reason&quot;: &quot;[2]: version conflict, required seqNo [6], primary term [1]. current document has seqNo [7] and primary term [1]&quot;,</span><br><span class="line">    &quot;index_uuid&quot;: &quot;CRQJQH4uTA2ffetowYCMNA&quot;,</span><br><span class="line">    &quot;shard&quot;: &quot;0&quot;,</span><br><span class="line">    &quot;index&quot;: &quot;order&quot;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;status&quot;: 409</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/15/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80/" rel="prev" title="elasticsearch系列（一）：基础">
+      <i class="fa fa-chevron-left"></i> elasticsearch系列（一）：基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/20/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AQuery%20DSL/" rel="next" title="elasticsearch系列（三）：Query DSL">
+      elasticsearch系列（三）：Query DSL <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%91%BD%E4%BB%A4%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">一、命令简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-API"><span class="nav-number">1.1.</span> <span class="nav-text">Java API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RESTful-API"><span class="nav-number">1.2.</span> <span class="nav-text">RESTful API</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">二、常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E9%9B%86%E7%BE%A4-API"><span class="nav-number">2.1.</span> <span class="nav-text">1、集群 API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E9%9B%86%E7%BE%A4%E5%81%A5%E5%BA%B7%E7%8A%B6%E6%80%81"><span class="nav-number">2.1.1.</span> <span class="nav-text">查看集群健康状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E9%9B%86%E7%BE%A4%E7%8A%B6%E5%86%B5"><span class="nav-number">2.1.2.</span> <span class="nav-text">查看集群状况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E9%9B%86%E7%BE%A4%E7%BB%9F%E8%AE%A1%E4%BF%A1%E6%81%AF"><span class="nav-number">2.1.3.</span> <span class="nav-text">查看集群统计信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E9%9B%86%E7%BE%A4%E9%85%8D%E7%BD%AE"><span class="nav-number">2.1.4.</span> <span class="nav-text">查看集群配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E7%B4%A2%E5%BC%95%E5%81%A5%E5%BA%B7%E7%8A%B6%E6%80%81"><span class="nav-number">2.1.5.</span> <span class="nav-text">查看索引健康状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%88%86%E7%89%87%E5%81%A5%E5%BA%B7%E7%8A%B6%E6%80%81"><span class="nav-number">2.1.6.</span> <span class="nav-text">查看分片健康状态</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E8%8A%82%E7%82%B9-API"><span class="nav-number">2.2.</span> <span class="nav-text">2、节点 API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E8%8A%82%E7%82%B9%E7%9A%84%E7%BB%9F%E8%AE%A1%E4%BF%A1%E6%81%AF"><span class="nav-number">2.2.1.</span> <span class="nav-text">查看所有节点的统计信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E8%8A%82%E7%82%B9%E7%9A%84%E7%B4%A2%E5%BC%95%E4%BF%A1%E6%81%AF"><span class="nav-number">2.2.2.</span> <span class="nav-text">查看所有节点的索引信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%9F%90%E4%B8%AA%E8%8A%82%E7%82%B9%E7%9A%84%E7%BB%9F%E8%AE%A1%E4%BF%A1%E6%81%AF"><span class="nav-number">2.2.3.</span> <span class="nav-text">查看某个节点的统计信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%9F%90%E4%B8%AA%E8%8A%82%E7%82%B9%E7%9A%84%E7%B4%A2%E5%BC%95%E4%BF%A1%E6%81%AF"><span class="nav-number">2.2.4.</span> <span class="nav-text">查看某个节点的索引信息</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81CAT-API"><span class="nav-number">2.3.</span> <span class="nav-text">3、CAT API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E9%9B%86%E7%BE%A4%E5%81%A5%E5%BA%B7%E7%8A%B6%E6%80%81-1"><span class="nav-number">2.3.1.</span> <span class="nav-text">查看集群健康状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E7%8A%B6%E6%80%81"><span class="nav-number">2.3.2.</span> <span class="nav-text">查看集群节点状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E7%B4%A2%E5%BC%95"><span class="nav-number">2.3.3.</span> <span class="nav-text">查看所有索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%88%86%E7%89%87%E6%83%85%E5%86%B5"><span class="nav-number">2.3.4.</span> <span class="nav-text">查看分片情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Bmaster%E4%BF%A1%E6%81%AF"><span class="nav-number">2.3.5.</span> <span class="nav-text">查看master信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Blucence%E7%9A%84%E6%AE%B5%E4%BF%A1%E6%81%AF"><span class="nav-number">2.3.6.</span> <span class="nav-text">查看lucence的段信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E7%B4%A2%E5%BC%95%E5%88%AB%E5%90%8D"><span class="nav-number">2.3.7.</span> <span class="nav-text">查看索引别名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%88%86%E9%85%8D%E8%B5%84%E6%BA%90%E6%8E%A5%E5%8F%A3"><span class="nav-number">2.3.8.</span> <span class="nav-text">查看分配资源接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%96%87%E6%A1%A3%E6%95%B0%E9%87%8F"><span class="nav-number">2.3.9.</span> <span class="nav-text">查看文档数量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%A8%A1%E6%9D%BF"><span class="nav-number">2.3.10.</span> <span class="nav-text">查看模板</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81%E7%B4%A2%E5%BC%95-API"><span class="nav-number">2.4.</span> <span class="nav-text">4、索引 API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%B4%A2%E5%BC%95"><span class="nav-number">2.4.1.</span> <span class="nav-text">创建索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E7%B4%A2%E5%BC%95"><span class="nav-number">2.4.2.</span> <span class="nav-text">查看索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E7%B4%A2%E5%BC%95"><span class="nav-number">2.4.3.</span> <span class="nav-text">修改索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E7%B4%A2%E5%BC%95"><span class="nav-number">2.4.4.</span> <span class="nav-text">删除索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%88%AB%E5%90%8D"><span class="nav-number">2.4.5.</span> <span class="nav-text">索引别名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%A8%A1%E6%9D%BF"><span class="nav-number">2.4.6.</span> <span class="nav-text">索引模板</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81%E6%96%87%E6%A1%A3"><span class="nav-number">2.5.</span> <span class="nav-text">5、文档</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E6%96%87%E6%A1%A3"><span class="nav-number">2.5.1.</span> <span class="nav-text">新增文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E6%96%87%E6%A1%A3"><span class="nav-number">2.5.2.</span> <span class="nav-text">更新文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%96%87%E6%A1%A3"><span class="nav-number">2.5.3.</span> <span class="nav-text">查看文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%96%87%E6%A1%A3"><span class="nav-number">2.5.4.</span> <span class="nav-text">删除文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E6%96%87%E6%A1%A3"><span class="nav-number">2.5.5.</span> <span class="nav-text">检索文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%B9%E9%87%8F%E6%93%8D%E4%BD%9C"><span class="nav-number">2.5.6.</span> <span class="nav-text">批量操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E6%A1%A3%E6%93%8D%E4%BD%9C%E7%9A%84%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6"><span class="nav-number">2.5.7.</span> <span class="nav-text">文档操作的并发控制</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="elasticsearch系列（六）：映射">
+<meta property="og:type" content="article">
+<meta property="og:title" content="elasticsearch系列（六）：映射">
+<meta property="og:url" content="http://yoursite.com/2021/05/01/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E6%98%A0%E5%B0%84/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="elasticsearch系列（六）：映射">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-05-01T15:01:42.000Z">
+<meta property="article:modified_time" content="2023-07-17T12:58:22.822Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="elasticsearch">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/05/01/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E6%98%A0%E5%B0%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>elasticsearch系列（六）：映射 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/05/01/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E6%98%A0%E5%B0%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          elasticsearch系列（六）：映射
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-01 23:01:42" itemprop="dateCreated datePublished" datetime="2021-05-01T23:01:42+08:00">2021-05-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-17 20:58:22" itemprop="dateModified" datetime="2023-07-17T20:58:22+08:00">2023-07-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticsearch/" itemprop="url" rel="index"><span itemprop="name">elasticsearch</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/05/01/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E6%98%A0%E5%B0%84/" class="post-meta-item leancloud_visitors" data-flag-title="elasticsearch系列（六）：映射" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/05/01/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E6%98%A0%E5%B0%84/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/05/01/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E6%98%A0%E5%B0%84/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p> elasticsearch系列（六）：映射</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="一、映射介绍"><a href="#一、映射介绍" class="headerlink" title="一、映射介绍"></a>一、映射介绍</h2><p>映射（mapping）类似数据库中的表结构定义 （schema），描述了文档包含哪些字段 ，每个字段的数据类型是什么，以及是如何存储和索引的。映射可以包含以下内容：</p>
+<ul>
+<li>定义Index下的字段名(Field Name)</li>
+<li>定义字段的类型，比如数值型、字符串型、布尔型等</li>
+<li>定义倒排索引相关的配置，比如是否索引、记录position等</li>
+</ul>
+<p>我们可以通过以下命令来查看索引的映射</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET account/_mapping</span><br></pre></td></tr></table></figure>
+<p>下面显示 account 的映射结构，包含 account_number 和 address 两个字段定义。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;account&quot;:&#123;</span><br><span class="line">        &quot;mappings&quot;:&#123;</span><br><span class="line">            &quot;properties&quot;:&#123;</span><br><span class="line">                &quot;account_number&quot;:&#123;</span><br><span class="line">                    &quot;type&quot;:&quot;long&quot;</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;address&quot;:&#123;</span><br><span class="line">                    &quot;type&quot;:&quot;text&quot;,</span><br><span class="line">                    &quot;fields&quot;:&#123;</span><br><span class="line">                        &quot;keyword&quot;:&#123;</span><br><span class="line">                            &quot;type&quot;:&quot;keyword&quot;,</span><br><span class="line">                            &quot;ignore_above&quot;:256</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建映射有两种方式：<code>动态映射</code> 和 <code>显式映射</code>。</p>
+<h3 id="动态映射-Dynamic-mapping"><a href="#动态映射-Dynamic-mapping" class="headerlink" title="动态映射 (Dynamic mapping)"></a>动态映射 (Dynamic mapping)</h3><p>如果我们没有预先定义文档的映射，在插入数据的时候，ES 默认会自动推断我们插入的数据的类型并创建索引。</p>
+<ul>
+<li>动态字段映射：根据数据类型规则应用于动态添加的字段。支持的数据类型包括：boolean、double、integer、object、array、date。<ul>
+<li>dynamic：开启动态映射的模式</li>
+<li>date_detection：开启日期检测</li>
+<li>dynamic_date_formats：检测的日期格式</li>
+<li>numeric_detection: true：开启数值检测</li>
+</ul>
+</li>
+<li>动态模板：又称自定义映射，根据匹配条件应用于动态添加的字段。<ul>
+<li>match_mapping_type: Elasticsearch检测到的数据类型进行操作</li>
+<li>match and unmatch: 使用模式来匹配字段名称</li>
+<li>path_match and path_unmatch: 使用字段的路径来匹配</li>
+</ul>
+</li>
+</ul>
+<p>例如执行下面命令会自动创建索引 <code>user</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PUT /user/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;John&quot;,</span><br><span class="line">  &quot;phone&quot;: &quot;13423455432&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>查看 <code>user</code> 的索引结构</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">GET /user/_mapping</span><br><span class="line">&#123;</span><br><span class="line">    &quot;user&quot;:&#123;</span><br><span class="line">        &quot;mappings&quot;:&#123;</span><br><span class="line">            &quot;properties&quot;:&#123;</span><br><span class="line">                &quot;name&quot;:&#123;</span><br><span class="line">                    &quot;type&quot;:&quot;text&quot;,</span><br><span class="line">                    &quot;fields&quot;:&#123;</span><br><span class="line">                        &quot;keyword&quot;:&#123;</span><br><span class="line">                            &quot;type&quot;:&quot;keyword&quot;,</span><br><span class="line">                            &quot;ignore_above&quot;:256</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;phone&quot;:&#123;</span><br><span class="line">                    &quot;type&quot;:&quot;text&quot;,</span><br><span class="line">                    &quot;fields&quot;:&#123;</span><br><span class="line">                        &quot;keyword&quot;:&#123;</span><br><span class="line">                            &quot;type&quot;:&quot;keyword&quot;,</span><br><span class="line">                            &quot;ignore_above&quot;:256</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到 phone 字段被自动映射为 text 类型，从业务的角度我们希望是一个精确值，使用 keyword 类型，<strong>这就是自动映射的缺点： ES 自动映射的数据类型，不一定是我们想要的类型</strong>。如果你想禁止自动创建索引，你可以通过在 <code>config/elasticsearch.yml</code>  的每个节点下添加下面的配置：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">action.auto_create_index: false</span><br></pre></td></tr></table></figure>
+<h3 id="显式映射（Explicit-mapping）"><a href="#显式映射（Explicit-mapping）" class="headerlink" title="显式映射（Explicit mapping）"></a>显式映射（Explicit mapping）</h3><p>因为被动映射的字段可能不太符合我们的需求，所以我们需要显式映射自定义 mapping 的结构。可以使用下面的语法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># 索引不存在，第一次创建索引</span><br><span class="line">PUT /indexname</span><br><span class="line">&#123;</span><br><span class="line">    &quot;mappings&quot;:&#123; // 表示定义映射规则</span><br><span class="line">        &quot;properties&quot;:&#123; // 定义字段类型</span><br><span class="line">            &quot;字段名1&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;字段类型&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;字段名2&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;字段类型&quot;</span><br><span class="line">            &#125;</span><br><span class="line">            ......</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 索引已存在，修改索引</span><br><span class="line">PUT /user9/_mapping</span><br><span class="line">&#123;</span><br><span class="line">    &quot;properties&quot;:&#123;</span><br><span class="line">        &quot;字段名1&quot;:&#123;</span><br><span class="line">            &quot;type&quot;:&quot;字段类型&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;字段名2&quot;:&#123;</span><br><span class="line">            &quot;type&quot;:&quot;字段类型&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>例如上面那个例子，我们可以手动创建 user 索引。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">PUT /user</span><br><span class="line">&#123;</span><br><span class="line">    &quot;mappings&quot;:&#123;</span><br><span class="line">        &quot;properties&quot;:&#123;</span><br><span class="line">            &quot;name&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;text&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;phone&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;keyword&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这时候查看 user 的索引结构，发现 phone 是 keyword 类型。</p>
+<h2 id="二、映射定义"><a href="#二、映射定义" class="headerlink" title="二、映射定义"></a>二、映射定义</h2><h3 id="字段数据类型（field-datatypes）"><a href="#字段数据类型（field-datatypes）" class="headerlink" title="字段数据类型（field datatypes）"></a>字段数据类型（field datatypes）</h3><p>Elasticsearch 支持以下数据类型：</p>
+<h4 id="基本类型"><a href="#基本类型" class="headerlink" title="基本类型"></a>基本类型</h4><ul>
+<li>字符串类型，包含 text 与 keyword 两种类型。<ul>
+<li>text，会将原始文本进行分词处理，在索引文件中，存储的不是原字符串，而是使用分词器对内容进行分词处理后得到一系列的词根，然后存储在 index 的倒排索引中。</li>
+<li>keyword，将原始输入内容当成一个词根存储在倒排索引中，与 text 字段的区别是该字段不会使用分词器进行分词。</li>
+</ul>
+</li>
+<li>数字类型：long、integer、short、byte、double、float、half_float、scaled_float。</li>
+<li>boolean 类型：true&#x2F;false。</li>
+<li>日期类型：date，json对象没有日期类型，故java中的日期数据会被格式化，具体如下：<ul>
+<li>字符串类型，例如”2015-01-01”</li>
+<li>long类型，表示从1970-01-01以来的毫秒数</li>
+<li>int类型，表示从1970-01-01以来的秒数<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">PUT /range_index</span><br><span class="line">&#123;</span><br><span class="line">    &quot;mappings&quot;:&#123;</span><br><span class="line">        &quot;properties&quot;:&#123;</span><br><span class="line">            &quot;create_date&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;date&quot;,</span><br><span class="line">                &quot;format&quot;:&quot;yyyy-MM-dd HH:mm:ss || yyyy-MM-dd || epoch_millis&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>binary 类型：存储二进制数据，存储之前，需要先用Base64进行编码。该字段类型默认不存储在索引中，也不能用来当搜索条件。</li>
+<li>range 类型：integer_range、float_range、long_range、double_range、date_range（64-bit 无符号整数，时间戳（单位：毫秒））、ip_range（IPV4 或 IPV6 格式的字符串）</li>
+</ul>
+<h4 id="复合类型"><a href="#复合类型" class="headerlink" title="复合类型"></a>复合类型</h4><h5 id="array-类型"><a href="#array-类型" class="headerlink" title="array 类型"></a>array 类型</h5><p>数组类型，Elasticsearch不提供专门的数组类型。任何字段，都可以包含多个相同类型的数值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 创建索引，字典status_code定义为字符串类型keyword</span><br><span class="line">PUT /indexname</span><br><span class="line">&#123;</span><br><span class="line">    &quot;mappings&quot;:&#123;</span><br><span class="line">        &quot;properties&quot;:&#123;</span><br><span class="line">            &quot;status_code&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;keyword&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 增加数据，可以向status_code字段插入一个数组</span><br><span class="line">PUT /indexname/1</span><br><span class="line">&#123;</span><br><span class="line">    &quot;status_code&quot;:[</span><br><span class="line">        &quot;200&quot;,</span><br><span class="line">        &quot;301&quot;,</span><br><span class="line">        &quot;404&quot;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="object-类型"><a href="#object-类型" class="headerlink" title="object 类型"></a>object 类型</h5><p>对象类型，json 对象字符串。在插入数据的时候，es 如果检测到数据值是 json 对象，会自动转成 object 类型。缺省设置 type 为 object，因此不用显式定义 type。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PUT /user/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">    &quot;user&quot;:&#123;</span><br><span class="line">        &quot;first&quot;:&quot;John&quot;,</span><br><span class="line">        &quot;last&quot;:&quot;Smith&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>也可以显示创建 object 类型字段的索引。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">PUT /user</span><br><span class="line">&#123;</span><br><span class="line">    &quot;mappings&quot;:&#123;</span><br><span class="line">        &quot;properties&quot;:&#123;</span><br><span class="line">            &quot;user&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;object&quot;, // 显示定义 object 类型。也可以不写 type，默认为 object 类型</span><br><span class="line">                &quot;properties&quot;:&#123;</span><br><span class="line">                    &quot;first&quot;:&#123;</span><br><span class="line">                        &quot;type&quot;:&quot;text&quot;</span><br><span class="line">                    &#125;,</span><br><span class="line">                    &quot;last&quot;:&#123;</span><br><span class="line">                        &quot;type&quot;:&quot;text&quot;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>es默认会将原 json 文档扁平化处理。上面 json 对象变成以下内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;user.first&quot;:&quot;John&quot;,</span><br><span class="line">    &quot;user.last&quot;:&quot;Smith&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以通过 <code>user.first</code>  的字段名进行查询</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GET /user/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match&quot;:&#123;</span><br><span class="line">            &quot;user.first&quot;:&quot;John&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="nested-类型"><a href="#nested-类型" class="headerlink" title="nested 类型"></a>nested 类型</h5><p>嵌套类型可以看成是一个特殊的 object 对象类型，nested 实际上就是 object 的数组，可以让 object 数组独立检索。例如创建一个 user 索引</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">PUT indexname/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">    &quot;user&quot;:[</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;first&quot;:&quot;John&quot;,</span><br><span class="line">            &quot;last&quot;:&quot;Smith&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;first&quot;:&quot;Alice&quot;,</span><br><span class="line">            &quot;last&quot;:&quot;White&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>es 会进行扁平化处理，变成</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;user.first&quot;:[&quot;John&quot;, &quot;Alice&quot;],</span><br><span class="line">    &quot;user.last&quot;:[&quot;Smith&quot;, &quot;White&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>user.first</code> 和 <code>user.last</code> 分别存储多个字段。原来只有两个用户 <code>John Smith</code> 和 <code>Alice White</code>，现在 John 和 Smith 失去了关联，所以下面直接搜索用户名  <code>Alice Smith</code> 也能查询到数据，这就不符合业务预期了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">  &quot;query&quot;: &#123;</span><br><span class="line">    &quot;bool&quot;: &#123;</span><br><span class="line">      &quot;must&quot;: [</span><br><span class="line">        &#123; &quot;match&quot;: &#123; &quot;user.first&quot;: &quot;Alice&quot; &#125;&#125;,</span><br><span class="line">        &#123; &quot;match&quot;: &#123; &quot;user.last&quot;:  &quot;Smith&quot; &#125;&#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>nested 就是将数组里面的每个 doc 单独变成子文档进行存储，因此在查询时就可以知道具体的结构信息了。<strong>要使用 nested 类型必须显示定义映射，否则 es 会自动转成 object 类型</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">PUT /user</span><br><span class="line">&#123;</span><br><span class="line">    &quot;mappings&quot;:&#123;</span><br><span class="line">        &quot;properties&quot;:&#123;</span><br><span class="line">            &quot;user&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;nested&quot;, // 必须显示定义为 nested 类型</span><br><span class="line">                &quot;properties&quot;:&#123;</span><br><span class="line">                    &quot;first&quot;:&#123;</span><br><span class="line">                        &quot;type&quot;:&quot;text&quot;</span><br><span class="line">                    &#125;,</span><br><span class="line">                    &quot;last&quot;:&#123;</span><br><span class="line">                        &quot;type&quot;:&quot;text&quot;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h5 id="geo-类型"><a href="#geo-类型" class="headerlink" title="geo 类型"></a>geo 类型</h5><p>地图数据类型。</p>
+<h3 id="映射参数"><a href="#映射参数" class="headerlink" title="映射参数"></a>映射参数</h3><p>除了 type 参数，和 type 同级的还可以定义以下映射参数。</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>index</td>
+<td>是否被索引，设置成false，字段将不会被索引</td>
+<td>false</td>
+</tr>
+<tr>
+<td>analyzer</td>
+<td>指定分词器，分词器在 settings 中定义</td>
+<td>ik</td>
+</tr>
+<tr>
+<td>boost</td>
+<td>增强当前字段的匹配权重</td>
+<td>1.23</td>
+</tr>
+<tr>
+<td>dynamic</td>
+<td>是否开启自动映射，目前支持三个参数：true&#x2F;false&#x2F;strict。默认为 true，表示新检测到未定义的的字段时候，自动添加到映射；false 表示不添加到映射；strict 表示当出现未定义的字段，抛出异常并拒绝添加文档</td>
+<td>strict</td>
+</tr>
+<tr>
+<td>format</td>
+<td>自定义日期格式</td>
+<td>yyyy-MM-dd</td>
+</tr>
+<tr>
+<td>doc_values</td>
+<td>对not_analyzed字段，默认都是开启，analyzed字段不能使用，对排序和聚合能提升较大性能，节约内存,如果您确定不需要对字段进行排序或聚合，或者从script访问字段值，则可以禁用doc值以节省磁盘空间</td>
+<td>false</td>
+</tr>
+<tr>
+<td>fields</td>
+<td>可以对一个字段提供多种索引模式，同一个字段的值，一个分词，一个不分词</td>
+<td>{“keyword”: {“type”: “keyword”,”ignore_above”: 256}}</td>
+</tr>
+<tr>
+<td>ignore_above</td>
+<td>超过长度的字符的文本，将会被忽略，不被索引</td>
+<td>100</td>
+</tr>
+<tr>
+<td>fielddata</td>
+<td>lasticsearch 加载内存 fielddata 的默认行为是延迟加载。 当 Elasticsearch 第一次查询某个字段时，它将会完整加载这个字段所有 Segment 中的倒排索引到内存中，以便于以后的查询能够获取更好的性能。</td>
+<td>{“loading” : “eager” }</td>
+</tr>
+<tr>
+<td>include_in_all</td>
+<td>设置是否此字段包含在 _all 字段中，默认是 true，除非 index 设置成 no 选项</td>
+<td>true</td>
+</tr>
+<tr>
+<td>index_options</td>
+<td>4个可选参数docs（索引文档号） ,freqs（文档号+词频），positions（文档号+词频+位置，通常用来距离查询），offsets（文档号+词频+位置+偏移量，通常被使用在高亮字段）分词字段默认是position，其他的默认是docs</td>
+<td>docs</td>
+</tr>
+<tr>
+<td>norms</td>
+<td>分词字段默认配置，不分词字段：默认{“enable”:false}，存储长度因子和索引时 boost，建议对需要参与评分字段使用 ，会额外增加内存消耗量</td>
+<td>{“enable”:true,”loading”:”lazy”}</td>
+</tr>
+<tr>
+<td>null_value</td>
+<td>设置一些缺失字段的初始化值，只有 string 可以使用，分词字段的 null 值也会被分词</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>store</td>
+<td>是否单独设置此字段的是否存储而从 _source 字段中分离，默认是false，只能搜索，不能获取值</td>
+<td>false</td>
+</tr>
+<tr>
+<td>search_analyzer</td>
+<td>设置搜索时的分词器，默认跟 ananlyzer 是一致的，比如 index 时用 standard+ngram，搜索时用 standard 用来完成自动提示功能</td>
+<td>ik</td>
+</tr>
+<tr>
+<td>similarity</td>
+<td>指定一个字段评分策略，仅仅对字符串型和分词类型有效 ，默认是TF&#x2F;IDF算法</td>
+<td>BM25</td>
+</tr>
+</tbody></table>
+<h3 id="映射元数据"><a href="#映射元数据" class="headerlink" title="映射元数据"></a>映射元数据</h3><p>每个文档都会有一些元数据属性，例如</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">GET /user/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">    &quot;_index&quot;:&quot;user4&quot;,</span><br><span class="line">    &quot;_id&quot;:&quot;1&quot;,</span><br><span class="line">    &quot;_version&quot;:1,</span><br><span class="line">    &quot;_seq_no&quot;:0,</span><br><span class="line">    &quot;_primary_term&quot;:1,</span><br><span class="line">    &quot;found&quot;:true,</span><br><span class="line">    &quot;_source&quot;:&#123;</span><br><span class="line">        &quot;name&quot;:&quot;John&quot;,</span><br><span class="line">        &quot;phone&quot;:&quot;13423455432&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>_index</code> 、<code>_id</code>  这些就被称为文档的元数据，用来描述文档本身的属性。常见的文档元数据有：</p>
+<ul>
+<li>_index：文档所在的索引，类似于关系型数据库的database。</li>
+<li>_id：文档的_id值。</li>
+<li>_source：文档的原始 json 数据。</li>
+<li>_size：文档_souce字段的字节长度，需要插件：mapper-size plugin。</li>
+<li>_ignored：设置为ignore_malformed&#x3D;true的所有字段。</li>
+<li>_routing：路由分片字段。</li>
+<li>_meta：用于用户自定义元数据。</li>
+</ul>
+<h2 id="三、其他"><a href="#三、其他" class="headerlink" title="三、其他"></a>三、其他</h2><h3 id="映射修改"><a href="#映射修改" class="headerlink" title="映射修改"></a>映射修改</h3><p>映射中已经定义的字段不能被更新和删除，因为lucene实现的倒排索引生成后不允许修改，除非 reindex 更新 mapping。除了三种情况：</p>
+<ul>
+<li>可以添加新的 filed。</li>
+<li>已经存在的 fields 里面可以添加 fields。</li>
+<li>ignore_above 参数可以更新的。</li>
+</ul>
+<p>假如先创建索引 user，包含 <code>user</code> 和 <code>age</code> 两个字段。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PUT /user1/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;John&quot;,</span><br><span class="line">  &quot;age&quot;: 18</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后想增加 <code>address</code>  字段，无论是使用下面哪一种方式，es 都可以识别出 <code>addrees</code>  字段，然后增加到映射。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 在原来的字段基础上增加 address 字段</span><br><span class="line">PUT /user10/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;John&quot;,</span><br><span class="line">  &quot;age&quot;: 18,</span><br><span class="line">  &quot;adrress&quot;: &quot;China&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 单独增加 address 字段</span><br><span class="line">&#123;</span><br><span class="line">  &quot;adrress&quot;: &quot;China&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是如果想把 age 字段改成 text 类型，就会报错 <code>mapper_parsing_exception</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PUT /user10/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;age&quot;: &quot;aaa&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="映射的版本迭代"><a href="#映射的版本迭代" class="headerlink" title="映射的版本迭代"></a>映射的版本迭代</h3><table>
+<thead>
+<tr>
+<th>version</th>
+<th>pattern</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>5.6.x</td>
+<td>可手动启用“index.mapping.single_type: true”，使用 join 字段进行替换</td>
+</tr>
+<tr>
+<td>6.x</td>
+<td>允许索引使用单一类型，有且仅有一个名称，首选_doc 类型；5.x 版本的索引可延续使用，新版本的索引不再支持父&#x2F;子方式和 join 类型；6.8中需要在索引创建、模板时需要显示指定 include _ type _ name，不显示申明会默认为 name _ doc</td>
+</tr>
+<tr>
+<td>7.x</td>
+<td>_doc 是路径中的永久部分，并且表示的是 endpoint 类型，而不是 doc 类型；include _ type _ name 参数默认为 false；移除 <em>default</em> mapping 类型</td>
+</tr>
+<tr>
+<td>8.x</td>
+<td>不再支持特殊类型;移除 include_type_name 参数</td>
+</tr>
+</tbody></table>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html">Mapping</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/" rel="prev" title="elasticsearch系列（五）：索引">
+      <i class="fa fa-chevron-left"></i> elasticsearch系列（五）：索引
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/05/10/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%83%EF%BC%89%EF%BC%9A%E9%85%8D%E7%BD%AE/" rel="next" title="elasticsearch系列（七）：配置">
+      elasticsearch系列（七）：配置 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%98%A0%E5%B0%84%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">一、映射介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E6%98%A0%E5%B0%84-Dynamic-mapping"><span class="nav-number">1.1.</span> <span class="nav-text">动态映射 (Dynamic mapping)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%BE%E5%BC%8F%E6%98%A0%E5%B0%84%EF%BC%88Explicit-mapping%EF%BC%89"><span class="nav-number">1.2.</span> <span class="nav-text">显式映射（Explicit mapping）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%98%A0%E5%B0%84%E5%AE%9A%E4%B9%89"><span class="nav-number">2.</span> <span class="nav-text">二、映射定义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E6%AE%B5%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%EF%BC%88field-datatypes%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">字段数据类型（field datatypes）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.1.1.</span> <span class="nav-text">基本类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%8D%E5%90%88%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.1.2.</span> <span class="nav-text">复合类型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#array-%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">array 类型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#object-%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.1.2.2.</span> <span class="nav-text">object 类型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#nested-%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.1.2.3.</span> <span class="nav-text">nested 类型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#geo-%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.1.2.4.</span> <span class="nav-text">geo 类型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%A0%E5%B0%84%E5%8F%82%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">映射参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%A0%E5%B0%84%E5%85%83%E6%95%B0%E6%8D%AE"><span class="nav-number">2.3.</span> <span class="nav-text">映射元数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%85%B6%E4%BB%96"><span class="nav-number">3.</span> <span class="nav-text">三、其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%A0%E5%B0%84%E4%BF%AE%E6%94%B9"><span class="nav-number">3.1.</span> <span class="nav-text">映射修改</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%A0%E5%B0%84%E7%9A%84%E7%89%88%E6%9C%AC%E8%BF%AD%E4%BB%A3"><span class="nav-number">3.2.</span> <span class="nav-text">映射的版本迭代</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

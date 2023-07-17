@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="elasticsearch系列（五）：索引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="elasticsearch系列（五）：索引">
+<meta property="og:url" content="http://yoursite.com/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="elasticsearch系列（五）：索引">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/image-20230710203832177.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/image-20230710203901923.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/image-20230710203920943.png">
+<meta property="article:published_time" content="2021-04-28T12:32:06.000Z">
+<meta property="article:modified_time" content="2023-07-12T03:07:41.858Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/image-20230710203832177.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>elasticsearch系列（五）：索引 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          elasticsearch系列（五）：索引
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-28 20:32:06" itemprop="dateCreated datePublished" datetime="2021-04-28T20:32:06+08:00">2021-04-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-12 11:07:41" itemprop="dateModified" datetime="2023-07-12T11:07:41+08:00">2023-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticsearch/" itemprop="url" rel="index"><span itemprop="name">elasticsearch</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/" class="post-meta-item leancloud_visitors" data-flag-title="elasticsearch系列（五）：索引" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>elasticsearch系列（五）：索引</p>
+</blockquote>
+<span id="more"></span>
+
+<h3 id="一、索引介绍"><a href="#一、索引介绍" class="headerlink" title="一、索引介绍"></a>一、索引介绍</h3><h4 id="索引结构"><a href="#索引结构" class="headerlink" title="索引结构"></a>索引结构</h4><p>Elasticsearch 索引是是具有类似特性的文档的集合，的索引结构主要包含 <code>mappings</code> 与 <code>settings</code> 两部分。</p>
+<ul>
+<li>settings：定义 index 分片数量、副本数量、解析器等相关的配置信息。</li>
+<li>mappings：定义 document 及其包含的字段类型和索引方式相关的信息。</li>
+</ul>
+<p>以最新的7.x以后的最新版本为例，新建一个索引结构如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">PUT /my-index</span><br><span class="line">&#123;</span><br><span class="line">    &quot;settings&quot;:&#123;</span><br><span class="line">        &quot;number_of_shards&quot;:3, // 3个主分片，主分片在设定后不能修改</span><br><span class="line">        &quot;number_of_replicas&quot;:1 // 除了本身分片之外，还有1个备份分片，备份分片可以在运行过程中根据业务需要动态调整</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;mappings&quot;:&#123;</span><br><span class="line">        &quot;properties&quot;:&#123; // 定义了 name、age、address 三个字段</span><br><span class="line">            &quot;name&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;text&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;age&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;integer&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;address&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;text&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="索引分片"><a href="#索引分片" class="headerlink" title="索引分片"></a>索引分片</h4><p>分片（shard）是 es 中存储数据的最小单元。一个索引被分成多个分片，分散到多台服务器上，每个分片存储一部分数据。分片分为 shard 和 replica 。</p>
+<ul>
+<li><code>shard</code>：只有一个，为了解决数据在单一节点存储的问题而做的水平扩展，将数据分片后存放在不同的节点上可以提高对于数据操作的吞吐量及可扩展性。此参数一旦在索引（Index）创建完成后，则不可以进行修改。</li>
+<li><code>replica</code>：是对 shard 的备份，为了解决数据可用性问题，通常在分片数据丢失后，如果有副本数据在的话可以保证数据的完整性。并且在高吞吐量场景时，增加副本数量可以提供服务的读取吞吐量。此参数可以在索引创建时指定，也可以在创建后进行调整。<strong>replica 值越大搜索效率越高，但写入性能越低</strong>（一条数据写入操作需要做（1+replicas）遍），具体值与集群 data 节点数量相关，不宜超过（data 节点数-1）</li>
+</ul>
+<p><strong>比如有一个索引，shard 设置为5，replica 设置为1，那么总的切片数为：shard（5） + shard（5） * replicas（1） &#x3D; total（10</strong>）。</p>
+<p>每次修改的时候都会先直接修改 primary shard，再同步其他所有 replica shard。查询的时候则在primary和replica中随机选择一个。</p>
+<h3 id="二、索引原理"><a href="#二、索引原理" class="headerlink" title="二、索引原理"></a>二、索引原理</h3><h4 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h4><p>Elasticsearch 的倒排索引，其实就是 Lucene 的倒排索引。倒排索引就是通过 Value 查找 Key：一段文本经过分析器分析以后就会输出一串单词，这一个一个的就叫做 Term。文档中所有不重复 Term 组成一个列表，对于其中每个 Term，有一个包含它的文档列表。lucene 倒排索引中包含的概念如下：</p>
+<ul>
+<li><code>索引(Index)</code>：类似于数据库的表。在Lucene中一个索引是放在一个文件夹中的。所以可以理解索引为整个文件夹的内容。</li>
+<li><code>段(Segment)</code>：类似于表的分区。一个索引下可以多个段。</li>
+<li><code>文档(Document)</code>：类似于表的一行数据。Document是索引的基本单位。一个段可以有多个Document。</li>
+<li><code>域(Field)</code>：类似于表的字段。Doument里可以有多个Field。Lucene提供多种不同类型的Field，例如StringField、TextField、LongFiled或NumericDocValuesField等。</li>
+<li><code>词(Term)</code>：Term是索引的最小单位。Term是由Field经过Analyzer（分词）产生。</li>
+</ul>
+<p>lucene 倒排索引的内部结构如下：<br><img src="/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/image-20230710203832177.png" alt="image-20230710203832177"></p>
+<ul>
+<li><code>Term Index</code>：字典树，用于快速查找Term。使用FST结构，只存储Term前缀，通过字典树找到Term所在的块，也就是Term的在字典表中的大概位置，再在块里二分查找，找到对应的Term。</li>
+<li><code>Term Dictionary</code>：字典表，用于存储Analyzer分割 后所有Term。使用跳表结构。</li>
+<li><code>Posting List</code>：记录表，记录了出现过某个单词的所有文档的文档列表及单词在该文档中出现的位置信息，每条记录称为一个倒排项(Posting)。使用Frame Of Reference（FOR）和Roaring bitmaps技术。它不仅仅为文档 id 信息，可能包含以下信息：<ul>
+<li>文档 id（DocId, Document Id），包含单词的所有文档唯一 id，用于去正排索引中查询原始数据。</li>
+<li>词频（TF，Term Frequency），记录 Term 在每篇文档中出现的次数，用于后续相关性算分。</li>
+<li>位置（Position），记录 Term 在每篇文档中的分词位置（多个），用于做词语搜索（Phrase Query）。</li>
+<li>偏移（Offset），记录 Term 在每篇文档的开始和结束位置，用于高亮显示等。</li>
+</ul>
+</li>
+</ul>
+<h4 id="构建倒排索引"><a href="#构建倒排索引" class="headerlink" title="构建倒排索引"></a>构建倒排索引</h4><p>构建倒排索引的过程：<strong>Elasticsearch 会使用多种分析器将文本拆分成用于搜索的词条（Term），然后将这些词条统一化以提高“可搜索性”，整个分析算法称为分析器（Analyzer）</strong>。<br><img src="/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/image-20230710203901923.png" alt="image-20230710203901923"><br>Analyzer 包含三部分内容：</p>
+<ol>
+<li><code>字符过滤器（Character Filter）</code>：在分词前进行预处理，如去除HTML，字符转换如&amp;转为and。</li>
+<li><code>分词器（Tokenizer）</code>：按照规则切割文档并提取词元（Token），例如遇到空格和标点将文本拆分成词元。</li>
+<li><code>Token过滤器（Token Filter</code>）：将切分的词元进行加工，如将大小写统一，增加词条（如jump、leap等同义词）。</li>
+</ol>
+<h4 id="index、shard、segment、倒排索引的区别和联系"><a href="#index、shard、segment、倒排索引的区别和联系" class="headerlink" title="index、shard、segment、倒排索引的区别和联系"></a>index、shard、segment、倒排索引的区别和联系</h4><p><img src="/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/image-20230710203920943.png" alt="image-20230710203920943"></p>
+<ul>
+<li>一个 Elastic Index 都是由多个 Shard （primary &amp; replica）构成的。</li>
+<li>一个Shard 本质对应一个Lucene Index。</li>
+<li>一个Lucene Index包含多个segment。</li>
+<li>每一个segment都是一个倒排索引。</li>
+</ul>
+<h3 id="三、索引模板"><a href="#三、索引模板" class="headerlink" title="三、索引模板"></a>三、索引模板</h3><h4 id="索引模板简介"><a href="#索引模板简介" class="headerlink" title="索引模板简介"></a>索引模板简介</h4><p><strong>索引模板是预先定义好的在创建新索引时自动应用的模板</strong>。创建索引之前可以先配置模板，这样在创建索引（手动创建索引或通过对文档建立索引）时，可以直接使用索引模板创建索引。索引模板一般与索引别名一起使用。另外需要注意，模板只在创建索引时应用，更改模板不会对现有索引产生影响。<br>在 elasticsearch v7.8 版本之后推出 <code>组合索引模板（composable index template）</code>。在这之前的都属于<code>旧的索引模板（legacy index template）</code>。在使用优先级上，组合模板优先于旧模板。</p>
+<p>组合索引模板的使用参考<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html">Index templates</a>，旧的索引模板的使用参考<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates-v1.html">Create or update index template (legacy)</a></p>
+<h4 id="旧索引模板"><a href="#旧索引模板" class="headerlink" title="旧索引模板"></a>旧索引模板</h4><p>旧索引模板没有组件的概念，直接在索引模板里面定义 settings 和 mappings。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">PUT _template/template_1</span><br><span class="line">&#123;</span><br><span class="line">    &quot;index_patterns&quot;:[ // 对满足正则匹配的索引应用索引模板</span><br><span class="line">        &quot;te*&quot;,</span><br><span class="line">        &quot;bar*&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;settings&quot;:&#123; // 定义settings</span><br><span class="line">        &quot;number_of_shards&quot;:1</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;mappings&quot;:&#123; // 定义mappings</span><br><span class="line">        &quot;_source&quot;:&#123;</span><br><span class="line">            &quot;enabled&quot;:false</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;properties&quot;:&#123; // 定义host_name和created_at两个字段</span><br><span class="line">            &quot;host_name&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;keyword&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;created_at&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;date&quot;,</span><br><span class="line">                &quot;format&quot;:&quot;EEE MMM dd HH:mm:ss Z yyyy&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在 7.8 版本后也可以直接用该方式创建索引，但是会有告警 <code>#! Legacy index templates are deprecated in favor of composable templates.</code></p>
+</blockquote>
+<h4 id="组合索引模板"><a href="#组合索引模板" class="headerlink" title="组合索引模板"></a>组合索引模板</h4><p>组合索引模板有两种类型：索引模板和组件模板。</p>
+<ul>
+<li><code>组件模板</code>：可重用的构建块，用于配置映射，设置和别名；它们不会直接应用于一组索引。</li>
+<li><code>索引模板</code>：可以包含组件模板的集合，也可以直接指定设置，映射和别名。</li>
+</ul>
+<p>可以不使用组件模板，直接在索引模板里面定义 settings 和 mappings，类似于旧索引模板。上面的旧索引模板的例子也可以改成下面的用法。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">PUT _index_template/template_1</span><br><span class="line">&#123;</span><br><span class="line">    &quot;index_patterns&quot;:[</span><br><span class="line">        &quot;te*&quot;,</span><br><span class="line">        &quot;bar*&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;template&quot;:&#123;</span><br><span class="line">        &quot;settings&quot;:&#123;</span><br><span class="line">            &quot;number_of_shards&quot;:1</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;mappings&quot;:&#123;</span><br><span class="line">            &quot;_source&quot;:&#123;</span><br><span class="line">                &quot;enabled&quot;:false</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;properties&quot;:&#123;</span><br><span class="line">                &quot;host_name&quot;:&#123;</span><br><span class="line">                    &quot;type&quot;:&quot;keyword&quot;</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;created_at&quot;:&#123;</span><br><span class="line">                    &quot;type&quot;:&quot;date&quot;,</span><br><span class="line">                    &quot;format&quot;:&quot;EEE MMM dd HH:mm:ss Z yyyy&quot;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用组件模板来组合索引模板。例如首先创建两个索引组件模板：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">PUT _component_template/component_template1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;template&quot;: &#123;</span><br><span class="line">    &quot;mappings&quot;: &#123;</span><br><span class="line">      &quot;properties&quot;: &#123;</span><br><span class="line">        &quot;@timestamp&quot;: &#123;</span><br><span class="line">          &quot;type&quot;: &quot;date&quot;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PUT _component_template/runtime_component_template</span><br><span class="line">&#123;</span><br><span class="line">  &quot;template&quot;: &#123;</span><br><span class="line">    &quot;mappings&quot;: &#123;</span><br><span class="line">      &quot;runtime&quot;: &#123; </span><br><span class="line">        &quot;day_of_week&quot;: &#123;</span><br><span class="line">          &quot;type&quot;: &quot;keyword&quot;,</span><br><span class="line">          &quot;script&quot;: &#123;</span><br><span class="line">            &quot;source&quot;: &quot;emit(doc[&#x27;@timestamp&#x27;].value.dayOfWeekEnum.getDisplayName(TextStyle.FULL, Locale.ROOT))&quot;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后创建使用组件模板的索引模板。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">PUT _index_template/template_2</span><br><span class="line">&#123;</span><br><span class="line">    &quot;index_patterns&quot;:[</span><br><span class="line">        &quot;bar*&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;template&quot;:&#123;</span><br><span class="line">        &quot;settings&quot;:&#123;</span><br><span class="line">            &quot;number_of_shards&quot;:1</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;mappings&quot;:&#123;</span><br><span class="line">            &quot;_source&quot;:&#123;</span><br><span class="line">                &quot;enabled&quot;:true</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;properties&quot;:&#123;</span><br><span class="line">                &quot;host_name&quot;:&#123;</span><br><span class="line">                    &quot;type&quot;:&quot;keyword&quot;</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;created_at&quot;:&#123;</span><br><span class="line">                    &quot;type&quot;:&quot;date&quot;,</span><br><span class="line">                    &quot;format&quot;:&quot;EEE MMM dd HH:mm:ss Z yyyy&quot;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;aliases&quot;:&#123;</span><br><span class="line">            &quot;mydata&quot;:&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;priority&quot;:500,</span><br><span class="line">    &quot;composed_of&quot;:[</span><br><span class="line">        &quot;component_template1&quot;,</span><br><span class="line">        &quot;runtime_component_template&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;version&quot;:3,</span><br><span class="line">    &quot;_meta&quot;:&#123;</span><br><span class="line">        &quot;description&quot;:&quot;my custom&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="索引模板的优先级"><a href="#索引模板的优先级" class="headerlink" title="索引模板的优先级"></a>索引模板的优先级</h4><ul>
+<li>可组合模板优先于旧模板。如果没有可组合模板匹配给定索引，则旧版模板可能仍匹配并被应用。</li>
+<li>如果使用显式设置创建索引并且该索引也与索引模板匹配，则创建索引请求中的设置将优先于索引模板及其组件模板中指定的设置。</li>
+<li>如果新数据流或索引与多个索引模板匹配，则使用优先级最高的索引模板。</li>
+</ul>
+<h4 id="内置索引模板"><a href="#内置索引模板" class="headerlink" title="内置索引模板"></a>内置索引模板</h4><p>Elasticsearch具有内置索引模板，每个索引模板的优先级为100，适用于以下索引模式：</p>
+<ul>
+<li><code>logs-*-*</code></li>
+<li><code>metrics-*-*</code></li>
+<li><code>synthetics-*-*</code></li>
+</ul>
+<p>所以在涉及内建索引模板时，要避免索引模式冲突。更多可以参考<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html">这里</a></p>
+<h4 id="版本变化"><a href="#版本变化" class="headerlink" title="版本变化"></a>版本变化</h4><h5 id="6-0之前的版本"><a href="#6-0之前的版本" class="headerlink" title="6.0之前的版本"></a>6.0之前的版本</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">POST _template/shop_template</span><br><span class="line">&#123;</span><br><span class="line">    &quot;template&quot;: &quot;shop*&quot;,       // 可以通过&quot;shop*&quot;来适配</span><br><span class="line">    &quot;order&quot;: 0,                // 模板的权重, 多个模板的时候优先匹配用, 值越大, 权重越高</span><br><span class="line">    &quot;settings&quot;: &#123;</span><br><span class="line">        &quot;number_of_shards&quot;: 1  // 分片数量, 可以定义其他配置项</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aliases&quot;: &#123;</span><br><span class="line">        &quot;alias_1&quot;: &#123;&#125;          // 索引对应的别名</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;mappings&quot;: &#123;</span><br><span class="line">        &quot;_default&quot;: &#123;          // 默认的配置, ES 6.0开始不再支持</span><br><span class="line">            &quot;_source&quot;: &#123; &quot;enabled&quot;: false &#125;,  // 是否保存字段的原始值</span><br><span class="line">            &quot;_all&quot;: &#123; &quot;enabled&quot;: false &#125;,     // 禁用_all字段</span><br><span class="line">            &quot;dynamic&quot;: &quot;strict&quot;               // 只用定义的字段, 关闭默认的自动类型推断</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;type1&quot;: &#123;             // 默认的文档类型设置为type1, ES 6.0开始只支持一种type, 所以这里不需要指出</span><br><span class="line">            &quot;_source&quot;: &#123;&quot;enabled&quot;: false&#125;,</span><br><span class="line">            &quot;properties&quot;: &#123;        // 字段的映射</span><br><span class="line">                &quot;@timestamp&quot;: &#123;    // 具体的字段映射</span><br><span class="line">                    &quot;type&quot;: &quot;date&quot;,           </span><br><span class="line">                    &quot;format&quot;: &quot;yyyy-MM-dd HH:mm:ss&quot;</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;@version&quot;: &#123;</span><br><span class="line">                    &quot;doc_values&quot;: true,</span><br><span class="line">                    &quot;index&quot;: &quot;not_analyzed&quot;,  // 不索引</span><br><span class="line">                    &quot;type&quot;: &quot;string&quot;          // string类型</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;logLevel&quot;: &#123;</span><br><span class="line">                    &quot;type&quot;: &quot;long&quot;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="6-0到7-0中间的版本"><a href="#6-0到7-0中间的版本" class="headerlink" title="6.0到7.0中间的版本"></a>6.0到7.0中间的版本</h5><p>es的type只保留一种_doc，所有索引模板的type都是_doc，作为过渡。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">POST _template/shop_template</span><br><span class="line">&#123;</span><br><span class="line">    &quot;index_patterns&quot;: [&quot;shop*&quot;, &quot;bar*&quot;],       // 可以通过&quot;shop*&quot;和&quot;bar*&quot;来适配, template字段已过期</span><br><span class="line">    &quot;order&quot;: 0,                         // 模板的权重, 多个模板的时候优先匹配用, 值越大, 权重越高</span><br><span class="line">    &quot;settings&quot;: &#123;</span><br><span class="line">        &quot;number_of_shards&quot;: 1       // 分片数量, 可以定义其他配置项</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aliases&quot;: &#123;</span><br><span class="line">        &quot;alias_1&quot;: &#123;&#125;                    // 索引对应的别名</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;mappings&quot;: &#123;</span><br><span class="line">        &quot;_doc&quot;: &#123;                       // ES 6.0开始只支持一种type, 名称为“_doc”</span><br><span class="line">            &quot;_source&quot;: &#123;                // 是否保存字段的原始值</span><br><span class="line">                &quot;enabled&quot;: false</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;properties&quot;: &#123;             // 字段的映射</span><br><span class="line">                &quot;@timestamp&quot;: &#123;      // 具体的字段映射</span><br><span class="line">                    &quot;type&quot;: &quot;date&quot;,           </span><br><span class="line">                    &quot;format&quot;: &quot;yyyy-MM-dd HH:mm:ss&quot;</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;@version&quot;: &#123;</span><br><span class="line">                    &quot;doc_values&quot;: true,</span><br><span class="line">                    &quot;index&quot;: &quot;false&quot;,   // 设置为false, 不索引</span><br><span class="line">                    &quot;type&quot;: &quot;text&quot;      // text类型</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;logLevel&quot;: &#123;</span><br><span class="line">                    &quot;type&quot;: &quot;long&quot;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="7-0以后的版本"><a href="#7-0以后的版本" class="headerlink" title="7.0以后的版本"></a>7.0以后的版本</h5><p>取消了type，mapping字段里面不能再带有type</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">POST _template/my_template</span><br><span class="line">&#123;</span><br><span class="line">    &quot;index_patterns&quot;:&quot;my-*&quot;,</span><br><span class="line">    &quot;order&quot;:0,</span><br><span class="line">    &quot;settings&quot;:&#123;</span><br><span class="line">        &quot;index&quot;:&#123;</span><br><span class="line">            &quot;number_of_shards&quot;:&quot;10&quot;,</span><br><span class="line">            &quot;number_of_replicas&quot;:&quot;0&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;analysis&quot;:&#123;</span><br><span class="line">            &quot;analyzer&quot;:&#123;</span><br><span class="line">                &quot;my_analyzer&quot;:&#123;</span><br><span class="line">                    &quot;type&quot;:&quot;custom&quot;,</span><br><span class="line">                    &quot;char_filter&quot;:[</span><br><span class="line">                        &quot;html_strip&quot;</span><br><span class="line">                    ],</span><br><span class="line">                    &quot;tokenizer&quot;:&quot;whitespace&quot;,</span><br><span class="line">                    &quot;filter&quot;:[</span><br><span class="line">                        &quot;stop&quot;,</span><br><span class="line">                        &quot;lowercase&quot;</span><br><span class="line">                    ]</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;mappings&quot;:&#123;</span><br><span class="line">        &quot;_source&quot;:&#123;</span><br><span class="line">            &quot;enabled&quot;:false</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;dynamic_templates&quot;:[</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;string_as_keyword&quot;:&#123;</span><br><span class="line">                    &quot;match_mapping_type&quot;:&quot;long&quot;,</span><br><span class="line">                    &quot;mapping&quot;:&#123;</span><br><span class="line">                        &quot;type&quot;:&quot;integer&quot;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        &quot;properties&quot;:&#123;</span><br><span class="line">            &quot;name&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;text&quot;,</span><br><span class="line">                &quot;analyzer&quot;:&quot;my_analyzer&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;age&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;integer&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;address&quot;:&#123;</span><br><span class="line">                &quot;type&quot;:&quot;text&quot;,</span><br><span class="line">                &quot;analyzer&quot;:&quot;standard&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aliases&quot;:&#123;</span><br><span class="line">        &quot;alias_name&quot;:&#123;</span><br><span class="line">            &quot;filter&quot;:&#123;</span><br><span class="line">                &quot;term&quot;:&#123;</span><br><span class="line">                    &quot;user&quot;:&quot;tim&quot;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;routing&quot;:&quot;tim&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>order：模板优先级，值越大，优先级越高。匹配到多个模板时，优先级高的模板会覆盖优先级低的模板的相同字段的配置（不会整个模板都覆盖）。</li>
+<li>index_patterns：模板匹配的名称方式，可包含多个正则表达式。新建索引时，新索引名称通过匹配index_patterns来查找合适和索引模板。</li>
+<li>settings：指定index的配置信息，比如分片数、副本数、tranlog同步条件、refresh策略、analyzer等信息。<ul>
+<li>index：索引的分片情况。</li>
+<li>analyzer：分析器，es里面，<code>analyzer = char_filter + tokenizer + token filter</code>。<ul>
+<li>char filter：对输入的文本字符进行第一步处理，如去除html标签（html_strip），将表情字符转换成英文单词（mapping）等。</li>
+<li>tokenizer： 对文本进行分词操作，如按照空格分词（whitespace）。分好的词成为token。</li>
+<li>filter （token filter）：对一个token集合的元素做过滤和转换(修改)，删除等操作，例如统一转成小写。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>mappings：指定index的内部构造信息。在6.x版本，mappings下面是type元素，默认是_doc，type下面才是properties等元素。但后面的版本type已经删除，所以mappings下面直接跟properties元素。<ul>
+<li>_source：设置为 false 默认检索只会返回ID，你需要通过 Fields 字段去到索引中去取数据，效率不是很高。但是 enabled 设置为 true 时，索引会比较大，这时可以通过 Compress 进行压缩和 inclueds、excludes 来在字段级别上进行一些限制，自定义哪些字段允许存储。</li>
+<li>dynamic_templates：自定义匹配规则模板，数组里面对象是个json，key就是名称</li>
+<li>properties：Field的映射配置。</li>
+</ul>
+</li>
+<li>aliases：索引别名。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/25/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E8%81%9A%E5%90%88/" rel="prev" title="elasticsearch系列（四）：聚合">
+      <i class="fa fa-chevron-left"></i> elasticsearch系列（四）：聚合
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/05/01/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E6%98%A0%E5%B0%84/" rel="next" title="elasticsearch系列（六）：映射">
+      elasticsearch系列（六）：映射 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%B4%A2%E5%BC%95%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">一、索引介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.</span> <span class="nav-text">索引结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%88%86%E7%89%87"><span class="nav-number">1.2.</span> <span class="nav-text">索引分片</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">二、索引原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95"><span class="nav-number">2.1.</span> <span class="nav-text">倒排索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95"><span class="nav-number">2.2.</span> <span class="nav-text">构建倒排索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#index%E3%80%81shard%E3%80%81segment%E3%80%81%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E7%9A%84%E5%8C%BA%E5%88%AB%E5%92%8C%E8%81%94%E7%B3%BB"><span class="nav-number">2.3.</span> <span class="nav-text">index、shard、segment、倒排索引的区别和联系</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%B4%A2%E5%BC%95%E6%A8%A1%E6%9D%BF"><span class="nav-number">3.</span> <span class="nav-text">三、索引模板</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%A8%A1%E6%9D%BF%E7%AE%80%E4%BB%8B"><span class="nav-number">3.1.</span> <span class="nav-text">索引模板简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%A7%E7%B4%A2%E5%BC%95%E6%A8%A1%E6%9D%BF"><span class="nav-number">3.2.</span> <span class="nav-text">旧索引模板</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E7%B4%A2%E5%BC%95%E6%A8%A1%E6%9D%BF"><span class="nav-number">3.3.</span> <span class="nav-text">组合索引模板</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%A8%A1%E6%9D%BF%E7%9A%84%E4%BC%98%E5%85%88%E7%BA%A7"><span class="nav-number">3.4.</span> <span class="nav-text">索引模板的优先级</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E7%BD%AE%E7%B4%A2%E5%BC%95%E6%A8%A1%E6%9D%BF"><span class="nav-number">3.5.</span> <span class="nav-text">内置索引模板</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E5%8F%98%E5%8C%96"><span class="nav-number">3.6.</span> <span class="nav-text">版本变化</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#6-0%E4%B9%8B%E5%89%8D%E7%9A%84%E7%89%88%E6%9C%AC"><span class="nav-number">3.6.1.</span> <span class="nav-text">6.0之前的版本</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#6-0%E5%88%B07-0%E4%B8%AD%E9%97%B4%E7%9A%84%E7%89%88%E6%9C%AC"><span class="nav-number">3.6.2.</span> <span class="nav-text">6.0到7.0中间的版本</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#7-0%E4%BB%A5%E5%90%8E%E7%9A%84%E7%89%88%E6%9C%AC"><span class="nav-number">3.6.3.</span> <span class="nav-text">7.0以后的版本</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

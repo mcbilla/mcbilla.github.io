@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="elasticsearch系列（四）：聚合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="elasticsearch系列（四）：聚合">
+<meta property="og:url" content="http://yoursite.com/2021/04/25/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E8%81%9A%E5%90%88/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="elasticsearch系列（四）：聚合">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-25T12:46:33.000Z">
+<meta property="article:modified_time" content="2023-07-10T01:36:12.035Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="elasticsearch">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/04/25/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E8%81%9A%E5%90%88/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>elasticsearch系列（四）：聚合 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/04/25/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E8%81%9A%E5%90%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          elasticsearch系列（四）：聚合
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-25 20:46:33" itemprop="dateCreated datePublished" datetime="2021-04-25T20:46:33+08:00">2021-04-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-10 09:36:12" itemprop="dateModified" datetime="2023-07-10T09:36:12+08:00">2023-07-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticsearch/" itemprop="url" rel="index"><span itemprop="name">elasticsearch</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/04/25/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E8%81%9A%E5%90%88/" class="post-meta-item leancloud_visitors" data-flag-title="elasticsearch系列（四）：聚合" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/04/25/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E8%81%9A%E5%90%88/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/04/25/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9A%E8%81%9A%E5%90%88/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>elasticsearch系列（四）：聚合</p>
+</blockquote>
+<span id="more"></span>
+
+<h3 id="一、聚合介绍"><a href="#一、聚合介绍" class="headerlink" title="一、聚合介绍"></a>一、聚合介绍</h3><p>聚合（aggregations）提供了从数据中分组和提取数据的能力。最简单的聚合方法大致等于SQL Group by 和 SQL 聚合函数。在 elasticsearch 中，执行搜索返回this（命中结果），并且同时返回聚合结果，把以响应中的所有hits（命中结果）分隔开的能力。这是非常强大且有效的，你可以执行查询和多个聚合，并且在一次使用中得到各自的（任何一个的）返回结果，使用一次简洁和简化的 API 来避免网络往返。<br>聚合有以下类型：</p>
+<ul>
+<li><code>桶集合（Bucket aggregations）</code>：对查询出的数据进⾏分组group by，再在组上进⾏指标聚合。桶等同于组，分桶和分组是一个意思，ES使用桶代表一组相同特征的数据。</li>
+<li><code>指标聚合（Metrics aggregations）</code>：先对数据进行分组（分桶），然后对每一个桶内的数据进行指标聚合，例如求最⼤、最⼩、和、平均值、去重等指标的聚合。</li>
+<li><code> 管道聚合（Pipeline aggregations）</code>：用的比较少。</li>
+</ul>
+<p>聚合的语法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&quot;aggregations&quot; : &#123;</span><br><span class="line">    &quot;&lt;aggregation_name&gt;&quot; : &#123;</span><br><span class="line">        &quot;&lt;aggregation_type&gt;&quot; : &#123;</span><br><span class="line">            &lt;aggregation_body&gt;</span><br><span class="line">        &#125;</span><br><span class="line">        [,&quot;meta&quot; : &#123;  [&lt;meta_data_body&gt;] &#125; ]?</span><br><span class="line">        [,&quot;aggregations&quot; : &#123; [&lt;sub_aggregation&gt;]+ &#125; ]?</span><br><span class="line">    &#125;</span><br><span class="line">    [,&quot;&lt;aggregation_name_2&gt;&quot; : &#123; ... &#125; ]*</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>aggregation_name：聚合名称，这个可以自己任意定义。因为ES支持一次进行多次统计分析查询，后面需要通过这个名字在查询结果中找到我们想要的计算结果。</li>
+<li>aggregation_type：聚合类型，代表我们想要怎么统计数据，主要有两大类聚合类型：桶聚合和指标聚合，这两类聚合又包括多种聚合类型，例如：指标聚合：sum、avg， 桶聚合：terms、Date histogram等等。</li>
+<li>meta：元数据，用的比较少。</li>
+<li>aggregations：子聚合，也就是说聚合里面还可以嵌套聚合。</li>
+<li>aggregation_name_2：并列聚合名称，同一个 aggregations 下可以并列多个聚合名称，也就是可以一次进行多种类型的统计。</li>
+</ul>
+<p>下面是一个简单使用示例，对 age 求平均值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">        &quot;avgAge&quot;:&#123;</span><br><span class="line">            &quot;avg&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;age&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;size&quot;:0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>aggs：表示使用聚合统计，聚合要和 query 一起配合使用，才能对返回的数据进行统计。</li>
+<li>avgAge：聚合名称，用户自定义名称。</li>
+<li>avg：聚合类型，avg 表示求平均值，还可以使用 max 求最大值，min 求最小值，sum 求合等。</li>
+<li>field：需要聚合的字段。</li>
+<li>size：查询结果条数，0 表示不返回查询数据，只返回聚合结果。</li>
+</ul>
+<p>聚合里面还可以嵌套聚合，例如按照年龄聚合， 并且请求这些年龄段的这些人的平均薪资</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">        &quot;ageAgg&quot;:&#123;</span><br><span class="line">            &quot;terms&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;age&quot;,</span><br><span class="line">                &quot;size&quot;:100</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;aggs&quot;:&#123;</span><br><span class="line">                &quot;ageAvg&quot;:&#123;</span><br><span class="line">                    &quot;avg&quot;:&#123;</span><br><span class="line">                        &quot;field&quot;:&quot;balance&quot;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;size&quot;:0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="二、桶集合"><a href="#二、桶集合" class="headerlink" title="二、桶集合"></a>二、桶集合</h3><p>桶聚合，目的就是数据分组，先将数据按指定的条件分成多个组，然后对每一个组进行统计。 组的概念跟桶是等同的，在ES中统一使用桶（bucket）这个术语。<br>ES桶聚合的作用跟 SQL 的 group by 的作用是一样的，区别是ES支持更加强大的数据分组能力，SQL 只能根据字段的唯一值进行分组，分组的数量跟字段的唯一值的数量相等，例如: group by 店铺id， 去掉重复的店铺ID后，有多少个店铺就有多少个分组。<br>ES 常用的桶聚合如下：</p>
+<ul>
+<li><code>Terms聚合</code> - 类似SQL的group by，根据字段唯一值分组</li>
+<li><code>Histogram聚合</code> - 根据数值间隔分组，例如: 价格按100间隔分组，0、100、200、300等等</li>
+<li><code>Date histogram聚合</code> - 根据时间间隔分组，例如：按月、按天、按小时分组</li>
+<li><code>Range聚合</code> - 按数值范围分组，例如: 0-150一组，150-200一组，200-500一组。</li>
+</ul>
+<blockquote>
+<p>提示：桶聚合一般不单独使用，都是配合指标聚合一起使用，对数据分组之后肯定要统计桶内数据，在ES中如果没有明确指定指标聚合，默认使用Value Count指标聚合，统计桶内文档总数。</p>
+</blockquote>
+<h4 id="terms-聚合"><a href="#terms-聚合" class="headerlink" title="terms 聚合"></a>terms 聚合</h4><p>类似于 mysql 的 group by 功能，都是根据字段唯一值对数据进行分组（分桶），字段值相等的文档都分到同一个桶内。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">        &quot;aggsAge&quot;:&#123;</span><br><span class="line">            &quot;terms&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;age&quot;,</span><br><span class="line">                &quot;size&quot;:5, // 返回的分组数，例如分组结果一共分成了5个组，5表示只返回前5个分组的数据。</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;size&quot;:0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>返回数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">......</span><br><span class="line">    &quot;aggregations&quot;:&#123;</span><br><span class="line">        &quot;aggsAge&quot;:&#123; // 聚合查询名称</span><br><span class="line">            &quot;doc_count_error_upper_bound&quot;:0,</span><br><span class="line">            &quot;sum_other_doc_count&quot;:775,</span><br><span class="line">            &quot;buckets&quot;:[</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key&quot;:20, // key分桶的标识，在terms聚合中，代表的就是分桶的字段值</span><br><span class="line">                    &quot;doc_count&quot;:44 // 默认的指标聚合是统计桶内文档总数</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key&quot;:21,</span><br><span class="line">                    &quot;doc_count&quot;:46</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key&quot;:22,</span><br><span class="line">                    &quot;doc_count&quot;:51</span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="histogram-聚合"><a href="#histogram-聚合" class="headerlink" title="histogram 聚合"></a>histogram 聚合</h4><p>histogram（直方图）聚合，主要根据数值间隔分组，使用histogram聚合分桶统计结果，通常用在绘制条形图报表。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">        &quot;aggsAge&quot;:&#123;</span><br><span class="line">            &quot;histogram&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;age&quot;,</span><br><span class="line">                &quot;interval&quot;:5 // 分桶的间隔为5，意思就是 age 字段值按 5 间隔分组</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;size&quot;:0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>返回结果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">......</span><br><span class="line">    &quot;aggregations&quot;:&#123;</span><br><span class="line">        &quot;aggsAge&quot;:&#123; // 聚合查询名称</span><br><span class="line">            &quot;buckets&quot;:[ // 分桶结果</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key&quot;:20, // 桶的标识，histogram分桶，这里是分组的间隔值</span><br><span class="line">                    &quot;doc_count&quot;:451 // 如果没有指定指标，默认按Value Count指标聚合，统计桶内文档总数</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key&quot;:30,</span><br><span class="line">                    &quot;doc_count&quot;:504</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key&quot;:40,</span><br><span class="line">                    &quot;doc_count&quot;:45</span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="date-histogram-聚合"><a href="#date-histogram-聚合" class="headerlink" title="date histogram 聚合"></a>date histogram 聚合</h4><p>类似 histogram 聚合，区别是 Date histogram 可以很好的处理时间类型字段，主要用于根据时间、日期分桶的场景。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot; : &#123;</span><br><span class="line">        &quot;sales_over_time&quot; : &#123; // 聚合查询名字，随便取一个</span><br><span class="line">            &quot;date_histogram&quot; : &#123; // 聚合类型为: date_histogram</span><br><span class="line">                &quot;field&quot; : &quot;date&quot;, // 根据date字段分组</span><br><span class="line">                &quot;calendar_interval&quot; : &quot;month&quot;, // 分组间隔：month代表每月、支持minute（每分钟）、hour（每小时）、day（每天）、week（每周）、year（每年）</span><br><span class="line">                &quot;format&quot; : &quot;yyyy-MM-dd&quot; // 设置返回结果中桶key的时间格式</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>返回数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    &quot;aggregations&quot;: &#123;</span><br><span class="line">        &quot;sales_over_time&quot;: &#123; // 聚合查询名字</span><br><span class="line">            &quot;buckets&quot;: [ // 桶聚合结果</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key_as_string&quot;: &quot;2015-01-01&quot;, // 每个桶key的字符串标识，格式由format指定</span><br><span class="line">                    &quot;key&quot;: 1420070400000, // key的具体字段值</span><br><span class="line">                    &quot;doc_count&quot;: 3 // 默认按Value Count指标聚合，统计桶内文档总数</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key_as_string&quot;: &quot;2015-02-01&quot;,</span><br><span class="line">                    &quot;key&quot;: 1422748800000,</span><br><span class="line">                    &quot;doc_count&quot;: 2</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key_as_string&quot;: &quot;2015-03-01&quot;,</span><br><span class="line">                    &quot;key&quot;: 1425168000000,</span><br><span class="line">                    &quot;doc_count&quot;: 2</span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="range-聚合"><a href="#range-聚合" class="headerlink" title="range 聚合"></a>range 聚合</h4><p>range 聚合，按数值范围分桶。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">GET idnexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot; : &#123;</span><br><span class="line">        &quot;price_ranges&quot; : &#123; // 聚合查询名字，随便取一个</span><br><span class="line">            &quot;range&quot; : &#123; // 聚合类型为： range</span><br><span class="line">                &quot;field&quot; : &quot;price&quot;, // 根据price字段分桶</span><br><span class="line">                &quot;ranges&quot; : [ // 范围配置</span><br><span class="line">                    &#123; &quot;to&quot; : 100.0 &#125;, // 意思就是 price &lt;= 100的文档归类到一个桶</span><br><span class="line">                    &#123; &quot;from&quot; : 100.0, &quot;to&quot; : 200.0 &#125;, // price&gt;100 and price&lt;200的文档归类到一个桶</span><br><span class="line">                    &#123; &quot;from&quot; : 200.0 &#125; // price&gt;200的文档归类到一个桶</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>返回结果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    &quot;aggregations&quot;: &#123;</span><br><span class="line">        &quot;price_ranges&quot; : &#123; // 聚合查询名字</span><br><span class="line">            &quot;buckets&quot;: [ // 桶聚合结果</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key&quot;: &quot;*-100.0&quot;, // key可以表达分桶的范围</span><br><span class="line">                    &quot;to&quot;: 100.0, // 结束值</span><br><span class="line">                    &quot;doc_count&quot;: 2 // 默认按Value Count指标聚合，统计桶内文档总数</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key&quot;: &quot;100.0-200.0&quot;,</span><br><span class="line">                    &quot;from&quot;: 100.0, // 起始值</span><br><span class="line">                    &quot;to&quot;: 200.0, // 结束值</span><br><span class="line">                    &quot;doc_count&quot;: 2</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;key&quot;: &quot;200.0-*&quot;,</span><br><span class="line">                    &quot;from&quot;: 200.0,</span><br><span class="line">                    &quot;doc_count&quot;: 3</span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>大家仔细观察的话，发现range分桶，默认key的值不太友好，尤其开发的时候，不知道key长什么样子，处理起来比较麻烦，我们可以为每一个分桶指定一个有意义的名字。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">GET idnexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;aggs&quot; : &#123;</span><br><span class="line">        &quot;price_ranges&quot; : &#123;</span><br><span class="line">            &quot;range&quot; : &#123;</span><br><span class="line">                &quot;field&quot; : &quot;price&quot;,</span><br><span class="line">                &quot;keyed&quot; : true,</span><br><span class="line">                &quot;ranges&quot; : [</span><br><span class="line">                    // 通过key参数，配置每一个分桶的名字</span><br><span class="line">                    &#123; &quot;key&quot; : &quot;cheap&quot;, &quot;to&quot; : 100 &#125;,</span><br><span class="line">                    &#123; &quot;key&quot; : &quot;average&quot;, &quot;from&quot; : 100, &quot;to&quot; : 200 &#125;,</span><br><span class="line">                    &#123; &quot;key&quot; : &quot;expensive&quot;, &quot;from&quot; : 200 &#125;</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="多桶嵌套查询"><a href="#多桶嵌套查询" class="headerlink" title="多桶嵌套查询"></a>多桶嵌套查询</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">GET /indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;size&quot;: 0, // size=0代表不需要返回query查询结果，仅仅返回aggs统计结果</span><br><span class="line">    &quot;query&quot; : &#123; // 设置查询语句，先赛选文档</span><br><span class="line">        &quot;match&quot; : &#123;</span><br><span class="line">            &quot;make&quot; : &quot;ford&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot; : &#123; // 然后对query搜索的结果，进行统计</span><br><span class="line">        &quot;colors&quot; : &#123; // 聚合查询名字</span><br><span class="line">            &quot;terms&quot; : &#123; // 聚合类型为：terms 先分桶</span><br><span class="line">              &quot;field&quot; : &quot;color&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;aggs&quot;: &#123; // 通过嵌套聚合查询，设置桶内指标聚合条件</span><br><span class="line">              &quot;avg_price&quot;: &#123; // 聚合查询名字</span><br><span class="line">                &quot;avg&quot;: &#123; // 聚合类型为: avg指标聚合</span><br><span class="line">                  &quot;field&quot;: &quot;price&quot; // 根据price字段计算平均值</span><br><span class="line">                &#125;</span><br><span class="line">              &#125;,</span><br><span class="line">              &quot;sum_price&quot;: &#123; // 聚合查询名字</span><br><span class="line">                &quot;sum&quot;: &#123; // 聚合类型为: sum指标聚合</span><br><span class="line">                  &quot;field&quot;: &quot;price&quot; // 根据price字段求和</span><br><span class="line">                &#125;</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="多桶排序"><a href="#多桶排序" class="headerlink" title="多桶排序"></a>多桶排序</h4><p>类似terms、histogram、date_histogram这类桶聚合都会动态生成多个桶，如果生成的桶特别多，有时候我们需要确定这些桶的排序顺序，并限制返回桶的数量。<br>默认情况，ES会根据 doc_count 文档总数，降序排序。ES桶聚合支持两种方式排序：</p>
+<ul>
+<li>内置排序</li>
+<li>按度量指标排序</li>
+</ul>
+<h5 id="内置排序"><a href="#内置排序" class="headerlink" title="内置排序"></a>内置排序</h5><p>内置排序参数：</p>
+<ul>
+<li>_count - 按文档数排序。对 terms 、 histogram 、 date_histogram 有效</li>
+<li>_term - 按词项的字符串值的字母顺序排序。只在 terms 内使用</li>
+<li>_key - 按每个桶的键值数值排序, 仅对 histogram 和 date_histogram 有效<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">GET /indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;size&quot; : 0,</span><br><span class="line">    &quot;aggs&quot; : &#123;</span><br><span class="line">        &quot;colors&quot; : &#123; // 聚合查询名字，随便取一个</span><br><span class="line">            &quot;terms&quot; : &#123; // 聚合类型为: terms</span><br><span class="line">              &quot;field&quot; : &quot;color&quot;, </span><br><span class="line">              &quot;order&quot;: &#123; // 设置排序参数</span><br><span class="line">                &quot;_count&quot; : &quot;asc&quot;  // 根据_count排序，asc升序，desc降序</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h5 id="按度量排序"><a href="#按度量排序" class="headerlink" title="按度量排序"></a>按度量排序</h5><p>通常情况下，我们根据桶聚合分桶后，都会对桶内进行多个维度的指标聚合，所以我们也可以根据桶内指标聚合的结果进行排序。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">GET /indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;size&quot; : 0,</span><br><span class="line">    &quot;aggs&quot; : &#123;</span><br><span class="line">        &quot;colors&quot; : &#123; // 聚合查询名字</span><br><span class="line">            &quot;terms&quot; : &#123; // 聚合类型: terms，先分桶</span><br><span class="line">              &quot;field&quot; : &quot;color&quot;, // 分桶字段为color</span><br><span class="line">              &quot;order&quot;: &#123; // 设置排序参数</span><br><span class="line">                &quot;avg_price&quot; : &quot;asc&quot;  // 根据avg_price指标聚合结果，升序排序。</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;aggs&quot;: &#123; // 嵌套聚合查询，设置桶内聚合指标</span><br><span class="line">                &quot;avg_price&quot;: &#123; // 聚合查询名字，前面排序引用的就是这个名字</span><br><span class="line">                    &quot;avg&quot;: &#123;&quot;field&quot;: &quot;price&quot;&#125; // 计算price字段平均值</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="限制返回桶的数量"><a href="#限制返回桶的数量" class="headerlink" title="限制返回桶的数量"></a>限制返回桶的数量</h4><p>如果分桶的数量太多，可以通过给桶聚合增加一个 size 参数限制返回桶的数量。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">GET  /indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;aggs&quot; : &#123;</span><br><span class="line">        &quot;products&quot; : &#123; // 聚合查询名字</span><br><span class="line">            &quot;terms&quot; : &#123; // 聚合类型为: terms</span><br><span class="line">                &quot;field&quot; : &quot;product&quot;, // 根据product字段分桶</span><br><span class="line">                &quot;size&quot; : 5 // 限制最多返回5个桶</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、指标聚合"><a href="#三、指标聚合" class="headerlink" title="三、指标聚合"></a>三、指标聚合</h3><h4 id="value-count-统计数量"><a href="#value-count-统计数量" class="headerlink" title="value_count 统计数量"></a>value_count 统计数量</h4><p>value_count表示统计⾮空字段的⽂档数，类似 mysql 的 count 函数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">        &quot;countAge&quot;:&#123;</span><br><span class="line">            &quot;value_count&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;age&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;size&quot;:0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="cardinality-去重统计数量"><a href="#cardinality-去重统计数量" class="headerlink" title="cardinality 去重统计数量"></a>cardinality 去重统计数量</h4><p>也是用于统计文档的总数，跟 Value Count 的区别是，cardinality 聚合会去重，类似于 mysql 的 count(DISTINCT 字段)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">        &quot;distinctAge&quot;:&#123;</span><br><span class="line">            &quot;cardinality&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;age&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;size&quot;:0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="stats-统计"><a href="#stats-统计" class="headerlink" title="stats 统计"></a>stats 统计</h4><p>stats同时统计 count max min avg sum 5个值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">        &quot;statsAge&quot;:&#123;</span><br><span class="line">            &quot;stats&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;age&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;size&quot;:0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="extended-stats-扩展统计"><a href="#extended-stats-扩展统计" class="headerlink" title="extended_stats 扩展统计"></a>extended_stats 扩展统计</h4><p>extended_stats ⽐ stats 多4个统计结果： 平⽅和、⽅差、标准差、平均值加&#x2F;减两个标准差的区间。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">        &quot;extendStatsAge&quot;:&#123;</span><br><span class="line">            &quot;extended_stats&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;age&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;size&quot;:0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="percentiles-区间统计"><a href="#percentiles-区间统计" class="headerlink" title="percentiles 区间统计"></a>percentiles 区间统计</h4><p>percentiles表示占⽐百分位对应的值统计，默认返回[ 1, 5, 25, 50, 75, 95, 99 ]分位上的值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">        &quot;percentilesAge&quot;:&#123;</span><br><span class="line">            &quot;percentiles&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;age&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;size&quot;:0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还可以指定百分位区间</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">GET indexname/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;:&#123;</span><br><span class="line">        &quot;match_all&quot;:&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">        &quot;percentilesAge&quot;:&#123;</span><br><span class="line">            &quot;percentiles&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;age&quot;,</span><br><span class="line">                &quot;percents&quot;:[</span><br><span class="line">                    20,</span><br><span class="line">                    50,</span><br><span class="line">                    75</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;size&quot;:0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p> <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html">官方文档 Aggregations</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.tizi365.com/archives/644.html">Elasticsearch 聚合查询（aggs）基本概念</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/20/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AQuery%20DSL/" rel="prev" title="elasticsearch系列（三）：Query DSL">
+      <i class="fa fa-chevron-left"></i> elasticsearch系列（三）：Query DSL
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/28/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E7%B4%A2%E5%BC%95/" rel="next" title="elasticsearch系列（五）：索引">
+      elasticsearch系列（五）：索引 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%81%9A%E5%90%88%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">一、聚合介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%A1%B6%E9%9B%86%E5%90%88"><span class="nav-number">2.</span> <span class="nav-text">二、桶集合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#terms-%E8%81%9A%E5%90%88"><span class="nav-number">2.1.</span> <span class="nav-text">terms 聚合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#histogram-%E8%81%9A%E5%90%88"><span class="nav-number">2.2.</span> <span class="nav-text">histogram 聚合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#date-histogram-%E8%81%9A%E5%90%88"><span class="nav-number">2.3.</span> <span class="nav-text">date histogram 聚合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#range-%E8%81%9A%E5%90%88"><span class="nav-number">2.4.</span> <span class="nav-text">range 聚合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9A%E6%A1%B6%E5%B5%8C%E5%A5%97%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.5.</span> <span class="nav-text">多桶嵌套查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9A%E6%A1%B6%E6%8E%92%E5%BA%8F"><span class="nav-number">2.6.</span> <span class="nav-text">多桶排序</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%86%85%E7%BD%AE%E6%8E%92%E5%BA%8F"><span class="nav-number">2.6.1.</span> <span class="nav-text">内置排序</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%89%E5%BA%A6%E9%87%8F%E6%8E%92%E5%BA%8F"><span class="nav-number">2.6.2.</span> <span class="nav-text">按度量排序</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%99%90%E5%88%B6%E8%BF%94%E5%9B%9E%E6%A1%B6%E7%9A%84%E6%95%B0%E9%87%8F"><span class="nav-number">2.7.</span> <span class="nav-text">限制返回桶的数量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%8C%87%E6%A0%87%E8%81%9A%E5%90%88"><span class="nav-number">3.</span> <span class="nav-text">三、指标聚合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#value-count-%E7%BB%9F%E8%AE%A1%E6%95%B0%E9%87%8F"><span class="nav-number">3.1.</span> <span class="nav-text">value_count 统计数量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#cardinality-%E5%8E%BB%E9%87%8D%E7%BB%9F%E8%AE%A1%E6%95%B0%E9%87%8F"><span class="nav-number">3.2.</span> <span class="nav-text">cardinality 去重统计数量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stats-%E7%BB%9F%E8%AE%A1"><span class="nav-number">3.3.</span> <span class="nav-text">stats 统计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#extended-stats-%E6%89%A9%E5%B1%95%E7%BB%9F%E8%AE%A1"><span class="nav-number">3.4.</span> <span class="nav-text">extended_stats 扩展统计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#percentiles-%E5%8C%BA%E9%97%B4%E7%BB%9F%E8%AE%A1"><span class="nav-number">3.5.</span> <span class="nav-text">percentiles 区间统计</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
