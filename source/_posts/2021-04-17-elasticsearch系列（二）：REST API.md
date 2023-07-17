@@ -12,8 +12,19 @@ tags:
 <!--more-->
 
 ## 一、命令简介
-可以使用 RESTful API 通过端口 9200 和 Elasticsearch 进行通信，甚至可以使用 curl 命令来和 Elasticsearch 交互。
-> 旧版的 Elasticsearch Clients 可以使用 9300 端口和 Elasticsearch 进行 tcp 通信，例如 spring-data-elasticsearch:transport-api.jar 包，7.x 已经不建议使用，8 以后就要废弃。建议统一使用 9200 端口以 http 请求的方式和 Elasticsearch 通讯。
+### Java API
+
+Elasticsearch 为 Java 用户提供了两种内置客户端
+
+1. 节点客户端 ( node client )：以无数据节点 (none data node) 身份加入集群，换言之，它自己不存储任何数据，但是它知道数据在集群中的具体位置，并且能够直接转发请求到对应的节点上。
+2. 传输客户端 ( Transport client )：传输客户端更轻量，且能够发送请求到远程集群。它自己不加入集群，只是简单转发请求给集群中的节点。
+
+两个 Java 客户端都通过 9300 端口和 Elasticsearch 传输协议 ( Elasticsearch Transport Protocol ) 与 Elasticsearch 进行交互。因为集群中的节点之间也通过 9300 端口进行通信，使用 Java API 可能会造成通讯混乱。现在已经不推荐使用 Java API 这种通讯方式，spring-boot 的高版本也已经移除 `spring-data-elasticsearch` 依赖。
+
+### RESTful API
+
+Elasticsearch 的 RESTful API 使用 [HTTP](https://www.twle.cn/l/yufei/http/http-basic-index.html) 作为传输协议，使用 [JSON](https://www.twle.cn/l/yufei/json/json-basic-index.html) 作为数据交换格式所有的语言都可以使用 RESTful API，通过 9200 端口的与 Elasticsearch 进行通信，甚至可以使用 curl 命令来和 Elasticsearch 交互。因为是基于 HTTP 的 RESTFul API，所以向 Elasticsearch 发出的请求的组成部分与其它普通的 HTTP 请求是一样的。
+
 ```
 curl -X<VERB> '<PROTOCOL>://<HOST>:<PORT>/<PATH>?<QUERY_STRING>' -d '<BODY>'
 ```
