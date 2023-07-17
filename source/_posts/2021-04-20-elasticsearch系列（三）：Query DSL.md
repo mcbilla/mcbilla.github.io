@@ -19,7 +19,7 @@ GET /indexname/_search?q=*&sort=account_number:asc
 ```
 这种方式缺点是请求参数越来越多，搜索条件越来越复杂的情况下，很难满足需求。
 
-2. `_search`  + 请求体。这个 JSON 格式的请求体数据就称为 `Query DSL`（Domain Specified Language）。Elasticsearch 把 Lucene 功能的绝大部分封装成基于 JSON 的 Query DSL 查询语法。可以构建复杂的查询条件。下面这个请求实现和上面相同的效果。
+2. `_search`  + 请求体。下面这个请求实现和上面相同的效果。
 ```
 GET /indexname/_search
 {
@@ -37,7 +37,7 @@ GET /indexname/_search
 ```
 
 
-`Query DSL` 是日常最常用的查询方式，是我们的学习重点。一个最简单的 `Query DSL` 语法如下：
+这个 JSON 格式的请求体数据就称为 `Query DSL`（Domain Specified Language）。Elasticsearch 把 Lucene 功能的绝大部分封装成基于 JSON 的 Query DSL 查询语法。可以构建复杂的查询条件。`Query DSL` 是日常最常用的查询方式，是我们的学习重点。一个最简单的 `Query DSL` 语法如下：
 
 ```
 GET indexname/_search
