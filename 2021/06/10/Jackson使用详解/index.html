@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="Jackson使用详解，转载 Jackson使用详解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jackson使用详解">
+<meta property="og:url" content="http://yoursite.com/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="Jackson使用详解，转载 Jackson使用详解">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249d91773e2~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp">
+<meta property="og:image" content="http://yoursite.com/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249d91c78d5~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp">
+<meta property="og:image" content="http://yoursite.com/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249db99a96b~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp">
+<meta property="og:image" content="http://yoursite.com/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249d868123a~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp">
+<meta property="og:image" content="http://yoursite.com/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249db453b83~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp">
+<meta property="article:published_time" content="2021-06-10T11:28:15.000Z">
+<meta property="article:modified_time" content="2023-07-22T11:48:00.421Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Jackson">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249d91773e2~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp">
+
+<link rel="canonical" href="http://yoursite.com/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Jackson使用详解 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Jackson使用详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-10 19:28:15" itemprop="dateCreated datePublished" datetime="2021-06-10T19:28:15+08:00">2021-06-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-22 19:48:00" itemprop="dateModified" datetime="2023-07-22T19:48:00+08:00">2023-07-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">Java组件</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E7%BB%84%E4%BB%B6/Jackson/" itemprop="url" rel="index"><span itemprop="name">Jackson</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/" class="post-meta-item leancloud_visitors" data-flag-title="Jackson使用详解" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>Jackson使用详解，转载 <a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904166809157639">Jackson使用详解</a></p>
+</blockquote>
+<span id="more"></span>
+
+<h1 id="Jackson使用详解"><a href="#Jackson使用详解" class="headerlink" title="Jackson使用详解"></a>Jackson使用详解</h1><blockquote>
+<p>❝</p>
+<p>Spring MVC 默认采用Jackson解析Json，尽管还有一些其它同样优秀的json解析工具，例如Fast Json、GSON，但是出于最小依赖的考虑，也许Json解析第一选择就应该是Jackson。</p>
+<p>❞</p>
+</blockquote>
+<h1 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h1><p>Jackson 是当前用的比较广泛的，用来序列化和反序列化 json 的 Java 的开源框架。Jackson 社区相对比较活跃，更新速度也比较快， 从 Github 中的统计来看，Jackson 是最流行的 json 解析器之一 。 Spring MVC 的默认 json 解析器便是 Jackson。 Jackson 优点很多。 Jackson 所依赖的 jar 包较少 ，简单易用。与其他 Java 的 json 的框架 Gson 等相比， Jackson 解析大的 json 文件速度比较快；Jackson 运行时占用内存比较低，性能比较好；Jackson 有灵活的 API，可以很容易进行扩展和定制。</p>
+<p>Jackson 的 1.x 版本的包名是 org.codehaus.jackson ，当升级到 2.x 版本时，包名变为 com.fasterxml.jackson。</p>
+<p>Jackson 的核心模块由三部分组成。</p>
+<ul>
+<li>jackson-core，核心包，提供基于”流模式”解析的相关 API，它包括 JsonPaser 和 JsonGenerator。 Jackson 内部实现正是通过高性能的流模式 API 的 JsonGenerator 和 JsonParser 来生成和解析 json。</li>
+<li>jackson-annotations，注解包，提供标准注解功能；</li>
+<li>jackson-databind ，数据绑定包， 提供基于”对象绑定” 解析的相关 API （ ObjectMapper ） 和”树模型” 解析的相关 API （JsonNode）；基于”对象绑定” 解析的 API 和”树模型”解析的 API 依赖基于”流模式”解析的 API。</li>
+</ul>
+<p>源码地址：<a href="https://link.juejin.cn/?target=https://github.com/FasterXML/jackson.git">FasterXML&#x2F;jackson</a></p>
+<h1 id="二、依赖"><a href="#二、依赖" class="headerlink" title="二、依赖"></a>二、依赖</h1><p>使用Maven构建项目，需要添加依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.fasterxml.jackson.core<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jackson-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.9.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.fasterxml.jackson.core<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jackson-annotations<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.9.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.fasterxml.jackson.core<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jackson-databind<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.9.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>当然了，jackson-databind 依赖 jackson-core 和 jackson-annotations，所以可以只显示地添加jackson-databind依赖，jackson-core 和 jackson-annotations 也随之添加到 Java 项目工程中。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.fasterxml.jackson.core<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jackson-databind<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.9.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>下面是Jackson的用法。</p>
+<h1 id="三、-ObjectMapper"><a href="#三、-ObjectMapper" class="headerlink" title="三、 ObjectMapper"></a>三、 ObjectMapper</h1><p>Jackson 最常用的 API 就是基于”对象绑定” 的 ObjectMapper：</p>
+<ul>
+<li>ObjectMapper可以从字符串，流或文件中解析JSON，并创建表示已解析的JSON的Java对象。 将JSON解析为Java对象也称为从JSON反序列化Java对象。</li>
+<li>ObjectMapper也可以从Java对象创建JSON。 从Java对象生成JSON也称为将Java对象序列化为JSON。</li>
+<li>Object映射器可以将JSON解析为自定义的类的对象，也可以解析置JSON树模型的对象。</li>
+</ul>
+<p>之所以称为ObjectMapper是因为它将JSON映射到Java对象（反序列化），或者将Java对象映射到JSON（序列化）。</p>
+<h2 id="一）、从JSON中获取Java对象"><a href="#一）、从JSON中获取Java对象" class="headerlink" title="一）、从JSON中获取Java对象"></a>一）、从JSON中获取Java对象</h2><h3 id="1、简单示例"><a href="#1、简单示例" class="headerlink" title="1、简单示例"></a>1、简单示例</h3><p>一个简单的例子：</p>
+<p>Car类：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Car</span> &#123;</span><br><span class="line"> <span class="keyword">private</span> <span class="type">String</span> brand = null;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> doors = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">String</span> <span class="title">getBrand</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="keyword">this</span>.brand; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">void</span>   <span class="title">setBrand</span><span class="params">(<span class="type">String</span> brand)</span></span>&#123; <span class="keyword">this</span>.brand = brand;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">int</span>  <span class="title">getDoors</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="keyword">this</span>.doors; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">void</span> <span class="title">setDoors</span> <span class="params">(<span class="type">int</span> doors)</span> </span>&#123; <span class="keyword">this</span>.doors = doors; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将Json转换为Car类对象：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">      ObjectMapper objectMapper = <span class="keyword">new</span> <span class="constructor">ObjectMapper()</span>;</span><br><span class="line"></span><br><span class="line">String carJson =<span class="string">&quot;&#123; \&quot;brand\&quot; : \&quot;Mercedes\&quot;, \&quot;doors\&quot; : 5 &#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    Car car = objectMapper.read<span class="constructor">Value(<span class="params">carJson</span>, Car.<span class="params">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">&quot;car brand = &quot;</span> + car.get<span class="constructor">Brand()</span>);</span><br><span class="line">    <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">&quot;car doors = &quot;</span> + car.get<span class="constructor">Doors()</span>);</span><br><span class="line">&#125; catch (IOException e) &#123;</span><br><span class="line">    e.print<span class="constructor">StackTrace()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、-ObjectMapper如何匹配JSON对象的字段和Java对象的属性"><a href="#2、-ObjectMapper如何匹配JSON对象的字段和Java对象的属性" class="headerlink" title="2、 ObjectMapper如何匹配JSON对象的字段和Java对象的属性"></a>2、 ObjectMapper如何匹配JSON对象的字段和Java对象的属性</h3><p>默认情况下，Jackson通过将JSON字段的名称与Java对象中的getter和setter方法进行匹配，将JSON对象的字段映射到Java对象中的属性。 Jackson删除了getter和setter方法名称的“ get”和“ set”部分，并将其余名称的第一个字符转换为小写。</p>
+<p>例如，名为brand的JSON字段与名为getBrand()和setBrand()的Java getter和setter方法匹配。 名为engineNumber的JSON字段将与名为getEngineNumber()和setEngineNumber()的getter和setter匹配。</p>
+<p>如果需要以其他方式将JSON对象字段与Java对象字段匹配，则需要使用自定义序列化器和反序列化器，或者使用一些Jackson注解。</p>
+<h3 id="3、JSON字符串–-gt-Java对象"><a href="#3、JSON字符串–-gt-Java对象" class="headerlink" title="3、JSON字符串–&gt;Java对象"></a>3、JSON字符串–&gt;Java对象</h3><p>从JSON字符串读取Java对象非常容易。 上面已经有了一个示例——JSON字符串作为第一个参数传递给ObjectMapper的readValue()方法。 这是另一个简单的示例：</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="variable">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line"></span><br><span class="line"><span class="title class_">String</span> <span class="variable">carJson</span> <span class="operator">=</span></span><br><span class="line">    <span class="string">&quot;&#123; <span class="char escape_">\&quot;</span>brand<span class="char escape_">\&quot;</span> : <span class="char escape_">\&quot;</span>Mercedes<span class="char escape_">\&quot;</span>, <span class="char escape_">\&quot;</span>doors<span class="char escape_">\&quot;</span> : 5 &#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title class_">Car</span> <span class="variable">car</span> <span class="operator">=</span> <span class="variable">objectMapper</span>.<span class="property">readValue</span>(<span class="variable">carJson</span>, <span class="title class_">Car</span>.<span class="property">class</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3、JSON-字符输入流–-gt-Java对象"><a href="#3、JSON-字符输入流–-gt-Java对象" class="headerlink" title="3、JSON 字符输入流–&gt;Java对象"></a>3、JSON 字符输入流–&gt;Java对象</h3><p>还可以从通过Reader实例加载的JSON中读取对象。示例如下：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper = <span class="keyword">new</span> <span class="constructor">ObjectMapper()</span>;</span><br><span class="line"></span><br><span class="line">String carJson =</span><br><span class="line">        <span class="string">&quot;&#123; \&quot;brand\&quot; : \&quot;Mercedes\&quot;, \&quot;doors\&quot; : 4 &#125;&quot;</span>;</span><br><span class="line">Reader reader = <span class="keyword">new</span> <span class="constructor">StringReader(<span class="params">carJson</span>)</span>;</span><br><span class="line"></span><br><span class="line">Car car = objectMapper.read<span class="constructor">Value(<span class="params">reader</span>, Car.<span class="params">class</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4、JSON文件–-gt-Java对象"><a href="#4、JSON文件–-gt-Java对象" class="headerlink" title="4、JSON文件–&gt;Java对象"></a>4、JSON文件–&gt;Java对象</h3><p>从文件读取JSON当然可以通过FileReader（而不是StringReader）来完成，也可以通过File对象来完成。 这是从文件读取JSON的示例：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper = <span class="keyword">new</span> ObjectMapper();</span><br><span class="line"></span><br><span class="line"><span class="keyword">File</span> <span class="keyword">file</span> = <span class="keyword">new</span> <span class="keyword">File</span>(<span class="string">&quot;data/car.json&quot;</span>);</span><br><span class="line"></span><br><span class="line">Car car = objectMapper.readValue(<span class="keyword">file</span>, Car.<span class="keyword">class</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="5、JSON-via-URL—-gt-Java对象"><a href="#5、JSON-via-URL—-gt-Java对象" class="headerlink" title="5、JSON via URL—&gt;Java对象"></a>5、JSON via URL—&gt;Java对象</h3><p>可以通过URL（java.net.URL）从JSON读取对象，如下所示：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper = <span class="keyword">new</span> <span class="constructor">ObjectMapper()</span>;</span><br><span class="line"></span><br><span class="line">URL url = <span class="keyword">new</span> <span class="constructor">URL(<span class="string">&quot;file:data/car.json&quot;</span>)</span>;</span><br><span class="line"></span><br><span class="line">Car car = objectMapper.read<span class="constructor">Value(<span class="params">url</span>, Car.<span class="params">class</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>示例使用文件URL，也可以使用HTTP URL（类似于<a target="_blank" rel="noopener" href="http://jenkov.com/some-data.json%EF%BC%89%E3%80%82">http://jenkov.com/some-data.json）。</a></p>
+<h3 id="6、JSON字节输入流–-gt-Java对象"><a href="#6、JSON字节输入流–-gt-Java对象" class="headerlink" title="6、JSON字节输入流–&gt;Java对象"></a>6、JSON字节输入流–&gt;Java对象</h3><p>也可以使用ObjectMapper通过InputStream从JSON读取对象。 这是一个从InputStream读取JSON的示例：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper = <span class="keyword">new</span> <span class="constructor">ObjectMapper()</span>;</span><br><span class="line"></span><br><span class="line">InputStream input = <span class="keyword">new</span> <span class="constructor">FileInputStream(<span class="string">&quot;data/car.json&quot;</span>)</span>;</span><br><span class="line"></span><br><span class="line">Car car = objectMapper.read<span class="constructor">Value(<span class="params">input</span>, Car.<span class="params">class</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="7、JSON二进制数组–-gt-Java对象"><a href="#7、JSON二进制数组–-gt-Java对象" class="headerlink" title="7、JSON二进制数组–&gt;Java对象"></a>7、JSON二进制数组–&gt;Java对象</h3><p>Jackson还支持从JSON字节数组读取对象。 这是从JSON字节数组读取对象的示例：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper = <span class="keyword">new</span> <span class="constructor">ObjectMapper()</span>;</span><br><span class="line"></span><br><span class="line">String carJson =</span><br><span class="line">        <span class="string">&quot;&#123; \&quot;brand\&quot; : \&quot;Mercedes\&quot;, \&quot;doors\&quot; : 5 &#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line">byte<span class="literal">[]</span> <span class="built_in">bytes</span> = carJson.get<span class="constructor">Bytes(<span class="string">&quot;UTF-8&quot;</span>)</span>;</span><br><span class="line"></span><br><span class="line">Car car = objectMapper.read<span class="constructor">Value(<span class="params">bytes</span>, Car.<span class="params">class</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="8、JSON数组字符串–-gt-Java对象数组"><a href="#8、JSON数组字符串–-gt-Java对象数组" class="headerlink" title="8、JSON数组字符串–&gt;Java对象数组"></a>8、JSON数组字符串–&gt;Java对象数组</h3><p>Jackson ObjectMapper也可以从JSON数组字符串读取对象数组。 这是从JSON数组字符串读取对象数组的示例：</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">String</span> <span class="variable">jsonArray</span> <span class="operator">=</span> <span class="string">&quot;[&#123;<span class="char escape_">\&quot;</span>brand<span class="char escape_">\&quot;</span>:<span class="char escape_">\&quot;</span>ford<span class="char escape_">\&quot;</span>&#125;, &#123;<span class="char escape_">\&quot;</span>brand<span class="char escape_">\&quot;</span>:<span class="char escape_">\&quot;</span>Fiat<span class="char escape_">\&quot;</span>&#125;]&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title class_">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="variable">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line"></span><br><span class="line"><span class="title class_">Car</span>[] <span class="variable">cars2</span> <span class="operator">=</span> <span class="variable">objectMapper</span>.<span class="property">readValue</span>(<span class="variable">jsonArray</span>, <span class="title class_">Car</span>[].<span class="property">class</span>);</span><br></pre></td></tr></table></figure>
+
+<p>需要将Car数组类作为第二个参数传递给readValue()方法。</p>
+<p>读取对象数组还可以与字符串以外的其他JSON源一起使用。 例如，文件，URL，InputStream，Reader等。</p>
+<h3 id="9、JSON数组字符串–-gt-List"><a href="#9、JSON数组字符串–-gt-List" class="headerlink" title="9、JSON数组字符串–&gt;List"></a>9、JSON数组字符串–&gt;List</h3><p>Jackson ObjectMapper还可以从JSON数组字符串读取对象的Java List。 这是从JSON数组字符串读取对象列表的示例：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">   <span class="type">String</span> jsonArray <span class="operator">=</span> <span class="string">&quot;[&#123;<span class="subst">\&quot;</span>brand<span class="subst">\&quot;</span>:<span class="subst">\&quot;</span>ford<span class="subst">\&quot;</span>&#125;, &#123;<span class="subst">\&quot;</span>brand<span class="subst">\&quot;</span>:<span class="subst">\&quot;</span>Fiat<span class="subst">\&quot;</span>&#125;]&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">ObjectMapper</span> objectMapper <span class="operator">=</span> new <span class="type">ObjectMapper</span>();</span><br><span class="line"></span><br><span class="line"><span class="type">List</span>&lt;<span class="type">Car</span>&gt; cars1 <span class="operator">=</span> objectMapper.readValue(jsonArray, new <span class="type">TypeReference</span>&lt;<span class="type">List</span>&lt;<span class="type">Car</span>&gt;&gt;()&#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="10、JSON字符串–-gt-Map"><a href="#10、JSON字符串–-gt-Map" class="headerlink" title="10、JSON字符串–&gt;Map"></a>10、JSON字符串–&gt;Map</h3><p>Jackson ObjectMapper还可以从JSON字符串读取Java Map。 如果事先不知道将要解析的确切JSON结构，这种方法是很有用的。 通常，会将JSON对象读入Java Map。 JSON对象中的每个字段都将成为Java Map中的键，值对。</p>
+<p>这是一个使用Jackson ObjectMapper从JSON字符串读取Java Map的示例：</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">String</span> <span class="variable">jsonObject</span> <span class="operator">=</span> <span class="string">&quot;&#123;<span class="char escape_">\&quot;</span>brand<span class="char escape_">\&quot;</span>:<span class="char escape_">\&quot;</span>ford<span class="char escape_">\&quot;</span>, <span class="char escape_">\&quot;</span>doors<span class="char escape_">\&quot;</span>:5&#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title class_">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="variable">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line"><span class="title class_">Map</span><span class="operator">&lt;</span><span class="title class_">String</span>, <span class="title class_">Object</span><span class="operator">&gt;</span> <span class="variable">jsonMap</span> <span class="operator">=</span> <span class="variable">objectMapper</span>.<span class="property">readValue</span>(<span class="variable">jsonObject</span>,</span><br><span class="line">    <span class="variable">new</span> <span class="title class_">TypeReference</span><span class="operator">&lt;</span><span class="title class_">Map</span><span class="operator">&lt;</span><span class="title class_">String</span>,<span class="title class_">Object</span><span class="operator">&gt;&gt;</span>()&#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="11、忽略未知的JSON字段"><a href="#11、忽略未知的JSON字段" class="headerlink" title="11、忽略未知的JSON字段"></a>11、忽略未知的JSON字段</h3><p>有时候，与要从JSON读取的Java对象相比，JSON中的字段更多。 默认情况下，Jackson在这种情况下会抛出异常，报不知道XYZ字段异常，因为在Java对象中找不到该字段。</p>
+<p>但是，有时应该允许JSON中的字段多于相应的Java对象中的字段。 例如，要从REST服务解析JSON，而该REST服务包含的数据远远超出所需的。 在这种情况下，可以使用Jackson配置忽略这些额外的字段。 以下是配置Jackson ObjectMapper忽略未知字段的示例：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">objectMapper.configure(</span><br><span class="line">    DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, <span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="12、不允许基本类型为null"><a href="#12、不允许基本类型为null" class="headerlink" title="12、不允许基本类型为null"></a>12、不允许基本类型为null</h3><p>如果JSON字符串包含其值设置为null的字段（对于在相应的Java对象中是基本数据类型（int，long，float，double等）的字段），Jackson ObjectMapper默认会处理基本数据类型为null的情况，我们可以可以将Jackson ObjectMapper默认配置为失效，这样基本数据为null就会转换失败。 例如以下Car类：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Car</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> brand = null;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> doors = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">String</span> <span class="title">getBrand</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="keyword">this</span>.brand; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">void</span>   <span class="title">setBrand</span><span class="params">(<span class="type">String</span> brand)</span></span>&#123; <span class="keyword">this</span>.brand = brand;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">int</span>  <span class="title">getDoors</span><span class="params">()</span></span>&#123; <span class="keyword">return</span> <span class="keyword">this</span>.doors; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">void</span> <span class="title">setDoors</span> <span class="params">(<span class="type">int</span> doors)</span> </span>&#123; <span class="keyword">this</span>.doors = doors; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>doors字段是一个int类型，它是Java中的基本数据类型。</p>
+<p>现在，假设有一个与Car对象相对应的JSON字符串，如下所示：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;brand&quot;</span><span class="punctuation">:</span><span class="string">&quot;Toyota&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;doors&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">null</span></span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>请注意，doors字段值为null。 Java中的基本数据类型不能为null值。 默认情况下，Jackson ObjectMapper会忽略原始字段的空值。 但是，可以将Jackson ObjectMapper配置设置为失败。</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper = <span class="keyword">new</span> <span class="type">ObjectMapper</span>();</span><br><span class="line"></span><br><span class="line">objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, <span class="literal">true</span>);</span><br></pre></td></tr></table></figure>
+
+<p>在FAIL_ON_NULL_FOR_PRIMITIVES配置值设置为true的情况下，尝试将空JSON字段解析为基本类型Java字段时会遇到异常。 这是一个Java Jackson ObjectMapper示例，该示例将失败，因为JSON字段包含原始Java字段的空值：</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="variable">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line"></span><br><span class="line"><span class="variable">objectMapper</span>.<span class="property">configure</span>(<span class="title class_">DeserializationFeature</span>.<span class="property">FAIL_ON_NULL_FOR_PRIMITIVES</span>, <span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line"><span class="title class_">String</span> <span class="variable">carJson</span> <span class="operator">=</span> <span class="string">&quot;&#123; <span class="char escape_">\&quot;</span>brand<span class="char escape_">\&quot;</span>:<span class="char escape_">\&quot;</span>Toyota<span class="char escape_">\&quot;</span>, <span class="char escape_">\&quot;</span>doors<span class="char escape_">\&quot;</span>:null &#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title class_">Car</span> <span class="variable">car</span> <span class="operator">=</span> <span class="variable">objectMapper</span>.<span class="property">readValue</span>(<span class="variable">carJson</span>, <span class="title class_">Car</span>.<span class="property">class</span>);</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<p><img src="/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249d91773e2~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp" alt="在这里插入图片描述"></p>
+<h3 id="13、自定义反序列化"><a href="#13、自定义反序列化" class="headerlink" title="13、自定义反序列化"></a>13、自定义反序列化</h3><p>有时，可能希望以不同于Jackson ObjectMapper缺省方式的方式将JSON字符串读入Java对象。 可以将自定义反序列化器添加到ObjectMapper，可以按需要执行反序列化。</p>
+<p>这是在Jackson的ObjectMapper中注册和使用自定义反序列化器的方式：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">String json = <span class="string">&quot;&#123; \&quot;brand\&quot; : \&quot;Ford\&quot;, \&quot;doors\&quot; : 6 &#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line">SimpleModule <span class="keyword">module</span> =</span><br><span class="line">        <span class="keyword">new</span> <span class="constructor">SimpleModule(<span class="string">&quot;CarDeserializer&quot;</span>, <span class="params">new</span> Version(3, 1, 8, <span class="params">null</span>, <span class="params">null</span>, <span class="params">null</span>)</span>);</span><br><span class="line"><span class="keyword">module</span>.add<span class="constructor">Deserializer(Car.<span class="params">class</span>, <span class="params">new</span> CarDeserializer(Car.<span class="params">class</span>)</span>);</span><br><span class="line"></span><br><span class="line">ObjectMapper mapper = <span class="keyword">new</span> <span class="constructor">ObjectMapper()</span>;</span><br><span class="line">mapper.register<span class="constructor">Module(<span class="params">module</span>)</span>;</span><br><span class="line"></span><br><span class="line">Car car = mapper.read<span class="constructor">Value(<span class="params">json</span>, Car.<span class="params">class</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>自定义反序列化器CarDeserializer类：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">public</span> <span class="keyword">class</span> CarDeserializer extends StdDeserializer&lt;Car&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">public</span> CarDeserializer(<span class="keyword">Class</span>&lt;?&gt; vc) &#123;</span><br><span class="line">        super(vc);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="built_in">public</span> Car deserialize(JsonParser <span class="keyword">parser</span>, DeserializationContext deserializer) throws IOException &#123;</span><br><span class="line">        Car car = <span class="built_in">new</span> Car();</span><br><span class="line">        <span class="keyword">while</span>(!<span class="keyword">parser</span>.isClosed())&#123;</span><br><span class="line">            JsonToken jsonToken = <span class="keyword">parser</span>.nextToken();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(JsonToken.FIELD_NAME.equals(jsonToken))&#123;</span><br><span class="line">                String fieldName = <span class="keyword">parser</span>.getCurrentName();</span><br><span class="line">                <span class="keyword">System</span>.<span class="keyword">out</span>.println(fieldName);</span><br><span class="line"></span><br><span class="line">                jsonToken = <span class="keyword">parser</span>.nextToken();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span>(&quot;brand&quot;.equals(fieldName))&#123;</span><br><span class="line">                    car.setBrand(<span class="keyword">parser</span>.getValueAsString());</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (&quot;doors&quot;.equals(fieldName))&#123;</span><br><span class="line">                    car.setDoors(<span class="keyword">parser</span>.getValueAsInt());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> car;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="二）、将对象写入JSON"><a href="#二）、将对象写入JSON" class="headerlink" title="二）、将对象写入JSON"></a>二）、将对象写入JSON</h2><h3 id="1、Java对象–-gt-JSON"><a href="#1、Java对象–-gt-JSON" class="headerlink" title="1、Java对象–&gt;JSON"></a>1、Java对象–&gt;JSON</h3><p>Jackson ObjectMapper也可以用于从对象生成JSON。 可以使用以下方法之一进行操作：</p>
+<ul>
+<li>writeValue()</li>
+<li>writeValueAsString()</li>
+<li>writeValueAsBytes()</li>
+</ul>
+<p>这是一个从Car对象生成JSON的示例，和上面的实例相反：</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper = <span class="keyword">new</span> <span class="type">ObjectMapper</span>();</span><br><span class="line"></span><br><span class="line">  Car car = <span class="keyword">new</span> <span class="type">Car</span>();</span><br><span class="line">  car.setBrand(<span class="string">&quot;BMW&quot;</span>);</span><br><span class="line">  car.setDoors(<span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">  objectMapper.writeValue(</span><br><span class="line">      <span class="keyword">new</span> <span class="type">FileOutputStream</span>(<span class="string">&quot;data/output-2.json&quot;</span>), car);</span><br></pre></td></tr></table></figure>
+
+<p>此示例首先创建一个ObjectMapper，然后创建一个Car实例，最后调用ObjectMapper的writeValue()方法，该方法将Car对象转换为JSON并将其写入给定的FileOutputStream。</p>
+<p>ObjectMapper的writeValueAsString()和writeValueAsBytes()都从一个对象生成JSON，并将生成的JSON作为String或字节数组返回。 示例如下：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper <span class="operator">=</span> new ObjectMapper()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">Car car <span class="operator">=</span> new Car()<span class="comment">;</span></span><br><span class="line">car.setBrand(<span class="string">&quot;宝马&quot;</span>)<span class="comment">;</span></span><br><span class="line">car.setDoors(<span class="number">4</span>)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">String json <span class="operator">=</span> objectMapper.writeValueAsString(car)<span class="comment">;</span></span><br><span class="line">System.out.println(json)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>运行结果： <img src="/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249d91c78d5~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp" alt="在这里插入图片描述"></p>
+<h3 id="2、自定义序列化"><a href="#2、自定义序列化" class="headerlink" title="2、自定义序列化"></a>2、自定义序列化</h3><p>有时，想要将Java对象序列化为JSON的方式与使用Jackson的默认方式不同。 例如，可能想要在JSON中使用与Java对象中不同的字段名称，或者希望完全省略某些字段。</p>
+<p>Jackson可以在ObjectMapper上设置自定义序列化器。 该序列化器已为某个类注册，然后在每次要求ObjectMapper序列化Car对象时将调用该序列化器。</p>
+<p>这是为Car类注册自定义序列化器的示例：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CarSerializer carSerializer = <span class="keyword">new</span> <span class="constructor">CarSerializer(Car.<span class="params">class</span>)</span>;</span><br><span class="line">ObjectMapper objectMapper = <span class="keyword">new</span> <span class="constructor">ObjectMapper()</span>;</span><br><span class="line"></span><br><span class="line">SimpleModule <span class="keyword">module</span> =</span><br><span class="line">        <span class="keyword">new</span> <span class="constructor">SimpleModule(<span class="string">&quot;CarSerializer&quot;</span>, <span class="params">new</span> Version(2, 1, 3, <span class="params">null</span>, <span class="params">null</span>, <span class="params">null</span>)</span>);</span><br><span class="line"><span class="keyword">module</span>.add<span class="constructor">Serializer(Car.<span class="params">class</span>, <span class="params">carSerializer</span>)</span>;</span><br><span class="line"></span><br><span class="line">objectMapper.register<span class="constructor">Module(<span class="params">module</span>)</span>;</span><br><span class="line"></span><br><span class="line">Car car = <span class="keyword">new</span> <span class="constructor">Car()</span>;</span><br><span class="line">car.set<span class="constructor">Brand(<span class="string">&quot;Mercedes&quot;</span>)</span>;</span><br><span class="line">car.set<span class="constructor">Doors(5)</span>;</span><br><span class="line"></span><br><span class="line">String carJson = objectMapper.write<span class="constructor">ValueAsString(<span class="params">car</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>自定义序列化器CarSerializer类：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">CarSerializer</span> <span class="keyword">extends</span> <span class="title">StdSerializer&lt;Car&gt;</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="type">CarSerializer</span>(<span class="type">Class</span>&lt;<span class="type">Car</span>&gt; t) &#123;</span><br><span class="line">        <span class="keyword">super</span>(t);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void serialize(<span class="type">Car</span> car, <span class="type">JsonGenerator</span> jsonGenerator,</span><br><span class="line">                          <span class="type">SerializerProvider</span> serializerProvider)</span><br><span class="line">            <span class="keyword">throws</span> <span class="type">IOException</span> &#123;</span><br><span class="line"></span><br><span class="line">        jsonGenerator.writeStartObject();</span><br><span class="line">        jsonGenerator.writeStringField(<span class="string">&quot;producer&quot;</span>, car.getBrand());</span><br><span class="line">        jsonGenerator.writeNumberField(<span class="string">&quot;doorCount&quot;</span>, car.getDoors());</span><br><span class="line">        jsonGenerator.writeEndObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<p><img src="/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249db99a96b~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp" alt="在这里插入图片描述">在这里插入图片描述</p>
+<h2 id="三）、Jackson-日期转化"><a href="#三）、Jackson-日期转化" class="headerlink" title="三）、Jackson 日期转化"></a>三）、Jackson 日期转化</h2><p>默认情况下，Jackson会将java.util.Date对象序列化为其long型的值，该值是自1970年1月1日以来的毫秒数。但是，Jackson还支持将日期格式化为字符串。</p>
+<h3 id="1、Date–-gt-long"><a href="#1、Date–-gt-long" class="headerlink" title="1、Date–&gt;long"></a>1、Date–&gt;long</h3><p>默认的Jackson日期格式，该格式将Date序列化为自1970年1月1日以来的毫秒数（long类型）。</p>
+<p>这是一个包含Date字段的Java类示例：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="title class_">String</span> <span class="keyword">type</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="title class_">Date</span> date = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="title class_">Transaction</span>() &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="title class_">Transaction</span>(<span class="title class_">String</span> <span class="keyword">type</span>, <span class="title class_">Date</span> date) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">type</span> = <span class="keyword">type</span>;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">date</span> = date;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="title class_">String</span> <span class="title function_">getType</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">type</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="built_in">void</span> <span class="title function_">setType</span>(<span class="params"><span class="built_in">String</span> <span class="keyword">type</span></span>) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">type</span> = <span class="keyword">type</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="title class_">Date</span> <span class="title function_">getDate</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> date;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="built_in">void</span> <span class="title function_">setDate</span>(<span class="params"><span class="built_in">Date</span> date</span>) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">date</span> = date;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>就像使用其他Java对象进行序列化一样，代码如下：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Transaction</span> <span class="keyword">transaction</span> = <span class="built_in">new</span> <span class="keyword">Transaction</span>(&quot;transfer&quot;, <span class="built_in">new</span> <span class="type">Date</span>());</span><br><span class="line"></span><br><span class="line">ObjectMapper objectMapper = <span class="built_in">new</span> ObjectMapper();</span><br><span class="line">String output = objectMapper.writeValueAsString(<span class="keyword">transaction</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(output);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<p><img src="/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249d868123a~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp" alt="在这里插入图片描述"></p>
+<h3 id="2、Date–-gt-String"><a href="#2、Date–-gt-String" class="headerlink" title="2、Date–&gt;String"></a>2、Date–&gt;String</h3><p>日期的long序列化格式不符合人类的时间查看格式。 因此，Jackson也支持文本日期格式。 可以通过在ObjectMapper上设置SimpleDateFormat来指定要使用的确切Jackson日期格式。 这是在Jackson的ObjectMapper上设置SimpleDateFormat的示例：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Transaction transaction = <span class="keyword">new</span> <span class="constructor">Transaction(<span class="string">&quot;transfer&quot;</span>, <span class="params">new</span> Date()</span>);</span><br><span class="line"></span><br><span class="line">ObjectMapper objectMapper = <span class="keyword">new</span> <span class="constructor">ObjectMapper()</span>;</span><br><span class="line">SimpleDateFormat dateFormat = <span class="keyword">new</span> <span class="constructor">SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd&quot;</span>)</span>;</span><br><span class="line">objectMapper.set<span class="constructor">DateFormat(<span class="params">dateFormat</span>)</span>;</span><br><span class="line"></span><br><span class="line">String output2 = objectMapper.write<span class="constructor">ValueAsString(<span class="params">transaction</span>)</span>;</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(output2);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<p><img src="/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/17242249db453b83~tplv-t2oaga2asx-zoom-in-crop-mark:3326:0:0:0.awebp" alt="在这里插入图片描述"></p>
+<h2 id="四）、Jackson-JSON-树模型"><a href="#四）、Jackson-JSON-树模型" class="headerlink" title="四）、Jackson JSON 树模型"></a>四）、Jackson JSON 树模型</h2><p>Jackson具有内置的树模型，可用于表示JSON对象。 如果不知道接收到的JSON的格式，或者由于某种原因而不能（或者只是不想）创建一个类来表示它，那么就要用到Jackson的树模型。 如果需要在使用或转化JSON之前对其进行操作，也需要被用到Jackson树模型。 所有这些情况在数据流场景中都很常见。</p>
+<p>Jackson树模型由JsonNode类表示。 您可以使用Jackson ObjectMapper将JSON解析为JsonNode树模型，就像使用您自己的类一样。</p>
+<p>以下将展示如何使用Jackson ObjectMapper读写JsonNode实例。</p>
+<h3 id="1、Jackson-Tree-Model简单例子"><a href="#1、Jackson-Tree-Model简单例子" class="headerlink" title="1、Jackson Tree Model简单例子"></a>1、Jackson Tree Model简单例子</h3><p>下面是一个简单的例子：</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">String</span> <span class="variable">carJson</span> <span class="operator">=</span></span><br><span class="line">        <span class="string">&quot;&#123; <span class="char escape_">\&quot;</span>brand<span class="char escape_">\&quot;</span> : <span class="char escape_">\&quot;</span>Mercedes<span class="char escape_">\&quot;</span>, <span class="char escape_">\&quot;</span>doors<span class="char escape_">\&quot;</span> : 5 &#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title class_">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="variable">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line"></span><br><span class="line"><span class="title function_">try</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="title class_">JsonNode</span> <span class="variable">jsonNode</span> <span class="operator">=</span> <span class="variable">objectMapper</span>.<span class="property">readValue</span>(<span class="variable">carJson</span>, <span class="title class_">JsonNode</span>.<span class="property">class</span>);</span><br><span class="line"></span><br><span class="line">&#125; <span class="title function_">catch</span> (<span class="title class_">IOException</span> <span class="variable">e</span>) &#123;</span><br><span class="line">    <span class="variable">e</span>.<span class="property">printStackTrace</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只需将JsonNode.class作为第二个参数传递给readValue()方法，而不是本教程前面的示例中使用的Car.class，就可以将JSON字符串解析为JsonNode对象而不是Car对象。 。</p>
+<p>ObjectMapper类还具有一个特殊的readTree()方法，该方法返回JsonNode。 这是使用ObjectMapper readTree()方法将JSON解析为JsonNode的示例：</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">String</span> <span class="variable">carJson</span> <span class="operator">=</span></span><br><span class="line">        <span class="string">&quot;&#123; <span class="char escape_">\&quot;</span>brand<span class="char escape_">\&quot;</span> : <span class="char escape_">\&quot;</span>Mercedes<span class="char escape_">\&quot;</span>, <span class="char escape_">\&quot;</span>doors<span class="char escape_">\&quot;</span> : 5 &#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title class_">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="variable">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line"></span><br><span class="line"><span class="title function_">try</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="title class_">JsonNode</span> <span class="variable">jsonNode</span> <span class="operator">=</span> <span class="variable">objectMapper</span>.<span class="property">readTree</span>(<span class="variable">carJson</span>);</span><br><span class="line"></span><br><span class="line">&#125; <span class="title function_">catch</span> (<span class="title class_">IOException</span> <span class="variable">e</span>) &#123;</span><br><span class="line">    <span class="variable">e</span>.<span class="property">printStackTrace</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、Jackson-JsonNode类"><a href="#2、Jackson-JsonNode类" class="headerlink" title="2、Jackson JsonNode类"></a>2、Jackson JsonNode类</h3><p>通过JsonNode类，可以以非常灵活和动态的方式将JSON作为Java对象导航。这里了解一些如何使用它的基础知识。</p>
+<p>将JSON解析为JsonNode（或JsonNode实例树）后，就可以浏览JsonNode树模型。 这是一个JsonNode示例，显示了如何访问JSON字段，数组和嵌套对象：</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">String</span> <span class="variable">carJson</span> <span class="operator">=</span></span><br><span class="line">        <span class="string">&quot;&#123; <span class="char escape_">\&quot;</span>brand<span class="char escape_">\&quot;</span> : <span class="char escape_">\&quot;</span>Mercedes<span class="char escape_">\&quot;</span>, <span class="char escape_">\&quot;</span>doors<span class="char escape_">\&quot;</span> : 5,&quot;</span> <span class="operator">+</span></span><br><span class="line">        <span class="string">&quot;  <span class="char escape_">\&quot;</span>owners<span class="char escape_">\&quot;</span> : [<span class="char escape_">\&quot;</span>John<span class="char escape_">\&quot;</span>, <span class="char escape_">\&quot;</span>Jack<span class="char escape_">\&quot;</span>, <span class="char escape_">\&quot;</span>Jill<span class="char escape_">\&quot;</span>],&quot;</span> <span class="operator">+</span></span><br><span class="line">        <span class="string">&quot;  <span class="char escape_">\&quot;</span>nestedObject<span class="char escape_">\&quot;</span> : &#123; <span class="char escape_">\&quot;</span>field<span class="char escape_">\&quot;</span> : <span class="char escape_">\&quot;</span>value<span class="char escape_">\&quot;</span> &#125; &#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title class_">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="variable">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="title function_">try</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="title class_">JsonNode</span> <span class="variable">jsonNode</span> <span class="operator">=</span> <span class="variable">objectMapper</span>.<span class="property">readValue</span>(<span class="variable">carJson</span>, <span class="title class_">JsonNode</span>.<span class="property">class</span>);</span><br><span class="line"></span><br><span class="line">    <span class="title class_">JsonNode</span> <span class="variable">brandNode</span> <span class="operator">=</span> <span class="variable">jsonNode</span>.<span class="property">get</span>(<span class="string">&quot;brand&quot;</span>);</span><br><span class="line">    <span class="title class_">String</span> <span class="variable">brand</span> <span class="operator">=</span> <span class="variable">brandNode</span>.<span class="property">asText</span>();</span><br><span class="line">    <span class="title class_">System</span>.<span class="property">out</span>.<span class="property">println</span>(<span class="string">&quot;brand = &quot;</span> <span class="operator">+</span> <span class="variable">brand</span>);</span><br><span class="line"></span><br><span class="line">    <span class="title class_">JsonNode</span> <span class="variable">doorsNode</span> <span class="operator">=</span> <span class="variable">jsonNode</span>.<span class="property">get</span>(<span class="string">&quot;doors&quot;</span>);</span><br><span class="line">    int <span class="variable">doors</span> <span class="operator">=</span> <span class="variable">doorsNode</span>.<span class="property">asInt</span>();</span><br><span class="line">    <span class="title class_">System</span>.<span class="property">out</span>.<span class="property">println</span>(<span class="string">&quot;doors = &quot;</span> <span class="operator">+</span> <span class="variable">doors</span>);</span><br><span class="line"></span><br><span class="line">    <span class="title class_">JsonNode</span> <span class="variable">array</span> <span class="operator">=</span> <span class="variable">jsonNode</span>.<span class="property">get</span>(<span class="string">&quot;owners&quot;</span>);</span><br><span class="line">    <span class="title class_">JsonNode</span> <span class="variable">jsonNode</span> <span class="operator">=</span> <span class="variable">array</span>.<span class="property">get</span>(<span class="number">0</span>);</span><br><span class="line">    <span class="title class_">String</span> <span class="variable">john</span> <span class="operator">=</span> <span class="variable">jsonNode</span>.<span class="property">asText</span>();</span><br><span class="line">    <span class="title class_">System</span>.<span class="property">out</span>.<span class="property">println</span>(<span class="string">&quot;john  = &quot;</span> <span class="operator">+</span> <span class="variable">john</span>);</span><br><span class="line"></span><br><span class="line">    <span class="title class_">JsonNode</span> <span class="variable">child</span> <span class="operator">=</span> <span class="variable">jsonNode</span>.<span class="property">get</span>(<span class="string">&quot;nestedObject&quot;</span>);</span><br><span class="line">    <span class="title class_">JsonNode</span> <span class="variable">childField</span> <span class="operator">=</span> <span class="variable">child</span>.<span class="property">get</span>(<span class="string">&quot;field&quot;</span>);</span><br><span class="line">    <span class="title class_">String</span> <span class="variable">field</span> <span class="operator">=</span> <span class="variable">childField</span>.<span class="property">asText</span>();</span><br><span class="line">    <span class="title class_">System</span>.<span class="property">out</span>.<span class="property">println</span>(<span class="string">&quot;field = &quot;</span> <span class="operator">+</span> <span class="variable">field</span>);</span><br><span class="line"></span><br><span class="line">&#125; <span class="title function_">catch</span> (<span class="title class_">IOException</span> <span class="variable">e</span>) &#123;</span><br><span class="line">    <span class="variable">e</span>.<span class="property">printStackTrace</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>请注意，JSON字符串现在包含一个称为owners的数组字段和一个称为nestedObject的嵌套对象字段。</p>
+<p>无论访问的是字段，数组还是嵌套对象，都可以使用JsonNode类的get()方法。 通过将字符串作为参数提供给get()方法，可以访问JsonNode的字段。 如果JsonNode表示数组，则需要将索引传递给get()方法。 索引指定要获取的数组元素。</p>
+<h3 id="3、Java对象–-gt-JsonNode"><a href="#3、Java对象–-gt-JsonNode" class="headerlink" title="3、Java对象–&gt;JsonNode"></a>3、Java对象–&gt;JsonNode</h3><p>可以使用Jackson ObjectMapper将Java对象转换为JsonNode，而JsonNode是转换后的Java对象的JSON表示形式。 可以通过Jackson ObjectMapper valueToTree()方法将Java对象转换为JsonNode。 这是一个使用ObjectMapper valueToTree()方法将Java对象转换为JsonNode的示例：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper <span class="operator">=</span> new ObjectMapper()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">Car car <span class="operator">=</span> new Car()<span class="comment">;</span></span><br><span class="line">car.brand <span class="operator">=</span> <span class="string">&quot;Cadillac&quot;</span><span class="comment">;</span></span><br><span class="line">car.doors <span class="operator">=</span> <span class="number">4</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">JsonNode carJsonNode <span class="operator">=</span> objectMapper.valueToTree(car)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4、JsonNode–-gt-Java对象"><a href="#4、JsonNode–-gt-Java对象" class="headerlink" title="4、JsonNode–&gt;Java对象"></a>4、JsonNode–&gt;Java对象</h3><p>可以使用Jackson ObjectMapper treeToValue()方法将JsonNode转换为Java对象。 这类似于使用Jackson Jackson的ObjectMapper将JSON字符串（或其他来源）解析为Java对象。 唯一的区别是，JSON源是JsonNode。 这是一个使用Jackson ObjectMapper treeToValue()方法将JsonNode转换为Java对象的示例：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper <span class="operator">=</span> new ObjectMapper()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">String carJson <span class="operator">=</span> <span class="string">&quot;&#123; \&quot;brand\&quot; : \&quot;Mercedes\&quot;, \&quot;doors\&quot; : 5 &#125;&quot;</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">JsonNode carJsonNode <span class="operator">=</span> objectMapper.readTree(carJson)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">Car car <span class="operator">=</span> objectMapper.treeToValue(carJsonNode)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>上面的示例有点“人为”，因为我们首先将JSON字符串转换为JsonNode，然后将JsonNode转换为Car对象。 显然，如果我们有对原始JSON字符串的引用，则最好将其直接转换为Car对象，而无需先将其转换为JsonNode。</p>
+<h1 id="四、JsonNode"><a href="#四、JsonNode" class="headerlink" title="四、JsonNode"></a>四、JsonNode</h1><p>Jackson JsonNode类com.fasterxml.jackson.databind.JsonNode是Jackson的JSON树形模型（对象图模型）。 Jackson可以将JSON读取到JsonNode实例中，然后将JsonNode写入JSON。 因此，这一节将说明如何将JSON反序列化为JsonNode以及将JsonNode序列化为JSON。 此Jackson JsonNode教程还将说明如何从头开始构建JsonNode对象图，因此以后可以将它们序列化为JSON。</p>
+<h2 id="1、JsonNode-vs-ObjectNode"><a href="#1、JsonNode-vs-ObjectNode" class="headerlink" title="1、JsonNode vs ObjectNode"></a>1、JsonNode vs ObjectNode</h2><p>Jackson JsonNode类是不可变的。 这意味着，实际上不能直接构建JsonNode实例的对象图。 而是创建JsonNode子类ObjectNode的对象图。 作为JsonNode的子类，可以在可以使用JsonNode的任何地方使用ObjectNode。</p>
+<h2 id="2、JSON–-gt-JsonNode"><a href="#2、JSON–-gt-JsonNode" class="headerlink" title="2、JSON–&gt;JsonNode"></a>2、JSON–&gt;JsonNode</h2><p>要使用Jackson将JSON读取到JsonNode中，首先需要创建一个Jackson ObjectMapper实例。 在ObjectMapper实例上，调用readTree()并将JSON源作为参数传递。 这是将JSON反序列化为JsonNode的示例：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String <span class="type">json</span> = &quot;&#123; \&quot;f1\&quot; : \&quot;v1\&quot; &#125; &quot;;</span><br><span class="line"></span><br><span class="line">ObjectMapper objectMapper = <span class="built_in">new</span> ObjectMapper();</span><br><span class="line"></span><br><span class="line">JsonNode jsonNode = objectMapper.readTree(<span class="type">json</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(jsonNode.<span class="keyword">get</span>(&quot;f1&quot;).asText());</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3、JsonNode–-gt-JSON"><a href="#3、JsonNode–-gt-JSON" class="headerlink" title="3、JsonNode–&gt;JSON"></a>3、JsonNode–&gt;JSON</h2><p>要将Jackson的JsonNode写入JSON，还需要一个Jackson ObjectMapper实例。 在ObjectMapper上，调用writeValueAsString()方法或任何适合需要的写入方法。 这是将JsonNode写入JSON的示例：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper <span class="operator">=</span> new ObjectMapper()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">JsonNode jsonNode <span class="operator">=</span> readJsonIntoJsonNode()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">String json <span class="operator">=</span> objectMapper.writeValueAsString(jsonNode)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="4、获取JsonNode字段"><a href="#4、获取JsonNode字段" class="headerlink" title="4、获取JsonNode字段"></a>4、获取JsonNode字段</h2><p>JsonNode可以像JSON对象一样具有字段。 假设已将以下JSON解析为JsonNode：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;field1&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;value1&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;field2&quot;</span> <span class="punctuation">:</span> <span class="number">999</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>此JSON对象具有两个名为field1和field2的字段。 如果有一个表示上述JSON对象的Jackson JsonNode，则可以这样获得两个字段：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">JsonNode jsonNode <span class="operator">=</span> ... //parse above JSON into a JsonNode</span><br><span class="line"></span><br><span class="line">JsonNode field1 <span class="operator">=</span> jsonNode.get(<span class="string">&quot;field1&quot;</span>)<span class="comment">;</span></span><br><span class="line">JsonNode field2 <span class="operator">=</span> jsonNode.get(<span class="string">&quot;field2&quot;</span>)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>请注意，即使两个字段都是String字段，get()方法也始终返回JsonNode来表示该字段。</p>
+<h2 id="5、在路径中获取JsonNode字段"><a href="#5、在路径中获取JsonNode字段" class="headerlink" title="5、在路径中获取JsonNode字段"></a>5、在路径中获取JsonNode字段</h2><p>Jackson JsonNode有一个称为at()的特殊方法。 at()方法可以从JSON图中以给定JsonNode为根的任何位置访问JSON字段。 假设JSON结构如下所示：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;identification&quot;</span> :  &#123;</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : &quot;<span class="type">James</span><span class="string">&quot;,</span></span><br><span class="line"><span class="string">        &quot;</span>ssn: <span class="string">&quot;ABC123552&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果将此JSON解析为JsonNode，则可以使用at()方法访问名称字段，如下所示：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JsonNode nameNode <span class="operator">=</span> jsonNode.at(<span class="string">&quot;/identification/name&quot;</span>)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>注意传递给at()方法的参数：字符串&#x2F; identification &#x2F; name。 这是一个JSON路径表达式。 此路径表达式指定从根JsonNode到您要访问其值的字段的完整路径。 这类似于从文件系统根目录到Unix文件系统中文件的路径。</p>
+<p>请注意，JSON路径表达式必须以斜杠字符（&#x2F;字符）开头。</p>
+<p>at()方法返回一个JsonNode，它表示请求的JSON字段。 要获取该字段的实际值，需要调用下一部分介绍的方法之一。 如果没有节点与给定的路径表达式匹配，则将返回null。</p>
+<h2 id="6、转换JsonNode字段"><a href="#6、转换JsonNode字段" class="headerlink" title="6、转换JsonNode字段"></a>6、转换JsonNode字段</h2><p>Jackson JsonNode类包含一组可以将字段值转换为另一种数据类型的方法。 例如，将String字段值转换为long或相反。 这是将JsonNode字段转换为一些更常见的数据类型的示例：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String f2Str = jsonNode.get(<span class="string">&quot;f2&quot;</span>).<span class="keyword">as</span><span class="constructor">Text()</span>;</span><br><span class="line">double f2Dbl = jsonNode.get(<span class="string">&quot;f2&quot;</span>).<span class="keyword">as</span><span class="constructor">Double()</span>;</span><br><span class="line"><span class="built_in">int</span>    f2Int = jsonNode.get(<span class="string">&quot;f2&quot;</span>).<span class="keyword">as</span><span class="constructor">Int()</span>;</span><br><span class="line">long   f2Lng = jsonNode.get(<span class="string">&quot;f2&quot;</span>).<span class="keyword">as</span><span class="constructor">Long()</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用默认值转换:</strong> 如果JsonNode中的字段可以为null，则在尝试转换它时可以提供默认值。 这是使用默认值调用转换方法的示例：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper <span class="operator">=</span> new ObjectMapper()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">String json <span class="operator">=</span> <span class="string">&quot;&#123; \&quot;f1\&quot;:\&quot;Hello\&quot;, \&quot;f2\&quot;:null &#125;&quot;</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">JsonNode jsonNode <span class="operator">=</span> objectMapper.readTree(json)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">String f2Value <span class="operator">=</span> jsonNode.get(<span class="string">&quot;f2&quot;</span>).asText(<span class="string">&quot;Default&quot;</span>)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>在示例的JSON字符串中可以看到，声明了f2字段，但将其设置为null。 在这种情况下，调用jsonNode.get（“ f2”）。asText（“ Default”）将返回默认值，在此示例中为字符串Default。</p>
+<p>asDouble()，asInt()和asLong()方法还可以采用默认参数值，如果尝试从中获取值的字段为null，则将返回默认参数值。</p>
+<p>请注意，如果该字段在JSON中未显式设置为null，但在JSON中丢失，则调用jsonNode.get（“ fieldName”）将返回Java null值，您无法在该Java值上调用asInt() ，asDouble()，asLong()或asText()。 如果尝试这样做，将会导致NullPointerException。 这是说明这种情况的示例：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> ObjectMapper objectMapper <span class="operator">=</span> new ObjectMapper()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">String json <span class="operator">=</span> <span class="string">&quot;&#123; \&quot;f1\&quot;:\&quot;Hello\&quot; &#125;&quot;</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">JsonNode jsonNode <span class="operator">=</span> objectMapper.readTree(json)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">JsonNode f2FieldNode <span class="operator">=</span> jsonNode.get(<span class="string">&quot;f2&quot;</span>)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="7、创建一个ObjectNode"><a href="#7、创建一个ObjectNode" class="headerlink" title="7、创建一个ObjectNode"></a>7、创建一个ObjectNode</h2><p>如前所述，JsonNode类是不可变的。 要创建JsonNode对象图，必须能够更改图中的JsonNode实例，例如 设置属性值和子JsonNode实例等。由于是不可变的，因此无法直接使用JsonNode来实现。</p>
+<p>而是创建一个ObjectNode实例，该实例是JsonNode的子类。 这是一个通过Jackson ObjectMapper createObjectNode()方法创建ObjectNode的示例：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ObjectMapper objectMapper <span class="operator">=</span> new ObjectMapper()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">ObjectNode objectNode <span class="operator">=</span> objectMapper.createObjectNode()<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="8、Set-ObjectNode字段"><a href="#8、Set-ObjectNode字段" class="headerlink" title="8、Set ObjectNode字段"></a>8、Set ObjectNode字段</h2><p>要在Jackson ObjectNode上设置字段，可以调用其set()方法，并将字段名称String和JsonNode作为参数传递。 这是在Jackson的ObjectNode上设置字段的示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ObjectMapper</span> <span class="variable">objectMapper</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line"><span class="type">ObjectNode</span> <span class="variable">parentNode</span> <span class="operator">=</span> objectMapper.createObjectNode();</span><br><span class="line"></span><br><span class="line"><span class="type">JsonNode</span> <span class="variable">childNode</span> <span class="operator">=</span> readJsonIntoJsonNode();</span><br><span class="line"></span><br><span class="line">parentNode.set(<span class="string">&quot;child1&quot;</span>, childNode);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="9、Put-ObjectNode字段"><a href="#9、Put-ObjectNode字段" class="headerlink" title="9、Put ObjectNode字段"></a>9、Put ObjectNode字段</h2><p>ObjectNode类还具有一组方法，可以直接为字段put(设置)值。 这比尝试将原始值转换为JsonNode并使用set()进行设置要容易得多。 以下是使用put()方法为ObjectNode上的字段设置字符串值的示例：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">objectNode</span>.put(<span class="string">&quot;field1&quot;</span>, <span class="string">&quot;value1&quot;</span>);</span><br><span class="line"><span class="attribute">objectNode</span>.put(<span class="string">&quot;field2&quot;</span>, <span class="number">123</span>);</span><br><span class="line"><span class="attribute">objectNode</span>.put(<span class="string">&quot;field3&quot;</span>, <span class="number">999</span>.<span class="number">999</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="10、删除字段"><a href="#10、删除字段" class="headerlink" title="10、删除字段"></a>10、删除字段</h2><p>ObjectNode类具有一个称为remove()的方法，该方法可用于从ObjectNode中删除字段。 这是一个通过其remove()方法从Jackson ObjectNode删除字段的示例：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objectNode.<span class="built_in">remove</span>(<span class="string">&quot;fieldName&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="11、循环JsonNode字段"><a href="#11、循环JsonNode字段" class="headerlink" title="11、循环JsonNode字段"></a>11、循环JsonNode字段</h2><p>JsonNode类具有一个名为fieldNames()的方法，该方法返回一个Iterator，可以迭代JsonNode的所有字段名称。 我们可以使用字段名称来获取字段值。 这是一个迭代Jackson JsonNode的所有字段名称和值的示例：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Iterator&lt;String&gt; fieldNames <span class="operator">=</span> jsonNode.fieldNames()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">while(fieldNames.hasNext()) &#123;</span><br><span class="line">    String fieldName <span class="operator">=</span> fieldNames.next()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">    JsonNode field <span class="operator">=</span> jsonNode.get(fieldName)<span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="五、JsonParser"><a href="#五、JsonParser" class="headerlink" title="五、JsonParser"></a>五、JsonParser</h1><p>Jackson JsonParser类是一个底层一些的JSON解析器。 它类似于XML的Java StAX解析器，差别是JsonParser解析JSON而不解析XML。</p>
+<p>Jackson JsonParser的运行层级低于Jackson ObjectMapper。 这使得JsonParser比ObjectMapper更快，但使用起来也比较麻烦。</p>
+<h2 id="1、创建一个JsonParser"><a href="#1、创建一个JsonParser" class="headerlink" title="1、创建一个JsonParser"></a>1、创建一个JsonParser</h2><p>为了创建Jackson JsonParser，首先需要创建一个JsonFactory。 JsonFactory用于创建JsonParser实例。 JsonFactory类包含几个createParser()方法，每个方法都使用不同的JSON源作为参数。</p>
+<p>这是创建一个JsonParser来从字符串中解析JSON的示例：</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">String</span> <span class="variable">carJson</span> <span class="operator">=</span></span><br><span class="line">        <span class="string">&quot;&#123; <span class="char escape_">\&quot;</span>brand<span class="char escape_">\&quot;</span> : <span class="char escape_">\&quot;</span>Mercedes<span class="char escape_">\&quot;</span>, <span class="char escape_">\&quot;</span>doors<span class="char escape_">\&quot;</span> : 5 &#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title class_">JsonFactory</span> <span class="variable">factory</span> <span class="operator">=</span> <span class="variable">new</span> <span class="title class_">JsonFactory</span>();</span><br><span class="line"><span class="title class_">JsonParser</span>  <span class="variable">parser</span>  <span class="operator">=</span> <span class="variable">factory</span>.<span class="property">createParser</span>(<span class="variable">carJson</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2、用JsonParser转化JSON"><a href="#2、用JsonParser转化JSON" class="headerlink" title="2、用JsonParser转化JSON"></a>2、用JsonParser转化JSON</h2><p>一旦创建了Jackson JsonParser，就可以使用它来解析JSON。 JsonParser的工作方式是将JSON分解为一系列令牌，可以一个一个地迭代令牌。</p>
+<p>这是一个JsonParser示例，它简单地循环遍历所有标记并将它们输出到System.out。 这是一个实际上很少用示例，只是展示了将JSON分解成的令牌，以及如何遍历令牌的基础知识。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">tring carJson =</span><br><span class="line">        &quot;&#123; \&quot;brand\&quot; : \&quot;Mercedes\&quot;, \&quot;doors\&quot; : 5 &#125;&quot;;</span><br><span class="line"></span><br><span class="line">JsonFactory factory = <span class="built_in">new</span> JsonFactory();</span><br><span class="line">JsonParser  parser  = factory.createParser(carJson);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(!<span class="keyword">parser</span>.isClosed())&#123;</span><br><span class="line">    JsonToken jsonToken = <span class="keyword">parser</span>.nextToken();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">System</span>.<span class="keyword">out</span>.println(&quot;jsonToken = &quot; + jsonToken);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只要JsonParser的isClosed()方法返回false，那么JSON源中仍然会有更多的令牌。</p>
+<p>可以使用JsonParser的nextToken()获得一个JsonToken。 您可以使用此JsonToken实例检查给定的令牌。 令牌类型由JsonToken类中的一组常量表示。 这些常量是：</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">START<span class="emphasis">_OBJECT</span></span><br><span class="line"><span class="emphasis">END_OBJECT</span></span><br><span class="line"><span class="emphasis">START_ARRAY</span></span><br><span class="line"><span class="emphasis">END_ARRAY</span></span><br><span class="line"><span class="emphasis">FIELD_NAME</span></span><br><span class="line"><span class="emphasis">VALUE_EMBEDDED_OBJECT</span></span><br><span class="line"><span class="emphasis">VALUE_FALSE</span></span><br><span class="line"><span class="emphasis">VALUE_TRUE</span></span><br><span class="line"><span class="emphasis">VALUE_NULL</span></span><br><span class="line"><span class="emphasis">VALUE_STRING</span></span><br><span class="line"><span class="emphasis">VALUE_NUMBER_INT</span></span><br><span class="line"><span class="emphasis">VALUE_NUMBER_</span>FLOAT</span><br></pre></td></tr></table></figure>
+
+<p>可以使用这些常量来找出当前JsonToken是什么类型的令牌。 可以通过这些常量的equals()方法进行操作。 这是一个例子：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">String carJson =</span><br><span class="line">        &quot;&#123; \&quot;brand\&quot; : \&quot;Mercedes\&quot;, \&quot;doors\&quot; : 5 &#125;&quot;;</span><br><span class="line"></span><br><span class="line">JsonFactory factory = <span class="built_in">new</span> JsonFactory();</span><br><span class="line">JsonParser  parser  = factory.createParser(carJson);</span><br><span class="line"></span><br><span class="line">Car car = <span class="built_in">new</span> Car();</span><br><span class="line"><span class="keyword">while</span>(!<span class="keyword">parser</span>.isClosed())&#123;</span><br><span class="line">    JsonToken jsonToken = <span class="keyword">parser</span>.nextToken();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(JsonToken.FIELD_NAME.equals(jsonToken))&#123;</span><br><span class="line">        String fieldName = <span class="keyword">parser</span>.getCurrentName();</span><br><span class="line">        <span class="keyword">System</span>.<span class="keyword">out</span>.println(fieldName);</span><br><span class="line"></span><br><span class="line">        jsonToken = <span class="keyword">parser</span>.nextToken();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(&quot;brand&quot;.equals(fieldName))&#123;</span><br><span class="line">            car.brand = <span class="keyword">parser</span>.getValueAsString();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (&quot;doors&quot;.equals(fieldName))&#123;</span><br><span class="line">            car.doors = <span class="keyword">parser</span>.getValueAsInt();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(&quot;car.brand = &quot; + car.brand);</span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(&quot;car.doors = &quot; + car.doors);</span><br></pre></td></tr></table></figure>
+
+<p>如果指向的标记是字段名称，则JsonParser的getCurrentName()方法将返回当前字段名称。</p>
+<p>如果指向的令牌是字符串字段值，则getValueAsString()返回当前令牌值作为字符串。 如果指向的令牌是整数字段值，则getValueAsInt()返回当前令牌值作为int值。 JsonParser具有更多类似的方法来获取不同类型的curren令牌值（例如boolean，short，long，float，double等）。</p>
+<h1 id="六、JsonGenerator"><a href="#六、JsonGenerator" class="headerlink" title="六、JsonGenerator"></a>六、JsonGenerator</h1><p>Jackson JsonGenerator用于从Java对象（或代码从中生成JSON的任何数据结构）生成JSON。</p>
+<h2 id="1、创建一个JsonGenerator"><a href="#1、创建一个JsonGenerator" class="headerlink" title="1、创建一个JsonGenerator"></a>1、创建一个JsonGenerator</h2><p>为了创建Jackson JsonGenerator，必须首先创建JsonFactory实例。 这是创建JsonFactory的方法：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JsonFactory factory <span class="operator">=</span> new JsonFactory()<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>一旦创建了JsonFactory，就可以使用JsonFactory的createGenerator()方法创建JsonGenerator。 这是创建JsonGenerator的示例：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">JsonFactory <span class="keyword">factory</span> = <span class="keyword">new</span> JsonFactory();</span><br><span class="line"></span><br><span class="line">JsonGenerator generator = <span class="keyword">factory</span>.createGenerator(</span><br><span class="line">    <span class="keyword">new</span> File(<span class="string">&quot;data/output.json&quot;</span>), JsonEncoding.UTF8);</span><br></pre></td></tr></table></figure>
+
+<p>createGenerator()方法的第一个参数是生成的JSON的目标。 在上面的示例中，参数是File对象。 这意味着生成的JSON将被写入给定文件。 createGenerator()方法已重载，因此还有其他版本的createGenerator()方法采用例如OutputStream等，提供了有关将生成的JSON写入何处的不同选项。</p>
+<p>createGenerator()方法的第二个参数是生成JSON时使用的字符编码。 上面的示例使用UTF-8。</p>
+<h2 id="2、使用JsonGenerator生成JSON"><a href="#2、使用JsonGenerator生成JSON" class="headerlink" title="2、使用JsonGenerator生成JSON"></a>2、使用JsonGenerator生成JSON</h2><p>一旦创建了JsonGenerator，就可以开始生成JSON。 JsonGenerator包含一组write …()方法，可以使用这些方法来编写JSON对象的各个部分。 这是一个使用Jackson JsonGenerator生成JSON的简单示例：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">JsonFactory </span>factory = new <span class="keyword">JsonFactory();</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">JsonGenerator </span>generator = factory.createGenerator(</span><br><span class="line">    new File(<span class="string">&quot;data/output.json&quot;</span>), <span class="keyword">JsonEncoding.UTF8);</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line">generator.writeStartObject();</span><br><span class="line">generator.writeStringField(<span class="string">&quot;brand&quot;</span>, <span class="string">&quot;Mercedes&quot;</span>);</span><br><span class="line">generator.writeNumberField(<span class="string">&quot;doors&quot;</span>, <span class="number">5</span>);</span><br><span class="line">generator.writeEndObject();</span><br><span class="line"></span><br><span class="line">generator.<span class="keyword">close();</span></span><br></pre></td></tr></table></figure>
+
+<p>此示例首先调用writeStartObject()，将{写入输出。 然后，该示例调用writeStringField()，将品牌字段名称+值写入输出。 之后，将调用writeNumberField()方法，此方法会将Doors字段名称+值写入输出。 最后，调用writeEndObject()，将}写入输出。</p>
+<p>JsonGenerator还可以使用许多其他写入方法。 这个例子只显示了其中一些。</p>
+<h2 id="3、关闭JsonGenerator"><a href="#3、关闭JsonGenerator" class="headerlink" title="3、关闭JsonGenerator"></a>3、关闭JsonGenerator</h2><p>完成生成JSON后，应关闭JsonGenerator。 您可以通过调用其close()方法来实现。 这是关闭JsonGenerator的样子：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">generator.close()<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="七、Jackson注解"><a href="#七、Jackson注解" class="headerlink" title="七、Jackson注解"></a>七、Jackson注解</h1><p>Jackson JSON工具包包含一组Java注解，可以使用这些注解来设置将JSON读入对象的方式或从对象生成什么JSON的方式。 此Jackson注解教程介绍了如何使用Jackson的注解。</p>
+<p>下面是一些常用的注解：</p>
+<table>
+<thead>
+<tr>
+<th>注解</th>
+<th>用法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>@JsonProperty</td>
+<td>用于属性，把属性的名称序列化时转换为另外一个名称。示例： @JsonProperty(“birth_ d ate”) private Date birthDate;</td>
+</tr>
+<tr>
+<td>@JsonFormat</td>
+<td>用于属性或者方法，把属性的格式序列化时转换成指定的格式。示例： @JsonFormat(timezone &#x3D; “GMT+8”, pattern &#x3D; “yyyy-MM-dd HH:mm”) public Date getBirthDate()</td>
+</tr>
+<tr>
+<td>@JsonPropertyOrder</td>
+<td>用于类， 指定属性在序列化时 json 中的顺序 ， 示例： @JsonPropertyOrder({ “birth_Date”, “name” }) public class Person</td>
+</tr>
+<tr>
+<td>@JsonCreator</td>
+<td>用于构造方法，和 @JsonProperty 配合使用，适用有参数的构造方法。 示例： @JsonCreator public Person(@JsonProperty(“name”)String name) {…}</td>
+</tr>
+<tr>
+<td>@JsonAnySetter</td>
+<td>用于属性或者方法，设置未反序列化的属性名和值作为键值存储到 map 中 @JsonAnySetter public void set(String key, Object value) { map.put(key, value); }</td>
+</tr>
+<tr>
+<td>@JsonAnyGetter</td>
+<td>用于方法 ，获取所有未序列化的属性 public Map&lt;String, Object&gt; any() { return map; }</td>
+</tr>
+</tbody></table>
+<p>下面是一些注解的详细说明。</p>
+<h2 id="一）、Read-Write注解"><a href="#一）、Read-Write注解" class="headerlink" title="一）、Read + Write注解"></a>一）、Read + Write注解</h2><p>Jackson包含一组注解，这些注解会影响从JSON读取Java对象以及将Java对象写入JSON。 我将这些注解称为“读+写注解”。 以下各节将更详细地介绍Jackson的读写注解。</p>
+<h3 id="1、-JsonIgnore"><a href="#1、-JsonIgnore" class="headerlink" title="1、@JsonIgnore"></a>1、@JsonIgnore</h3><p>Jackson注解@JsonIgnore用于告诉Jackson忽略Java对象的某个属性（字段）。 在将JSON读取到Java对象中以及将Java对象写入JSON时，都将忽略该属性。</p>
+<p>这是使用@JsonIgnore注解的示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.annotation.JsonIgnore;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonIgnore</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JsonIgnore</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span>  <span class="variable">personId</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的类中，不会从JSON读取或写入JSON属性personId。</p>
+<h3 id="2、-JsonIgnoreProperties"><a href="#2、-JsonIgnoreProperties" class="headerlink" title="2、@JsonIgnoreProperties"></a>2、@JsonIgnoreProperties</h3><p>@JsonIgnoreProperties Jackson注解用于指定要忽略的类的属性列表。 @JsonIgnoreProperties注解放置在类声明上方，而不是要忽略的各个属性（字段）上方。</p>
+<p>这是如何使用@JsonIgnoreProperties注解的示例：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.<span class="keyword">annotation</span>.JsonIgnoreProperties;</span><br><span class="line"></span><br><span class="line"><span class="meta">@JsonIgnoreProperties(&#123;<span class="string">&quot;firstName&quot;</span>, <span class="string">&quot;lastName&quot;</span>&#125;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonIgnoreProperties</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> long   personId = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String  firstName = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">public</span> String  lastName  = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在此示例中，属性firstName和lastName都将被忽略，因为它们的名称在类声明上方的@JsonIgnoreProperties注解声明内列出。</p>
+<h3 id="3、-JsonIgnoreType"><a href="#3、-JsonIgnoreType" class="headerlink" title="3、@JsonIgnoreType"></a>3、@JsonIgnoreType</h3><p>@JsonIgnoreType Jackson注解用于将整个类型（类）标记为在使用该类型的任何地方都将被忽略。</p>
+<p>这是一个示例，展示如何使用@JsonIgnoreType注解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.annotation.JsonIgnoreType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonIgnoreType</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JsonIgnoreType</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Address</span> &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="type">String</span> <span class="variable">streetName</span>  <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">public</span> <span class="type">String</span> <span class="variable">houseNumber</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">public</span> <span class="type">String</span> <span class="variable">zipCode</span>     <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">public</span> <span class="type">String</span> <span class="variable">city</span>        <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">public</span> <span class="type">String</span> <span class="variable">country</span>     <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span>    <span class="variable">personId</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span>  <span class="variable">name</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">Address</span> <span class="variable">address</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的示例中，所有Address实例将被忽略。</p>
+<h3 id="4、-JsonAutoDetect"><a href="#4、-JsonAutoDetect" class="headerlink" title="4、@JsonAutoDetect"></a>4、@JsonAutoDetect</h3><p>Jackson注解@JsonAutoDetect用于告诉Jackson在读写对象时包括非public修饰的属性。</p>
+<p>这是一个示例类，展示如何使用@JsonAutoDetect注解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.annotation.JsonAutoDetect;</span><br><span class="line"></span><br><span class="line"><span class="meta">@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY )</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonAutoDetect</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">long</span>  <span class="variable">personId</span> <span class="operator">=</span> <span class="number">123</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> <span class="variable">name</span>     <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>JsonAutoDetect.Visibility类包含与Java中的可见性级别匹配的常量，表示ANY，DEFAULT，NON_PRIVATE，NONE，PROTECTED_AND_PRIVATE和PUBLIC_ONLY。</p>
+<h2 id="二）、Read注解"><a href="#二）、Read注解" class="headerlink" title="二）、Read注解"></a>二）、Read注解</h2><p>Jackson包含一组注解，这些注解仅影响Jackson将JSON解析为对象的方式-意味着它们影响Jackson对JSON的读取。 我称这些为“读注解”。 以下各节介绍了Jackson的读注解。</p>
+<h3 id="1、-JsonSetter"><a href="#1、-JsonSetter" class="headerlink" title="1、@JsonSetter"></a>1、@JsonSetter</h3><p>Jackson注解@JsonSetter用于告诉Jackson，当将JSON读入对象时，应将此setter方法的名称与JSON数据中的属性名称匹配。 如果Java类内部使用的属性名称与JSON文件中使用的属性名称不同，这个注解就很有用了。</p>
+<p>以下Person类用personId名称对应JSON中名为id的字段：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> long   personId = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="title class_">String</span> name     = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> long <span class="title function_">getPersonId</span>(<span class="params"></span>) &#123; <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">personId</span>; &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">void</span> <span class="title function_">setPersonId</span>(<span class="params">long personId</span>) &#123; <span class="variable language_">this</span>.<span class="property">personId</span> = personId; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title class_">String</span> <span class="title function_">getName</span>(<span class="params"></span>) &#123; <span class="keyword">return</span> name; &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">void</span> <span class="title function_">setName</span>(<span class="params"><span class="built_in">String</span> name</span>) &#123; <span class="variable language_">this</span>.<span class="property">name</span> = name; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是在此JSON对象中，使用名称id代替personId：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;id&quot;</span>   : 1234,</span><br><span class="line">  <span class="string">&quot;name&quot;</span> : &quot;<span class="type">John</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>Jackson无法将id属性从JSON对象映射到Java类的personId字段。</p>
+<p>@JsonSetter注解指示Jackson为给定的JSON字段使用setter方法。 在我们的示例中，我们在setPersonId()方法上方添加@JsonSetter注解。</p>
+<p>这是添加@JsonSetter注解的实例：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> long   personId = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="title class_">String</span> name     = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> long <span class="title function_">getPersonId</span>(<span class="params"></span>) &#123; <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">personId</span>; &#125;</span><br><span class="line">    <span class="meta">@JsonSetter</span>(<span class="string">&quot;id&quot;</span>)</span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">void</span> <span class="title function_">setPersonId</span>(<span class="params">long personId</span>) &#123; <span class="variable language_">this</span>.<span class="property">personId</span> = personId; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title class_">String</span> <span class="title function_">getName</span>(<span class="params"></span>) &#123; <span class="keyword">return</span> name; &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">void</span> <span class="title function_">setName</span>(<span class="params"><span class="built_in">String</span> name</span>) &#123; <span class="variable language_">this</span>.<span class="property">name</span> = name; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>@JsonSetter注解中指定的值是要与此setter方法匹配的JSON字段的名称。 在这种情况下，名称为id，因为这是我们要映射到setPersonId()setter方法的JSON对象中字段的名称。</p>
+<h3 id="2、-JsonAnySetter"><a href="#2、-JsonAnySetter" class="headerlink" title="2、@JsonAnySetter"></a>2、@JsonAnySetter</h3><p>Jackson注解@JsonAnySetter表示Jackson为JSON对象中所有无法识别的字段调用相同的setter方法。 “无法识别”是指尚未映射到Java对象中的属性或设置方法的所有字段。</p>
+<p>看一下这个Bag类：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Bag</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title class_">Map</span>&lt;<span class="title class_">String</span>, <span class="title class_">Object</span>&gt; properties = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">void</span> <span class="title function_">set</span>(<span class="params"><span class="built_in">String</span> fieldName, <span class="built_in">Object</span> value</span>)&#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">properties</span>.<span class="title function_">put</span>(fieldName, value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title class_">Object</span> <span class="title function_">get</span>(<span class="params"><span class="built_in">String</span> fieldName</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">properties</span>.<span class="title function_">get</span>(fieldName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后查看此JSON对象：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;id&quot;</span>   : 1234,</span><br><span class="line">  <span class="string">&quot;name&quot;</span> : &quot;<span class="type">John</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>Jackson无法直接将此JSON对象的id和name属性映射到Bag类，因为Bag类不包含任何公共字段或setter方法。</p>
+<p>可以通过添加@JsonAnySetter注解来告诉Jackson为所有无法识别的字段调用set()方法，如下所示：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Bag</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title class_">Map</span>&lt;<span class="title class_">String</span>, <span class="title class_">Object</span>&gt; properties = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JsonAnySetter</span></span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">void</span> <span class="title function_">set</span>(<span class="params"><span class="built_in">String</span> fieldName, <span class="built_in">Object</span> value</span>)&#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">properties</span>.<span class="title function_">put</span>(fieldName, value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title class_">Object</span> <span class="title function_">get</span>(<span class="params"><span class="built_in">String</span> fieldName</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">properties</span>.<span class="title function_">get</span>(fieldName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在，Jackson将使用JSON对象中所有无法识别的字段的名称和值调用set()方法。</p>
+<p>请记住，这仅对无法识别的字段有效。 例如，如果您向Bag Java类添加了公共名称属性或setName（String）方法，则JSON对象中的名称字段将改为映射到该属性&#x2F;设置器。</p>
+<h3 id="3、-JsonCreator"><a href="#3、-JsonCreator" class="headerlink" title="3、@JsonCreator"></a>3、@JsonCreator</h3><p>Jackson注解@JsonCreator用于告诉Jackson该Java对象具有一个构造函数（“创建者”），该构造函数可以将JSON对象的字段与Java对象的字段进行匹配。</p>
+<p>@JsonCreator注解在无法使用@JsonSetter注解的情况下很有用。 例如，不可变对象没有任何设置方法，因此它们需要将其初始值注入到构造函数中。</p>
+<p>以这个PersonImmutable类为例：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonImmutable</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">long</span>   id   = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> name = null;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">PersonImmutable</span><span class="params">(<span class="type">long</span> id, <span class="type">String</span> name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">long</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="type">String</span> <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要告诉Jackson应该调用PersonImmutable的构造函数，我们必须在构造函数中添加@JsonCreator注解。 但是，仅凭这一点还不够。 我们还必须注解构造函数的参数，以告诉Jackson将JSON对象中的哪些字段传递给哪些构造函数参数。</p>
+<p>添加了@JsonCreator和@JsonProperty注解的PersonImmutable类的示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonImmutable</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">long</span>   <span class="variable">id</span>   <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JsonCreator</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">PersonImmutable</span><span class="params">(</span></span><br><span class="line"><span class="params">            <span class="meta">@JsonProperty(&quot;id&quot;)</span>  <span class="type">long</span> id,</span></span><br><span class="line"><span class="params">            <span class="meta">@JsonProperty(&quot;name&quot;)</span> String name  )</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">this</span>.id = id;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span> <span class="title function_">getId</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getName</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>请注意，构造函数上方的注解以及构造函数参数之前的注解。 现在，Jackson能够从此JSON对象创建PersonImmutable：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;id&quot;</span>   : 1234,</span><br><span class="line">  <span class="string">&quot;name&quot;</span> : &quot;<span class="type">John</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4、-JacksonInject"><a href="#4、-JacksonInject" class="headerlink" title="4、@JacksonInject"></a>4、@JacksonInject</h3><p>Jackson注解@JacksonInject用于将值注入到解析的对象中，而不是从JSON中读取这些值。 例如，假设正在从各种不同的源下载Person JSON对象，并且想知道给定Person对象来自哪个源。 源本身可能不包含该信息，但是可以让Jackson将其注入到根据JSON对象创建的Java对象中。</p>
+<p>要将Java类中的字段标记为需要由Jackson注入其值的字段，请在该字段上方添加@JacksonInject注解。</p>
+<p>这是一个示例PersonInject类，在属性上方添加了@JacksonInject注解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonInject</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span>   <span class="variable">id</span>   <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JacksonInject</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> <span class="variable">source</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为了让Jackson将值注入属性，需要在创建Jackson ObjectMapper时做一些额外的工作。</p>
+<p>这是让Jackson将值注入Java对象的过程：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">InjectableValues inject = <span class="keyword">new</span> InjectableValues.<span class="constructor">Std()</span>.add<span class="constructor">Value(String.<span class="params">class</span>, <span class="string">&quot;jenkov.com&quot;</span>)</span>;</span><br><span class="line">PersonInject personInject = <span class="keyword">new</span> <span class="constructor">ObjectMapper()</span>.reader(inject)</span><br><span class="line">                        .<span class="keyword">for</span><span class="constructor">Type(PersonInject.<span class="params">class</span>)</span></span><br><span class="line">                        .read<span class="constructor">Value(<span class="params">new</span> File(<span class="string">&quot;data/person.json&quot;</span>)</span>);</span><br></pre></td></tr></table></figure>
+
+<p>请注意，如何在InjectableValues addValue()方法中设置要注入到source属性中的值。 还要注意，该值仅绑定到字符串类型-而不绑定到任何特定的字段名称。 @JacksonInject注解指定将值注入到哪个字段。</p>
+<p>如果要从多个源下载人员JSON对象，并为每个源注入不同的源值，则必须为每个源重复以上代码。</p>
+<h3 id="5、-JsonDeserialize"><a href="#5、-JsonDeserialize" class="headerlink" title="5、@JsonDeserialize"></a>5、@JsonDeserialize</h3><p>Jackson注解@JsonDeserialize用于为Java对象中给定的属性指定自定义反序列化器类。</p>
+<p>例如，假设想优化布尔值false和true的在线格式，使其分别为0和1。</p>
+<p>首先，需要将@JsonDeserialize注解添加到要为其使用自定义反序列化器的字段。 这是将@JsonDeserialize注解添加到字段的示例：</p>
+<figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonDeserialize</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">long</span>    id      = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> String  name    = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    @JsonDeserialize(<span class="keyword">using</span> = OptimizedBooleanDeserializer.<span class="keyword">class</span>)</span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">boolean</span> enabled = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其次，这是@JsonDeserialize注解中引用的OptimizedBooleanDeserializer类的实例：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OptimizedBooleanDeserializer</span></span><br><span class="line">    extends JsonDeserializer&lt;<span class="built_in">Boolean</span>&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">Boolean</span> deserialize(JsonParser jsonParser,</span><br><span class="line">            DeserializationContext deserializationContext) throws</span><br><span class="line">        IOException, JsonProcessingException &#123;</span><br><span class="line"></span><br><span class="line">        String text = jsonParser.getText();</span><br><span class="line">        <span class="keyword">if</span>(<span class="string">&quot;0&quot;</span>.equals(text)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>请注意，OptimizedBooleanDeserializer类使用通用类型Boolean扩展了JsonDeserializer。 这样做会使deserialize()方法返回一个布尔对象。 如果要反序列化其他类型（例如java.util.Date），则必须在泛型括号内指定该类型。</p>
+<p>可以通过调用jsonParser参数的getText()方法来获取要反序列化的字段的值。 然后，可以将该文本反序列化为任何值，然后输入反序列化程序所针对的类型（在此示例中为布尔值）。</p>
+<p>最后，需要查看使用自定义反序列化器和@JsonDeserializer注解反序列化对象的格式：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PersonDeserialize person = objectMapper</span><br><span class="line">        .reader(<span class="module-access"><span class="module"><span class="identifier">PersonDeserialize</span>.</span></span><span class="keyword">class</span>)</span><br><span class="line">        .read<span class="constructor">Value(<span class="params">new</span> File(<span class="string">&quot;data/person-optimized-boolean.json&quot;</span>)</span>);</span><br></pre></td></tr></table></figure>
+
+<p>注意，我们首先需要如何使用ObjectMapper的reader()方法为PersonDeserialize类创建一个阅读器，然后在该方法返回的对象上调用readValue()。</p>
+<h2 id="三）、Write注解"><a href="#三）、Write注解" class="headerlink" title="三）、Write注解"></a>三）、Write注解</h2><p>Jackson还包含一组注解，这些注解可以影响Jackson将Java对象序列化（写入）到JSON的方式。 以下各节将介绍这些写（序列化）注解中的每一个。</p>
+<h3 id="1、-JsonInclude"><a href="#1、-JsonInclude" class="headerlink" title="1、@JsonInclude"></a>1、@JsonInclude</h3><p>Jackson注解@JsonInclude告诉Jackson仅在某些情况下包括属性。 例如，仅当属性为非null，非空或具有非默认值时，才应包括该属性。 这是显示如何使用@JsonInclude注解的示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.annotation.JsonInclude;</span><br><span class="line"></span><br><span class="line"><span class="meta">@JsonInclude(JsonInclude.Include.NON_EMPTY)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonInclude</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span>  <span class="variable">personId</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> <span class="variable">name</span>     <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果为该示例设置的值是非空的，则此示例将仅包括name属性，这意味着不为null且不是空字符串。</p>
+<p>@JsonInclude注解的一个更通俗的名称应该是@JsonIncludeOnlyWhen，但是写起来会更长。</p>
+<h3 id="2、-JsonGetter"><a href="#2、-JsonGetter" class="headerlink" title="2、@JsonGetter"></a>2、@JsonGetter</h3><p>@JsonGetter Jackson注解用于告诉Jackson，应该通过调用getter方法而不是通过直接字段访问来获取某个字段值。 如果您的Java类使用jQuery样式的getter和setter名称，则@JsonGetter注解很有用。</p>
+<p>例如，您可能拥有方法personId()和personId（long id），而不是getPersonId()和setPersonId()。</p>
+<p>这是一个名为PersonGetter的示例类，它显示了@JsonGetter注解的用法：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PersonGetter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span>  personId = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JsonGetter</span>(<span class="string">&quot;id&quot;</span>)</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">long</span> <span class="title">personId</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="keyword">this</span>.personId; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JsonSetter</span>(<span class="string">&quot;id&quot;</span>)</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">personId</span><span class="params">(<span class="keyword">long</span> personId)</span> </span>&#123; <span class="keyword">this</span>.personId = personId; &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如您所见，personId()方法带有@JsonGetter注解。 @JsonGetter注解上设置的值是JSON对象中应使用的名称。 因此，用于JSON对象中personId的名称是id。 生成的JSON对象如下所示：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="number">0</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>还要注意，personId（long personId）方法使用@JsonSetter注解进行注解，以使Jackson识别为与JSON对象中的id属性匹配的设置方法。 从JSON读取Java对象时使用@JsonSetter注解-将Java对象写入JSON时不使用。 为了完整起见，仅包含@JsonSetter注解。</p>
+<h3 id="3、-JsonAnyGetter"><a href="#3、-JsonAnyGetter" class="headerlink" title="3、@JsonAnyGetter"></a>3、@JsonAnyGetter</h3><p>@JsonAnyGetter Jackson注解使您可以将Map用作要序列化为JSON的属性的容器。 这是在Java类中使用@JsonAnyGetter注解的示例：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonAnyGetter</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title class_">Map</span>&lt;<span class="title class_">String</span>, <span class="title class_">Object</span>&gt; properties = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JsonAnyGetter</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title class_">Map</span>&lt;<span class="title class_">String</span>, <span class="title class_">Object</span>&gt; <span class="title function_">properties</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> properties;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当看到@JsonAnyGetter注解时，Jackson将从@JsonAnyGetter注解的方法中获取返回的Map，并将该Map中的每个键值对都视为一个属性。 换句话说，Map中的所有键值对都将作为PersonAnyGetter对象的一部分序列化为JSON。</p>
+<h3 id="4、-JsonPropertyOrder"><a href="#4、-JsonPropertyOrder" class="headerlink" title="4、@JsonPropertyOrder"></a>4、@JsonPropertyOrder</h3><p>@JsonPropertyOrder Jackson注解可用于指定将Java对象的字段序列化为JSON的顺序。 这是显示如何使用@JsonPropertyOrder注解的示例：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@JsonPropertyOrder(&#123;<span class="string">&quot;name&quot;</span>, <span class="string">&quot;personId&quot;</span>&#125;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonPropertyOrder</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> long  personId  = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> String name     = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通常，Jackson会按照在类中找到的顺序序列化PersonPropertyOrder中的属性。 但是，@JsonPropertyOrder注解指定了不同的顺序，在序列化的JSON输出中，name属性将首先出现，personId属性将随后出现。</p>
+<h3 id="5、-JsonRawValue"><a href="#5、-JsonRawValue" class="headerlink" title="5、@JsonRawValue"></a>5、@JsonRawValue</h3><p>@JsonRawValue Jackson注解告诉Jackson该属性值应直接写入JSON输出。 如果该属性是字符串，Jackson通常会将值括在引号中，但是如果使用@JsonRawValue属性进行注解，Jackson将不会这样做。</p>
+<p>为了更清楚@JsonRawValue的作用，看看没有使用@JsonRawValue的此类：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonRawValue</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span>   personId = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> address  = <span class="string">&quot;$#&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Jackson会将其序列化为以下JSON字符串：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;personId&quot;</span>:0,<span class="string">&quot;address&quot;</span>:<span class="string">&quot;<span class="variable">$#</span>&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在，我们将@JsonRawValue添加到address属性，如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonRawValue</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span>   <span class="variable">personId</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JsonRawValue</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> <span class="variable">address</span>  <span class="operator">=</span> <span class="string">&quot;$#&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在，当对地址属性进行序列化时，杰克逊将省略引号。 因此，序列化的JSON如下所示：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;personId&quot;</span>:<span class="number">0</span>,<span class="string">&quot;address&quot;</span>:<span class="variable">$</span><span class="comment">#&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>当然它是无效的JSON，那么为什么要这么做呢？</p>
+<p>如果address属性包含一个JSON字符串，那么该JSON字符串将被序列化为最终的JSON对象，作为JSON对象结构的一部分，而不仅是序列化为JSON对象的address字段中的字符串。</p>
+<p>要查看其工作原理，让我们像下面这样更改address属性的值：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonRawValue</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> long   personId <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JsonRawValue</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> address  <span class="operator">=</span></span><br><span class="line">            <span class="string">&quot;&#123; <span class="subst">\&quot;</span>street<span class="subst">\&quot;</span> : <span class="subst">\&quot;</span>Wall Street<span class="subst">\&quot;</span>, <span class="subst">\&quot;</span>no<span class="subst">\&quot;</span>:1&#125;&quot;</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Jackson会将其序列化为以下JSON：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;personId&quot;</span><span class="punctuation">:</span><span class="number">0</span><span class="punctuation">,</span><span class="attr">&quot;address&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> <span class="attr">&quot;street&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;Wall Street&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;no&quot;</span><span class="punctuation">:</span><span class="number">1</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>请注意，JSON字符串现在如何成为序列化JSON结构的一部分。</p>
+<p>没有@JsonRawValue注解，Jackson会将对象序列化为以下JSON：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;personId&quot;</span>:<span class="number">0</span>,<span class="string">&quot;address&quot;</span>:<span class="string">&quot;&#123; <span class="subst">\&quot;</span>street<span class="subst">\&quot;</span> : <span class="subst">\&quot;</span>Wall Street<span class="subst">\&quot;</span>, <span class="subst">\&quot;</span>no<span class="subst">\&quot;</span>:1&#125;&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p>请注意，address属性的值现在如何用引号引起来，并且值内的所有引号均被转义。</p>
+<h3 id="6、-JsonValue"><a href="#6、-JsonValue" class="headerlink" title="6、@JsonValue"></a>6、@JsonValue</h3><p>Jackson注解@JsonValue告诉Jackson，Jackson不应该尝试序列化对象本身，而应在对象上调用将对象序列化为JSON字符串的方法。 请注意，Jackson将在自定义序列化返回的String内转义任何引号，因此不能返回例如 完整的JSON对象。 为此，应该改用@JsonRawValue（请参阅上一节）。</p>
+<p>@JsonValue注解已添加到Jackson调用的方法中，以将对象序列化为JSON字符串。 这是显示如何使用@JsonValue注解的示例：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonValue</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> long   personId = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> String name = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JsonValue</span></span><br><span class="line">    <span class="keyword">public</span> String toJson()&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.personId + <span class="string">&quot;,&quot;</span> + <span class="keyword">this</span>.name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要求Jackson序列化PersonValue对象所得到的输出是：</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;0,null&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>引号由Jackson添加。 请记住，对象返回的值字符串中的所有引号均会转义。</p>
+<h3 id="7、-JsonSerialize"><a href="#7、-JsonSerialize" class="headerlink" title="7、@JsonSerialize"></a>7、@JsonSerialize</h3><p>@JsonSerialize Jackson注解用于为Java对象中的字段指定自定义序列化程序。 这是一个使用@JsonSerialize注解的Java类示例：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PersonSerializer</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span>   personId = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">String</span> name     = <span class="string">&quot;John&quot;</span>;</span><br><span class="line"></span><br><span class="line">    @<span class="built_in">JsonSerialize</span>(<span class="keyword">using</span> = OptimizedBooleanSerializer.<span class="keyword">class</span>)</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> enabled = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意启用字段上方的@JsonSerialize注解。</p>
+<p>OptimizedBooleanSerializer将序列的真值序列化为1，将假值序列化为0。这是代码：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">OptimizedBooleanSerializer</span> <span class="keyword">extends</span> <span class="title">JsonSerializer&lt;Boolean&gt;</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    public void serialize(<span class="type">Boolean</span> aBoolean, <span class="type">JsonGenerator</span> jsonGenerator, </span><br><span class="line">        <span class="type">SerializerProvider</span> serializerProvider) </span><br><span class="line">    <span class="keyword">throws</span> <span class="type">IOException</span>, <span class="type">JsonProcessingException</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(aBoolean)&#123;</span><br><span class="line">            jsonGenerator.writeNumber(<span class="number">1</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            jsonGenerator.writeNumber(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Jackson/" rel="tag"># Jackson</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/10/elasticsearch%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%83%EF%BC%89%EF%BC%9A%E9%85%8D%E7%BD%AE/" rel="prev" title="elasticsearch系列（七）：配置">
+      <i class="fa fa-chevron-left"></i> elasticsearch系列（七）：配置
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">Jackson使用详解</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">一、简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%BE%9D%E8%B5%96"><span class="nav-number">3.</span> <span class="nav-text">二、依赖</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E3%80%81-ObjectMapper"><span class="nav-number">4.</span> <span class="nav-text">三、 ObjectMapper</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%EF%BC%89%E3%80%81%E4%BB%8EJSON%E4%B8%AD%E8%8E%B7%E5%8F%96Java%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.1.</span> <span class="nav-text">一）、从JSON中获取Java对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E7%AE%80%E5%8D%95%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.1.1.</span> <span class="nav-text">1、简单示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81-ObjectMapper%E5%A6%82%E4%BD%95%E5%8C%B9%E9%85%8DJSON%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%AD%97%E6%AE%B5%E5%92%8CJava%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="nav-number">4.1.2.</span> <span class="nav-text">2、 ObjectMapper如何匹配JSON对象的字段和Java对象的属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81JSON%E5%AD%97%E7%AC%A6%E4%B8%B2%E2%80%93-gt-Java%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.1.3.</span> <span class="nav-text">3、JSON字符串–&gt;Java对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81JSON-%E5%AD%97%E7%AC%A6%E8%BE%93%E5%85%A5%E6%B5%81%E2%80%93-gt-Java%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.1.4.</span> <span class="nav-text">3、JSON 字符输入流–&gt;Java对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81JSON%E6%96%87%E4%BB%B6%E2%80%93-gt-Java%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.1.5.</span> <span class="nav-text">4、JSON文件–&gt;Java对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81JSON-via-URL%E2%80%94-gt-Java%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.1.6.</span> <span class="nav-text">5、JSON via URL—&gt;Java对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6%E3%80%81JSON%E5%AD%97%E8%8A%82%E8%BE%93%E5%85%A5%E6%B5%81%E2%80%93-gt-Java%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.1.7.</span> <span class="nav-text">6、JSON字节输入流–&gt;Java对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7%E3%80%81JSON%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%95%B0%E7%BB%84%E2%80%93-gt-Java%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.1.8.</span> <span class="nav-text">7、JSON二进制数组–&gt;Java对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8%E3%80%81JSON%E6%95%B0%E7%BB%84%E5%AD%97%E7%AC%A6%E4%B8%B2%E2%80%93-gt-Java%E5%AF%B9%E8%B1%A1%E6%95%B0%E7%BB%84"><span class="nav-number">4.1.9.</span> <span class="nav-text">8、JSON数组字符串–&gt;Java对象数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9%E3%80%81JSON%E6%95%B0%E7%BB%84%E5%AD%97%E7%AC%A6%E4%B8%B2%E2%80%93-gt-List"><span class="nav-number">4.1.10.</span> <span class="nav-text">9、JSON数组字符串–&gt;List</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10%E3%80%81JSON%E5%AD%97%E7%AC%A6%E4%B8%B2%E2%80%93-gt-Map"><span class="nav-number">4.1.11.</span> <span class="nav-text">10、JSON字符串–&gt;Map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11%E3%80%81%E5%BF%BD%E7%95%A5%E6%9C%AA%E7%9F%A5%E7%9A%84JSON%E5%AD%97%E6%AE%B5"><span class="nav-number">4.1.12.</span> <span class="nav-text">11、忽略未知的JSON字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12%E3%80%81%E4%B8%8D%E5%85%81%E8%AE%B8%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E4%B8%BAnull"><span class="nav-number">4.1.13.</span> <span class="nav-text">12、不允许基本类型为null</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13%E3%80%81%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">4.1.14.</span> <span class="nav-text">13、自定义反序列化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%EF%BC%89%E3%80%81%E5%B0%86%E5%AF%B9%E8%B1%A1%E5%86%99%E5%85%A5JSON"><span class="nav-number">4.2.</span> <span class="nav-text">二）、将对象写入JSON</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81Java%E5%AF%B9%E8%B1%A1%E2%80%93-gt-JSON"><span class="nav-number">4.2.1.</span> <span class="nav-text">1、Java对象–&gt;JSON</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E8%87%AA%E5%AE%9A%E4%B9%89%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">4.2.2.</span> <span class="nav-text">2、自定义序列化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%EF%BC%89%E3%80%81Jackson-%E6%97%A5%E6%9C%9F%E8%BD%AC%E5%8C%96"><span class="nav-number">4.3.</span> <span class="nav-text">三）、Jackson 日期转化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81Date%E2%80%93-gt-long"><span class="nav-number">4.3.1.</span> <span class="nav-text">1、Date–&gt;long</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81Date%E2%80%93-gt-String"><span class="nav-number">4.3.2.</span> <span class="nav-text">2、Date–&gt;String</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%EF%BC%89%E3%80%81Jackson-JSON-%E6%A0%91%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.4.</span> <span class="nav-text">四）、Jackson JSON 树模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81Jackson-Tree-Model%E7%AE%80%E5%8D%95%E4%BE%8B%E5%AD%90"><span class="nav-number">4.4.1.</span> <span class="nav-text">1、Jackson Tree Model简单例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81Jackson-JsonNode%E7%B1%BB"><span class="nav-number">4.4.2.</span> <span class="nav-text">2、Jackson JsonNode类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81Java%E5%AF%B9%E8%B1%A1%E2%80%93-gt-JsonNode"><span class="nav-number">4.4.3.</span> <span class="nav-text">3、Java对象–&gt;JsonNode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81JsonNode%E2%80%93-gt-Java%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.4.4.</span> <span class="nav-text">4、JsonNode–&gt;Java对象</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B%E3%80%81JsonNode"><span class="nav-number">5.</span> <span class="nav-text">四、JsonNode</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1%E3%80%81JsonNode-vs-ObjectNode"><span class="nav-number">5.1.</span> <span class="nav-text">1、JsonNode vs ObjectNode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2%E3%80%81JSON%E2%80%93-gt-JsonNode"><span class="nav-number">5.2.</span> <span class="nav-text">2、JSON–&gt;JsonNode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3%E3%80%81JsonNode%E2%80%93-gt-JSON"><span class="nav-number">5.3.</span> <span class="nav-text">3、JsonNode–&gt;JSON</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4%E3%80%81%E8%8E%B7%E5%8F%96JsonNode%E5%AD%97%E6%AE%B5"><span class="nav-number">5.4.</span> <span class="nav-text">4、获取JsonNode字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5%E3%80%81%E5%9C%A8%E8%B7%AF%E5%BE%84%E4%B8%AD%E8%8E%B7%E5%8F%96JsonNode%E5%AD%97%E6%AE%B5"><span class="nav-number">5.5.</span> <span class="nav-text">5、在路径中获取JsonNode字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6%E3%80%81%E8%BD%AC%E6%8D%A2JsonNode%E5%AD%97%E6%AE%B5"><span class="nav-number">5.6.</span> <span class="nav-text">6、转换JsonNode字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7%E3%80%81%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAObjectNode"><span class="nav-number">5.7.</span> <span class="nav-text">7、创建一个ObjectNode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8%E3%80%81Set-ObjectNode%E5%AD%97%E6%AE%B5"><span class="nav-number">5.8.</span> <span class="nav-text">8、Set ObjectNode字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9%E3%80%81Put-ObjectNode%E5%AD%97%E6%AE%B5"><span class="nav-number">5.9.</span> <span class="nav-text">9、Put ObjectNode字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10%E3%80%81%E5%88%A0%E9%99%A4%E5%AD%97%E6%AE%B5"><span class="nav-number">5.10.</span> <span class="nav-text">10、删除字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11%E3%80%81%E5%BE%AA%E7%8E%AFJsonNode%E5%AD%97%E6%AE%B5"><span class="nav-number">5.11.</span> <span class="nav-text">11、循环JsonNode字段</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E3%80%81JsonParser"><span class="nav-number">6.</span> <span class="nav-text">五、JsonParser</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1%E3%80%81%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAJsonParser"><span class="nav-number">6.1.</span> <span class="nav-text">1、创建一个JsonParser</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2%E3%80%81%E7%94%A8JsonParser%E8%BD%AC%E5%8C%96JSON"><span class="nav-number">6.2.</span> <span class="nav-text">2、用JsonParser转化JSON</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AD%E3%80%81JsonGenerator"><span class="nav-number">7.</span> <span class="nav-text">六、JsonGenerator</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1%E3%80%81%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAJsonGenerator"><span class="nav-number">7.1.</span> <span class="nav-text">1、创建一个JsonGenerator</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2%E3%80%81%E4%BD%BF%E7%94%A8JsonGenerator%E7%94%9F%E6%88%90JSON"><span class="nav-number">7.2.</span> <span class="nav-text">2、使用JsonGenerator生成JSON</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3%E3%80%81%E5%85%B3%E9%97%ADJsonGenerator"><span class="nav-number">7.3.</span> <span class="nav-text">3、关闭JsonGenerator</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%83%E3%80%81Jackson%E6%B3%A8%E8%A7%A3"><span class="nav-number">8.</span> <span class="nav-text">七、Jackson注解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%EF%BC%89%E3%80%81Read-Write%E6%B3%A8%E8%A7%A3"><span class="nav-number">8.1.</span> <span class="nav-text">一）、Read + Write注解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81-JsonIgnore"><span class="nav-number">8.1.1.</span> <span class="nav-text">1、@JsonIgnore</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81-JsonIgnoreProperties"><span class="nav-number">8.1.2.</span> <span class="nav-text">2、@JsonIgnoreProperties</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81-JsonIgnoreType"><span class="nav-number">8.1.3.</span> <span class="nav-text">3、@JsonIgnoreType</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81-JsonAutoDetect"><span class="nav-number">8.1.4.</span> <span class="nav-text">4、@JsonAutoDetect</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%EF%BC%89%E3%80%81Read%E6%B3%A8%E8%A7%A3"><span class="nav-number">8.2.</span> <span class="nav-text">二）、Read注解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81-JsonSetter"><span class="nav-number">8.2.1.</span> <span class="nav-text">1、@JsonSetter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81-JsonAnySetter"><span class="nav-number">8.2.2.</span> <span class="nav-text">2、@JsonAnySetter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81-JsonCreator"><span class="nav-number">8.2.3.</span> <span class="nav-text">3、@JsonCreator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81-JacksonInject"><span class="nav-number">8.2.4.</span> <span class="nav-text">4、@JacksonInject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81-JsonDeserialize"><span class="nav-number">8.2.5.</span> <span class="nav-text">5、@JsonDeserialize</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%EF%BC%89%E3%80%81Write%E6%B3%A8%E8%A7%A3"><span class="nav-number">8.3.</span> <span class="nav-text">三）、Write注解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81-JsonInclude"><span class="nav-number">8.3.1.</span> <span class="nav-text">1、@JsonInclude</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81-JsonGetter"><span class="nav-number">8.3.2.</span> <span class="nav-text">2、@JsonGetter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81-JsonAnyGetter"><span class="nav-number">8.3.3.</span> <span class="nav-text">3、@JsonAnyGetter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81-JsonPropertyOrder"><span class="nav-number">8.3.4.</span> <span class="nav-text">4、@JsonPropertyOrder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81-JsonRawValue"><span class="nav-number">8.3.5.</span> <span class="nav-text">5、@JsonRawValue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6%E3%80%81-JsonValue"><span class="nav-number">8.3.6.</span> <span class="nav-text">6、@JsonValue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7%E3%80%81-JsonSerialize"><span class="nav-number">8.3.7.</span> <span class="nav-text">7、@JsonSerialize</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
