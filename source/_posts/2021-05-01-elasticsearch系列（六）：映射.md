@@ -2,9 +2,10 @@
 title: elasticsearch系列（六）：映射
 date: 2021-05-01 23:01:42
 categories:
-- elasticsearch
+- 中间件
+- Elasticsearch
 tags:
-- elasticsearch
+- Elasticsearch
 ---
 
 >  elasticsearch系列（六）：映射

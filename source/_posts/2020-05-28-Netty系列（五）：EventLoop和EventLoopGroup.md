@@ -3,6 +3,7 @@ title: Netty系列（五）：EventLoop和EventLoopGroup
 tags:
   - Netty
 categories:
+  - Java组件
   - Netty
 date: 2020-05-28 17:33:07
 ---

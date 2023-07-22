@@ -3,10 +3,8 @@ title: Java异常处理中throw和throws的区别和用法
 date: 2018-07-10 17:41:56
 categories:
 - Java
-- Java异常
 tags:
 - Java
-- 异常处理
 ---
 
 > 前一篇文章已经详细介绍了 Java 的异常处理机制，在这里做一些补充，探讨异常处理关键字 throw 和 throws 的区别和用法。转载请说明出处。

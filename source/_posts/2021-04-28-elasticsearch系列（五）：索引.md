@@ -2,9 +2,10 @@
 title: elasticsearch系列（五）：索引
 date: 2021-04-28 20:32:06
 categories:
-- elasticsearch
+- 中间件
+- Elasticsearch
 tags:
-- elasticsearch
+- Elasticsearch
 ---
 
 > elasticsearch系列（五）：索引

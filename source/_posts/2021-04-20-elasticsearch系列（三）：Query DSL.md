@@ -2,9 +2,10 @@
 title: elasticsearch系列（三）：Query DSL
 date: 2021-04-20 14:39:25
 categories:
-- elasticsearch
+- 中间件
+- Elasticsearch
 tags:
-- elasticsearch
+- Elasticsearch
 ---
 
 > elasticsearch系列（三）：Query DSL

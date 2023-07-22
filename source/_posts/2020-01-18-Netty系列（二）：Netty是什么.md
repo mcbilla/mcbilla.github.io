@@ -1,10 +1,11 @@
 ---
 title: Netty系列（二）：Netty是什么
+date: 2020-01-18 16:50:22
+categories:
+  - Java组件
+  - Netty
 tags:
   - Netty
-categories:
-  - Netty
-date: 2020-01-18 16:50:22
 ---
 
 

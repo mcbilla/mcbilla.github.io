@@ -2,9 +2,10 @@
 title: elasticsearch系列（四）：聚合
 date: 2021-04-25 20:46:33
 categories:
-- elasticsearch
+- 中间件
+- Elasticsearch
 tags:
-- elasticsearch
+- Elasticsearch
 ---
 
 > elasticsearch系列（四）：聚合

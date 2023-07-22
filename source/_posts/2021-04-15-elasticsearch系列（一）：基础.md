@@ -2,9 +2,10 @@
 title: elasticsearch系列（一）：基础
 date: 2021-04-15 19:02:43
 categories:
-- elasticsearch
+- 中间件
+- Elasticsearch
 tags:
-- elasticsearch
+- Elasticsearch
 ---
 
 > elasticsearch系列（一）：基础

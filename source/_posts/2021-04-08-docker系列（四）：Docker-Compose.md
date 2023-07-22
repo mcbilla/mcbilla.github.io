@@ -2,9 +2,10 @@
 title: docker系列（四）：Docker Compose
 date: 2021-04-08 19:02:24
 categories:
-- docker
+- 中间件
+- Docker
 tags:
-- docker
+- Docker
 ---
 
 > docker系列（四）：Docker Compose

@@ -2,9 +2,10 @@
 title: elasticsearch系列（二）：REST API
 date: 2021-04-17 11:44:55
 categories:
-- elasticsearch
+- 中间件
+- Elasticsearch
 tags:
-- elasticsearch
+- Elasticsearch
 ---
 
 > elasticsearch系列（二）：REST API

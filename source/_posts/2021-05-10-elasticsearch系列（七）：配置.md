@@ -2,9 +2,10 @@
 title: elasticsearch系列（七）：配置
 date: 2021-05-10 00:47:38
 categories:
-- elasticsearch
+- 中间件
+- Elasticsearch
 tags:
-- elasticsearch
+- Elasticsearch
 ---
 
 > elasticsearch系列（七）：配置
