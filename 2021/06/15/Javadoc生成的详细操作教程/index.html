@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="Javadoc文档，转载Javadoc生成的详细操作教程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Javadoc生成的详细操作教程">
+<meta property="og:url" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="Javadoc文档，转载Javadoc生成的详细操作教程">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png.png">
+<meta property="og:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157720.png">
+<meta property="og:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157704.png">
+<meta property="og:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157731.png">
+<meta property="og:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157699.png">
+<meta property="og:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157731-0089117.png">
+<meta property="og:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157666.png">
+<meta property="og:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157689.png">
+<meta property="og:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157723.png">
+<meta property="og:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157719.png">
+<meta property="article:published_time" content="2021-06-15T05:10:08.000Z">
+<meta property="article:modified_time" content="2023-07-23T05:14:45.552Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Javadoc生成的详细操作教程 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Javadoc生成的详细操作教程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-15 13:10:08" itemprop="dateCreated datePublished" datetime="2021-06-15T13:10:08+08:00">2021-06-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-23 13:14:45" itemprop="dateModified" datetime="2023-07-23T13:14:45+08:00">2023-07-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/" class="post-meta-item leancloud_visitors" data-flag-title="Javadoc生成的详细操作教程" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>Javadoc文档，转载<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44170221/article/details/106502037">Javadoc生成的详细操作教程</a></p>
+</blockquote>
+<span id="more"></span>
+
+<h3 id="一、什么是Javadoc文档"><a href="#一、什么是Javadoc文档" class="headerlink" title="一、什么是Javadoc文档"></a>一、什么是Javadoc文档</h3><blockquote>
+<p>javadoc是Sun公司提供的一个技术，它从程序源代码中抽取类、方法、成员等注释形成一个和源代码配套的API帮助文档。也就是说，只要在编写程序时以一套特定的标签作注释，在程序编写完成后，通过Javadoc就可以同时形成程序的开发文档了。</p>
+<p>javadoc命令是用来生成自己API文档的，使用方式：使用命令行在目标文件所在目录输入<code>javadoc +文件名.java</code>。</p>
+</blockquote>
+<h3 id="二、Javadoc文档注释"><a href="#二、Javadoc文档注释" class="headerlink" title="二、Javadoc文档注释"></a>二、Javadoc文档注释</h3><blockquote>
+<p>Java注释分类：</p>
+<ul>
+<li><code>//注释内容</code>：单行注释，不支持换行</li>
+<li><code>/*注释内容*/</code>：多行注释，支持换行</li>
+<li>Javadoc文档注释格式如下，支持换行，可以生成Javadoc文档【重点】</li>
+</ul>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 文档注释</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、常用注释文档标记"><a href="#三、常用注释文档标记" class="headerlink" title="三、常用注释文档标记"></a>三、常用注释文档标记</h3><p><strong>参考官方文档：</strong> <a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/1.5.0/docs/tooldocs/windows/javadoc.html#@serialData">javadoc - The Java API Documentation Generator</a></p>
+<table>
+<thead>
+<tr>
+<th>常用标签</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>@author 作者</td>
+<td>作者标识</td>
+</tr>
+<tr>
+<td>@version 版本号</td>
+<td>版本号</td>
+</tr>
+<tr>
+<td>@param 参数名 描述</td>
+<td>方法的入参名及描述信息，如入参有特别要求，可在此注释。</td>
+</tr>
+<tr>
+<td>@return 描述</td>
+<td>对函数返回值的注释</td>
+</tr>
+<tr>
+<td>@deprecated 过期文本</td>
+<td>标识随着程序版本的提升，当前API已经过期，仅为了保证兼容性依然存在，以此告之开发者不应再用这个API。</td>
+</tr>
+<tr>
+<td>@throws异常类名</td>
+<td>构造函数或方法所会抛出的异常。</td>
+</tr>
+<tr>
+<td>@exception 异常类名</td>
+<td>同@throws。</td>
+</tr>
+<tr>
+<td>@see 引用</td>
+<td>查看相关内容，如类、方法、变量等。</td>
+</tr>
+<tr>
+<td>@since 描述文本</td>
+<td>API在什么程序的什么版本后开发支持。</td>
+</tr>
+<tr>
+<td>{@link包.类#成员 标签}</td>
+<td>链接到某个特定的成员对应的文档中。</td>
+</tr>
+<tr>
+<td>{@value}</td>
+<td>当对常量进行注释时，如果想将其值包含在文档中，则通过该标签来引用常量的值。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>不常用标签</strong></td>
+<td><strong>说明</strong></td>
+</tr>
+<tr>
+<td>@serial</td>
+<td>说明一个序列化属性</td>
+</tr>
+<tr>
+<td>@serialField</td>
+<td>说明一个ObjectStreamField组件</td>
+</tr>
+<tr>
+<td>@serialData</td>
+<td>说明通过writeObject( ) 和 writeExternal( )方法写的数据</td>
+</tr>
+<tr>
+<td>{@docRoot}</td>
+<td>指明当前文档根目录的路径</td>
+</tr>
+<tr>
+<td>{@inheritDoc}</td>
+<td>从直接父类继承的注释</td>
+</tr>
+<tr>
+<td>{@literal}</td>
+<td>显示文本而不将其解释为HTML标记或嵌套的javadoc标记。</td>
+</tr>
+<tr>
+<td>{@code}</td>
+<td>以字体 显示文本，<code>code</code>而不将文本解释为HTML标记或嵌套的Javadoc标记。</td>
+</tr>
+</tbody></table>
+<h3 id="四、Javadoc选项说明"><a href="#四、Javadoc选项说明" class="headerlink" title="四、Javadoc选项说明"></a>四、Javadoc选项说明</h3><blockquote>
+<p><strong>Javadoc命令格式：</strong> javadoc [选项] [软件包名称] [源文件]</p>
+</blockquote>
+<h4 id="4-1-选项说明"><a href="#4-1-选项说明" class="headerlink" title="4.1 选项说明"></a>4.1 选项说明</h4><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-overview</td>
+<td>&lt;文件&gt; 读取 HTML 文件的概述文档</td>
+</tr>
+<tr>
+<td>-public</td>
+<td>仅显示公共类和成员</td>
+</tr>
+<tr>
+<td>-protected</td>
+<td>显示受保护&#x2F;公共类和成员（默认）</td>
+</tr>
+<tr>
+<td>-package</td>
+<td>显示软件包&#x2F;受保护&#x2F;公共类和成员</td>
+</tr>
+<tr>
+<td>-private</td>
+<td>显示所有类和成员</td>
+</tr>
+<tr>
+<td>-help</td>
+<td>显示命令行选项并退出</td>
+</tr>
+<tr>
+<td>-doclet</td>
+<td>&lt;类&gt; 通过替代 doclet 生成输出</td>
+</tr>
+<tr>
+<td>-docletpath</td>
+<td>&lt;路径&gt; 指定查找 doclet 类文件的位置</td>
+</tr>
+<tr>
+<td>-sourcepath</td>
+<td>&lt;路径列表&gt; 指定查找源文件的位置</td>
+</tr>
+<tr>
+<td>-classpath</td>
+<td>&lt;路径列表&gt; 指定查找用户类文件的位置</td>
+</tr>
+<tr>
+<td>-exclude</td>
+<td>&lt;软件包列表&gt; 指定要排除的软件包的列表</td>
+</tr>
+<tr>
+<td>-subpackages</td>
+<td>&lt;子软件包列表&gt; 指定要递归装入的子软件包</td>
+</tr>
+<tr>
+<td>-breakiterator</td>
+<td>使用 BreakIterator 计算第 1 句</td>
+</tr>
+<tr>
+<td>-bootclasspath</td>
+<td>&lt;路径列表&gt; 覆盖引导类加载器所装入的类文件的位置</td>
+</tr>
+<tr>
+<td>-source</td>
+<td>&lt;版本&gt; 提供与指定版本的源兼容性</td>
+</tr>
+<tr>
+<td>-extdirs</td>
+<td>&lt;目录列表&gt; 覆盖安装的扩展目录的位置</td>
+</tr>
+<tr>
+<td>-verbose</td>
+<td>输出有关 Javadoc 正在执行的操作的消息</td>
+</tr>
+<tr>
+<td>-locale</td>
+<td>&lt;名称&gt; 要使用的语言环境，例如 en_US 或 en_US_WIN</td>
+</tr>
+<tr>
+<td>-encoding</td>
+<td>&lt;名称&gt; 源文件编码名称</td>
+</tr>
+<tr>
+<td>-quiet</td>
+<td>不显示状态消息</td>
+</tr>
+<tr>
+<td>-J&lt;标志&gt;</td>
+<td>直接将 &lt;标志&gt; 传递给运行时系统</td>
+</tr>
+<tr>
+<td>-X</td>
+<td>输出非标准选项的提要</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>标准doclet选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-d</td>
+<td><directory>输出文件的目标目录</td>
+</tr>
+<tr>
+<td>-use</td>
+<td>创建类和程序包用法页面</td>
+</tr>
+<tr>
+<td>-version</td>
+<td>包含 @version 段</td>
+</tr>
+<tr>
+<td>-author</td>
+<td>包含 @author 段</td>
+</tr>
+<tr>
+<td>-docfilessubdirs</td>
+<td>递归复制文档文件子目录</td>
+</tr>
+<tr>
+<td>-splitindex</td>
+<td>将索引分为每个字母对应一个文件</td>
+</tr>
+<tr>
+<td>-windowtitle</td>
+<td><text>文档的浏览器窗口标题</td>
+</tr>
+<tr>
+<td>-doctitle</td>
+<td><html-code>包含概览页面的标题</td>
+</tr>
+<tr>
+<td>-header</td>
+<td><html-code>包含每个页面的页眉文本</td>
+</tr>
+<tr>
+<td>-footer</td>
+<td><html-code>包含每个页面的页脚文本</td>
+</tr>
+<tr>
+<td>-top</td>
+<td><html-code>包含每个页面的顶部文本</td>
+</tr>
+<tr>
+<td>-bottom</td>
+<td><html-code>包含每个页面的底部文本</td>
+</tr>
+<tr>
+<td>-link</td>
+<td>创建指向位于 <url> 的 javadoc 输出的链接</td>
+</tr>
+<tr>
+<td>-linkoffline</td>
+<td><url> <url2>利用位于 <url2> 的程序包列表链接至位于 <url> 的文档</td>
+</tr>
+<tr>
+<td>-excludedocfilessubdir</td>
+<td><name1>:… 排除具有给定名称的所有文档文件子目录。</td>
+</tr>
+<tr>
+<td>-group</td>
+<td><name> <p1>:<p2>… 在概览页面中, 将指定的程序包分组</td>
+</tr>
+<tr>
+<td>-nocomment</td>
+<td>不生成说明和标记, 只生成声明。</td>
+</tr>
+<tr>
+<td>-nodeprecated</td>
+<td>不包含 @deprecated 信息</td>
+</tr>
+<tr>
+<td>-noqualifier</td>
+<td><name1>:<name2>:… 输出中不包括指定限定符的列表。</td>
+</tr>
+<tr>
+<td>-nosince</td>
+<td>不包含 @since 信息</td>
+</tr>
+<tr>
+<td>-notimestamp</td>
+<td>不包含隐藏时间戳</td>
+</tr>
+<tr>
+<td>-nodeprecatedlist</td>
+<td>不生成已过时的列表</td>
+</tr>
+<tr>
+<td>-notree</td>
+<td>不生成类分层结构</td>
+</tr>
+<tr>
+<td>-noindex</td>
+<td>不生成索引</td>
+</tr>
+<tr>
+<td>-nohelp</td>
+<td>不生成帮助链接</td>
+</tr>
+<tr>
+<td>-nonavbar</td>
+<td>不生成导航栏</td>
+</tr>
+<tr>
+<td>-serialwarn</td>
+<td>生成有关 @serial 标记的警告</td>
+</tr>
+<tr>
+<td>-tag</td>
+<td><name>:<locations>:<header> 指定单个参数定制标记</td>
+</tr>
+<tr>
+<td>-taglet</td>
+<td>要注册的 Taglet 的全限定名称</td>
+</tr>
+<tr>
+<td>-tagletpath</td>
+<td>Taglet 的路径</td>
+</tr>
+<tr>
+<td>-charset</td>
+<td><charset> 用于跨平台查看生成的文档的字符集。</td>
+</tr>
+<tr>
+<td>-helpfile</td>
+<td><file>包含帮助链接所链接到的文件</td>
+</tr>
+<tr>
+<td>-linksource</td>
+<td>以 HTML 格式生成源文件</td>
+</tr>
+<tr>
+<td>-sourcetab</td>
+<td><tab length>指定源中每个制表符占据的空格数</td>
+</tr>
+<tr>
+<td>-keywords</td>
+<td>使程序包, 类和成员信息附带 HTML 元标记</td>
+</tr>
+<tr>
+<td>-stylesheetfile</td>
+<td><path>用于更改生成文档的样式的文件</td>
+</tr>
+<tr>
+<td>-docencoding</td>
+<td><name>指定输出的字符编码</td>
+</tr>
+</tbody></table>
+<h4 id="4-2-标记的顺序"><a href="#4-2-标记的顺序" class="headerlink" title="4.2 标记的顺序"></a>4.2 标记的顺序</h4><blockquote>
+<ol>
+<li>@author (classes and interfaces only, required)</li>
+<li>@version (classes and interfaces only, required. See footnote 1)</li>
+<li>@param (methods and constructors only)</li>
+<li>@return (methods only)</li>
+<li>@exception (@throws is a synonym added in Javadoc 1.2)</li>
+<li>@see</li>
+<li>@since</li>
+<li>@serial (or @serialField or @serialData)</li>
+<li>@deprecated (see How and When To Deprecate APIs)</li>
+</ol>
+</blockquote>
+<h4 id="4-3-可以多次使用标记"><a href="#4-3-可以多次使用标记" class="headerlink" title="4.3 可以多次使用标记"></a>4.3 可以多次使用标记</h4><blockquote>
+<ol>
+<li>@author 标记应按时间顺序排列，并用逗号分隔。</li>
+<li>@ param 标记应该在参数声明的顺序列出，这使它更容易在视觉上与声明相匹配的列表。</li>
+<li>@throws 标记 (类同 @exception)应按字母顺序列出的例外的名字。</li>
+<li>@see 标记遵循由近到远，参数由少到多，由上到下的顺序。</li>
+</ol>
+</blockquote>
+<h3 id="五、命令生成doc文档"><a href="#五、命令生成doc文档" class="headerlink" title="五、命令生成doc文档"></a>五、命令生成doc文档</h3><h4 id="5-1-测试所在的目录结构"><a href="#5-1-测试所在的目录结构" class="headerlink" title="5.1 测试所在的目录结构"></a>5.1 测试所在的目录结构</h4><p>项目所在目录为：<code>d:\Code\javase\firstdoc</code></p>
+<p>目录结构如下：</p>
+<p><img src="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png.png" alt="image-20200602150018307"></p>
+<p>创建的两个类均有javadoc文档注释如下：</p>
+<p>Calculator：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">package com.mylifes1110.java;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @author Ziph</span><br><span class="line"> * @since 1.8</span><br><span class="line"> * @version 1.0</span><br><span class="line"> */</span><br><span class="line">public class Calculator &#123;</span><br><span class="line">    /**</span><br><span class="line">     * 无参构造器</span><br><span class="line">     */</span><br><span class="line">    public Calculator() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 计算两个数字相加</span><br><span class="line">     * @param num1 整数1</span><br><span class="line">     * @param num2 整数2</span><br><span class="line">     * @return 两个整数之和</span><br><span class="line">     */</span><br><span class="line">    public int add(int num1, int num2) &#123;</span><br><span class="line">        return num1 + num2;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>CalculatorTest：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">package com.mylifes1110.test;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @author Ziph</span><br><span class="line"> * @since 1.8</span><br><span class="line"> * @version 1.0</span><br><span class="line"> */</span><br><span class="line">public class CalculatorTest &#123;</span><br><span class="line">    /**</span><br><span class="line">     * 测试</span><br><span class="line">     */</span><br><span class="line">    public CalculatorTest() &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-2-命令生成Javadoc文档步骤"><a href="#5-2-命令生成Javadoc文档步骤" class="headerlink" title="5.2 命令生成Javadoc文档步骤"></a>5.2 命令生成Javadoc文档步骤</h4><blockquote>
+<p><strong>生成好的Javadoc文档index.html是文档入口，打开后即可看见doc文档内容。</strong></p>
+</blockquote>
+<h5 id="方式一：单个或多个-java文件生成doc文档"><a href="#方式一：单个或多个-java文件生成doc文档" class="headerlink" title="方式一：单个或多个.java文件生成doc文档"></a>方式一：单个或多个.java文件生成doc文档</h5><blockquote>
+<p>这里我们生成Calculator.java的doc文档，首先先进入到Calculator.java所在目录，然后去此文件夹中打开DOS命令窗口，此方式生成的doc文档是默认创建了.java文件所在的包，输入以下命令即可：</p>
+<p><strong>命令格式：</strong> javadoc -d 文档存储目录 -encoding utf-8 -charset utf-8 Xxx.java</p>
+<p><strong>参数说明：</strong></p>
+<ul>
+<li><strong>-d</strong> 指定API文档的输出目录，默认是当前目录。建议总是指定该参数。</li>
+<li><strong>-encoding UTF-8</strong> 表示你的源代码（含有符合 JavaDoc 标准的注释）是基于 UTF-8 编码的，以免处理过程中出现中文等非英语字符乱码</li>
+<li><strong>-charset UTF-8</strong> 表示在处理并生成 JavaDoc 超文本时使用的字符集也是以 UTF-8 为编码，目前所有浏览器都支持 UTF-8，这样最具有通用性，支持中文非常好</li>
+</ul>
+<p><strong>注意：</strong> 如果此文件夹内有多个.java文件需要生成，我们可以在指定.java文件的时候使用<code>*.java</code>。这里utf-8编码相关是指定文档的编码字符集，如果与项目或系统编码不一致可能会造成生成的doc文档乱码。</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javadoc -d d:\Code\javase\firstdoc\doc -encoding utf-8 -charset utf-8 Calculator.java</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157720.png" alt="image-20200602151026465"></p>
+<h5 id="方式二：指定源文件路径生成doc文档"><a href="#方式二：指定源文件路径生成doc文档" class="headerlink" title="方式二：指定源文件路径生成doc文档"></a>方式二：指定源文件路径生成doc文档</h5><blockquote>
+<p>由于方式一每次生成doc文档都需要进入到.java文件所在目录操作，借此我们简化了此操作。使用doc文档选项生成。首先，我们这次只需要进入到项目内的第一层文件夹，在此文件夹中就可以看到src了，然后在此文件夹中打开DOS命令窗口，此方式生成的doc文档可以用doc文档选项来指定源文件所在生成的目录的包，输入以下命令即可：</p>
+<p><strong>命令格式：</strong> javadoc -d 文档存储目录 -encoding utf-8 charset utf-8 -sourcepath 源文件所在目录 -subpackages 需要生成的源文件目录包 -version -author</p>
+<p><strong>参数说明：</strong></p>
+<ul>
+<li><strong>-d</strong> 指定API文档的输出目录，默认是当前目录。建议总是指定该参数。</li>
+<li><strong>-encoding UTF-8</strong> 表示你的源代码（含有符合 JavaDoc 标准的注释）是基于 UTF-8 编码的，以免处理过程中出现中文等非英语字符乱码</li>
+<li><strong>-charset UTF-8</strong> 表示在处理并生成 JavaDoc 超文本时使用的字符集也是以 UTF-8 为编码，目前所有浏览器都支持 UTF-8，这样最具有通用性，支持中文非常好</li>
+<li><strong>-sourcepath</strong> 指定源代码路径，默认是当前目录。 此参数通常是必须的。</li>
+<li><strong>-subpackages</strong> 以递归的方式处理各子包。如果不使用本参数，每次只能处理一个子包（或需手工列出所有子包）。</li>
+<li><strong>-author</strong> 可以将作者信息（@author ***）导出到最终生成的API文档中。</li>
+<li><strong>-version</strong> 可以生成版本信息。</li>
+<li><strong>-windowtitle</strong> 设置API文档的浏览器窗口标题。</li>
+<li><strong>-doctitle</strong> 指定概述页面的标题。</li>
+<li><strong>-header</strong> 指定页面的页眉。</li>
+</ul>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javadoc -d ./doc -encoding utf-8 -charset utf-8 -sourcepath d:\Code\javase\firstdoc\src -subpackages com.mylifes1110.test -version -author</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157704.png" alt="image-20200602153457552"></p>
+<h5 id="查看生成的doc目录"><a href="#查看生成的doc目录" class="headerlink" title="查看生成的doc目录"></a>查看生成的doc目录</h5><p><img src="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157731.png" alt="image-20200602155923047"></p>
+<p><img src="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157699.png" alt="image-20200602160059852"></p>
+<p><img src="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157731-0089117.png" alt="image-20200602160118805"></p>
+<h3 id="六、IDEA生成doc目录"><a href="#六、IDEA生成doc目录" class="headerlink" title="六、IDEA生成doc目录"></a>六、IDEA生成doc目录</h3><ol>
+<li>首先，打开IDEA，并找到<code>Tools -&gt; Generate JavaDoc...</code></li>
+</ol>
+<p><img src="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157666.png" alt="image-20200602160803209"></p>
+<ol start="2">
+<li>生成Doc文档中的选项操作</li>
+</ol>
+<blockquote>
+<p><strong>Loacle：</strong> 这是一个可选项，表示的是需要生成的 JavaDoc 以何种语言版本展示，根据 javadoc.exe 的帮助说明，这其实对应的就是 javadoc.exe 的 -locale 参数，如果不填，默认可能是英文或者是当前操作系统的语言。但是我们也可以填<code>zh_CN</code>。</p>
+</blockquote>
+<p><img src="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157689.png" alt="image-20200602161559282"></p>
+<ol start="3">
+<li>IDEA生成Doc文档过程</li>
+</ol>
+<p><img src="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157723.png" alt="image-20200602161802054"></p>
+<ol start="4">
+<li>查看生成后的Doc文档</li>
+</ol>
+<p><img src="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/format,png-20230723131157719.png" alt="image-20200602161835634">  </p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/10/Jackson%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/" rel="prev" title="Jackson使用详解">
+      <i class="fa fa-chevron-left"></i> Jackson使用详解
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BB%80%E4%B9%88%E6%98%AFJavadoc%E6%96%87%E6%A1%A3"><span class="nav-number">1.</span> <span class="nav-text">一、什么是Javadoc文档</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81Javadoc%E6%96%87%E6%A1%A3%E6%B3%A8%E9%87%8A"><span class="nav-number">2.</span> <span class="nav-text">二、Javadoc文档注释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%B8%B8%E7%94%A8%E6%B3%A8%E9%87%8A%E6%96%87%E6%A1%A3%E6%A0%87%E8%AE%B0"><span class="nav-number">3.</span> <span class="nav-text">三、常用注释文档标记</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81Javadoc%E9%80%89%E9%A1%B9%E8%AF%B4%E6%98%8E"><span class="nav-number">4.</span> <span class="nav-text">四、Javadoc选项说明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-%E9%80%89%E9%A1%B9%E8%AF%B4%E6%98%8E"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 选项说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-%E6%A0%87%E8%AE%B0%E7%9A%84%E9%A1%BA%E5%BA%8F"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 标记的顺序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-%E5%8F%AF%E4%BB%A5%E5%A4%9A%E6%AC%A1%E4%BD%BF%E7%94%A8%E6%A0%87%E8%AE%B0"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 可以多次使用标记</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%91%BD%E4%BB%A4%E7%94%9F%E6%88%90doc%E6%96%87%E6%A1%A3"><span class="nav-number">5.</span> <span class="nav-text">五、命令生成doc文档</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-1-%E6%B5%8B%E8%AF%95%E6%89%80%E5%9C%A8%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 测试所在的目录结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-%E5%91%BD%E4%BB%A4%E7%94%9F%E6%88%90Javadoc%E6%96%87%E6%A1%A3%E6%AD%A5%E9%AA%A4"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 命令生成Javadoc文档步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%80%EF%BC%9A%E5%8D%95%E4%B8%AA%E6%88%96%E5%A4%9A%E4%B8%AA-java%E6%96%87%E4%BB%B6%E7%94%9F%E6%88%90doc%E6%96%87%E6%A1%A3"><span class="nav-number">5.2.1.</span> <span class="nav-text">方式一：单个或多个.java文件生成doc文档</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%BA%8C%EF%BC%9A%E6%8C%87%E5%AE%9A%E6%BA%90%E6%96%87%E4%BB%B6%E8%B7%AF%E5%BE%84%E7%94%9F%E6%88%90doc%E6%96%87%E6%A1%A3"><span class="nav-number">5.2.2.</span> <span class="nav-text">方式二：指定源文件路径生成doc文档</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E7%94%9F%E6%88%90%E7%9A%84doc%E7%9B%AE%E5%BD%95"><span class="nav-number">5.2.3.</span> <span class="nav-text">查看生成的doc目录</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81IDEA%E7%94%9F%E6%88%90doc%E7%9B%AE%E5%BD%95"><span class="nav-number">6.</span> <span class="nav-text">六、IDEA生成doc目录</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">56</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
