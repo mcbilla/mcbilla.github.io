@@ -12,45 +12,49 @@ tags:
 
 <!--more-->
 
-## 一、Docker Compose 基础
+## 一、Docker Compose是什么
 
-### Docker Compose是什么
-Docker Compose 是单个宿主机上快速编排多个容器的工具。使用 Docker Compose 不再需要使用 shell 脚本来启动容器。 
+前面我们学习过 `Dockerfile`  模板文件，可以让用户很方便的定义一个单独的应用容器。然而，在日常工作中，经常会碰到需要多个容器相互配合来完成某项任务的情况。例如要实现一个 Web 项目，除了 Web 服务容器本身，往往还需要再加上后端的数据库服务容器，甚至还包括负载均衡容器等。这个问题在早期的 Docker 部署时期只能通过 Shell 脚本 + Crontab 计划任务来完成，不但操作复杂，稳定性也没有保障。
 
-Compose 通过一个配置文件来管理多个 Docker 容器，在配置文件中，所有的容器通过 services 来定义，然后使用 docker-compose 脚本来启动，停止和重启应用，和应用中的服务以及所有依赖服务的容器，非常适合组合使用多个容器进行开发的场景。
-
-使用 Docker Compose 的步骤如下：
-
-* 新建空目录作为 Docker Compose 的根目录。
-* 定义容器资源，新建 `Dockerfile` 文件定义容器启动需要的资源，并把容器需要的所有资源移动到根目录下。
-* 编排服务，新建 `docker-compose.yml` 配置文件，编排服务启动顺序和依赖关系。
-* 在根目录下执行 `docker-compose up` 启动所有容器。
-
-`docker-compose.yml` 典型示例如下：
+`Docker Compose` 刚好可以满足这样的场景。Docker Compose 是单个宿主机上快速编排多个容器的工具，通过一个单独的 `docker-compose.yml` 模板文件（YAML 格式）来定义一组相关联的应用容器为一个项目（project），支持容器的自动启动、自动部署、热更新、热升级等功能，非常适合组合使用多个容器进行开发的场景。`docker-compose.yml` 示例如下：
 
 ```
-# yaml 配置实例
+# 版本
 version: '3'
+
+# 定义服务
 services:
   web:
     build: .
     ports:
-   - "5000:5000"
-    volumes:
-   - .:/code
-    - logvolume01:/var/log
-    links:
-   - redis
+   	- "5000:5000"
+
   redis:
     image: redis
-volumes:
-  logvolume01: {}
 ```
 
-### Docker Compose安装
-安装可能需要 root 权限。
+这个 `docker-compose.yml` 文件定义了 web 和 redis 两个服务。
+
+## 二、Docker Compose使用
+
+### 1、安装
+
+`Compose` 支持 Linux、macOS、Windows 10 三大平台。
+
+`Compose` 可以通过 Python 的包管理工具 `pip` 进行安装，也可以直接下载编译好的二进制文件使用，甚至能够直接在 Docker 容器中运行。
+
+`Docker Desktop for Mac/Windows` 自带 `docker-compose` 二进制文件，安装 Docker 之后可以直接使用。
+
+Linux 系统请使用以下介绍的方法安装。
+
 ```
-$ sudo pip install -U docker-compose
+$ sudo curl -L https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+
+# 国内用户可以使用以下方式加快下载
+$ sudo curl -L https://download.fastgit.org/docker/compose/releases/download/v2.17.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+
+# 将可执行权限应用于二进制文件：
+$ sudo chmod +x /usr/local/bin/docker-compose
 ```
 
 查看是否安装成功
@@ -59,7 +63,20 @@ $ sudo pip install -U docker-compose
 $ docker-compose --version
 ```
 
-## 二、 Docker Compose 配置文件
+### 2、编写配置文件
+
+* 新建空目录作为 Docker Compose 的根目录。
+* 新建 `docker-compose.yml` 配置文件，编排服务启动顺序和依赖关系。并把容器需要的所有资源移动到根目录下。
+
+### 3、启动
+
+在 Docker Compose 根目录下执行明亮启动所有容器。
+
+```
+$ docker-compose up
+```
+
+## 三、 Docker Compose 配置文件详解
 Docker Compose 使用 YAML 文件来定义多服务的应用。文件可以命名为：
 
 * `compose.yaml`（官方推荐）
@@ -529,7 +546,7 @@ options说明
 ```
 $ docker-compose up [options] [SERVICE...]
 ```
-options说明：
+该命令十分强大，它将尝试自动完成包括构建镜像，（重新）创建服务，启动服务，并关联服务相关容器的一系列操作。链接的服务都将会被自动启动，除非已经处于运行状态。可以说，大部分时候都可以直接通过该命令来启动一个项目。options说明：
 * -d 在后台运行服务容器。
 * --no-color 不使用颜色来区分不同的服务的控制台输出。
 * --no-deps 不启动服务所链接的容器。
@@ -538,13 +555,23 @@ options说明：
 * --no-build 不自动构建缺失的服务镜像。
 * -t, --timeout TIMEOUT 停止容器时候的超时（默认为 10 秒）。
 
-该命令十分强大，它将尝试自动完成包括构建镜像，（重新）创建服务，启动服务，并关联服务相关容器的一系列操作。链接的服务都将会被自动启动，除非已经处于运行状态。可以说，大部分时候都可以直接通过该命令来启动一个项目。
+默认情况，启动的容器都在前台，控制台将会同时打印所有容器的输出信息，可以很方便进行调试。当通过 Ctrl-C 停止命令时，所有容器将会停止。一般推荐生产环境下使用后台运行，使用下面命令。
 
-常用的有两种格式：
-* `docker-compose up`：默认情况，启动的容器都在前台，控制台将会同时打印所有容器的输出信息，可以很方便进行调试。当通过 Ctrl-C 停止命令时，所有容器将会停止。
-* `docker-compose up -d`，后台启动并运行所有的容器。一般推荐生产环境下使用该选项。
+```
+docker-compose up -d
+```
 
-默认情况，如果服务容器已经存在，docker-compose up 将会尝试停止容器，然后重新创建（保持使用 volumes-from 挂载的卷），以保证新启动的服务匹配 docker-compose.yml 文件的最新内容。如果用户不希望容器被停止并重新创建，可以使用 docker-compose up --no-recreate。这样将只会启动处于停止状态的容器，而忽略已经运行的服务。如果用户只想重新部署某个服务，可以使用 docker-compose up --no-deps -d <SERVICE_NAME> 来重新创建服务并后台停止旧服务，启动新服务，并不会影响到其所依赖的服务。
+默认情况，如果服务容器已经存在，docker-compose up 将会尝试停止容器，然后重新创建（保持使用 volumes-from 挂载的卷），以保证新启动的服务匹配 docker-compose.yml 文件的最新内容。如果用户不希望容器被停止并重新创建，可以使用下面命令。这样将只会启动处于停止状态的容器，而忽略已经运行的服务。
+
+```
+docker-compose up --no-recreate
+```
+
+如果用户只想重新部署某个服务，可以使用下面命令来重新创建服务并后台停止旧服务，启动新服务，并不会影响到其所依赖的服务。
+
+```
+docker-compose up --no-deps -d <SERVICE_NAME>
+```
 
 ### 列出所有服务
 ```
