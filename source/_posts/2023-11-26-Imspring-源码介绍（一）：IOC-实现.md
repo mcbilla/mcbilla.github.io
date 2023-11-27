@@ -39,17 +39,13 @@ Imspring-core 模块围绕 ApplicationContext 和 Beanfactory 两个 Bean 工厂
 
 ### BeanPostProcessor 和 BeanFactoryPostProcessor
 
-# 项目介绍
+### Environment、Profile 和 PropertyResolver
 
-## 项目结构
+# 代码分析
 
 ![image-20231127202003918](2023-11-26-Imspring-源码介绍（一）：IOC-实现/image-20231127202003918.png)
 
 整个项目结构如上所示：
-
-
-
-# 代码分析
 
 ## 1、资源扫描
 
