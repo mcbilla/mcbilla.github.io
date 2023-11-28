@@ -90,7 +90,26 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 
 ### Bean 生命周期
 
-### Resource
+![image-20231128190205771](image-20231128190205771.png)
+
+**Bean 的生命周期是指一个对象在 Spring 容器里面从创建到被销毁的整个过程**。这里引用一个网上非常经典的图，这个图基本涵盖了 Bean 从初始化到被销毁的整个生命周期。为了方便记忆，可以分为四个阶段：
+
+1. 实例化（Instantiation）
+2. 属性赋值（Populate）
+3. 初始化（Initialization）
+4. 销毁（Destruction）
+
+![image-20231128190523202](image-20231128190523202.png)
+
+Imspring 项目严格遵循以上 Bean 生命周期的顺序，最后为了简化跳过了销毁阶段。
+
+### Resource 和 ResourceLoader
+
+Spring 用 Resource 接口抽象所有的底层资源，包括File、ClassPath、URL等。
+
+ResourceLoader 接口 是Resource 的加载器。
+
+Spring 通过 Resource 和 ResourceLoader 对外提供统一的资源访问方式。
 
 ### BeanDefinition
 
@@ -102,7 +121,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 
 # 代码分析
 
-![image-20231127202003918](2023-11-26-Imspring-源码介绍（一）：IOC-实现/image-20231127202003918.png)
+<img src="image-20231127202003918.png" width="60%" height="60%">
 
 整个项目结构如上所示：
 
