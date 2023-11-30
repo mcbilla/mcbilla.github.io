@@ -90,11 +90,106 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 
 ### Bean 生命周期
 
-### Resource
+![image-20231128190205771](image-20231128190205771.png)
 
-### BeanDefinition
+**Bean 的生命周期是指一个对象在 Spring 容器里面从创建到被销毁的整个过程**。这里引用一个网上非常经典的图，这个图基本涵盖了 Bean 从初始化到被销毁的整个生命周期。为了方便记忆，可以分为四个阶段：
+
+1. 实例化（Instantiation）
+2. 属性赋值（Populate）
+3. 初始化（Initialization）
+4. 销毁（Destruction）
+
+![image-20231128190523202](image-20231128190523202.png)
+
+Imspring 项目严格遵循以上 Bean 生命周期的顺序，最后为了简化跳过了销毁阶段。
+
+### Resource 和 ResourceLoader
+
+Spring 用 Resource 接口抽象所有的底层资源，包括 File、ClassPath、URL 等。Spring 通过 Resource 接口将对物理资源的访问方式统一为  URL 格式和 Ant 风格带通配符的资源地址。
+
+```java
+public interface Resource extends InputStreamSource {
+	// 判断某个资源是否以物理形式存在
+	boolean exists();
+	
+	// 获取资源对象的URL，不能表示为URL就抛异常
+	URL getURL() throws IOException;
+	
+	// 获取资源的File表示对象，不能表示为File就抛异常
+	File getFile() throws IOException;
+	......
+}
+```
+
+Spring 提供多种 Resource 的实现类，我们可以直接使用。常用的有：
+
+* `FileSystemResource`：针对 java.io.File 的 Resource 实现类。可以消除操作系统底层差异，对不同的操作系统使用同一的 API 来访问。
+* `ClassPathResource`：访问类加载路径下的资源，对于 WEB 应用可以自动搜索位于 WEB-INF/classes 下的资源文件，是 Spring 中是非常常用的一种资源类型。
+* `UrlResource`：java.net.URL 的 Resource 实现类。可以访问网络资源，也可以访问本地资源。支持 http、https、file、ftp、jar 等协议。
+
+ResourceLoader 接口是 Resource 的加载器，用于快速加载一个 Resource 资源对象。Spring 中的默认实现是 `DefaultResourceLoader`。
+
+```java
+public interface ResourceLoader {
+ 	// 根据路径信息返回一个对应的 Resource 资源实例
+    Resource getResource(String location);
+ 
+ 	// 返回该 ResourceLoader 所使用的 ClassLoader
+    @Nullable
+    ClassLoader getClassLoader();
+}
+```
+
+**简单来说，Spring 通过 Resource 和 ResourceLoader 对外提供统一的资源访问方式**。
+
+### BeanDefinition 和 BeanDefinitionRegistry
+
+BeanDefinition 是用来描述 Bean 的元数据信息。除了我们熟悉的 Bean 的 Class 对象之外，还保存了 bean是否是单例、bean是否在容器中是懒加载、bean在容器中的名字等信息。Spring 依赖这些信息来完成一个 Bean 的实例化。
+
+**简单来说，Spring 将 Bean 的定义和 Bean 的实例分开处理。首先将类文件 Class 解析为 BeanDefinition，然后再根据 BeanDefinition 的定义，在合适的时机（例如延迟创建）创建正确类型的 Bean 实例（单例或原型）。**这个 Bean 实例就是我们日常使用的 Bean。
+
+BeanDefinitionRegistry 可以理解为 BeanDefinition 的容器接口，完成 BeanDefinition 的注册、移除和删除等功能。Spring 的 BeanFactory 默认实现类 `DefaultListableBeanFactory` 实现了 BeanDefinitionRegistry 接口，使用 `beanDefinitionMap` 集合来存放所有的 BeanDefinition。
+
+> Spring 中命名为 `XXXRegistry` 的接口或者类，在 `Spring` 中通常扮演注册中心的职责，维护管理对应的一组实例。
+
+```java
+public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
+		implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
+		
+	// beanDefinitionMap 存放所有 Bean 的元数据信息
+	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
+}
+```
 
 ### SingletonBeanRegistry
+
+上面谈到 Spring 中 Bean 的定义和 Bean 的实例是分开处理。我们日常使用 Spring 的时候，99% 的场景都是使用 Spring Bean 的单例实例。SingletonBeanRegistry 相当于 Bean 单例实例的容器接口，提供了统一访问单例 Bean 的功能。
+
+Spring 中 SingletonBeanRegistry 的 默认实现类是 `DefaultSingletonBeanRegistry`。这个类非常非常的重要，可以认为是 Spring IOC 容器的核心内容，大名鼎鼎的三级缓存就放在这里面。除此之外还有非常多的缓存用于提高性能，并且做的事情也很多，比如解决 Bean 的循环依赖问题。
+
+```java
+public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
+	......
+    // 一级缓存，存放完全初始化好的 bean，从该缓存中取出的 bean 可以直接使用，我们日常使用的 Bean 就是从这里面取
+    private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
+
+    // 二级缓存，提前曝光的单例对象的cache，存放原始的 bean 对象（尚未填充属性），用于解决循环依赖
+    private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
+
+    // 三级缓存，存放 bean 工厂对象，这个对象其实是一个函数式接口，用来解决 AOP 的循环依赖
+    private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
+    ......
+    
+    // 注册单例对象
+    public void registerSingleton(String beanName, Object singletonObject) {...}
+    
+    // 获取单例对象，使用三级缓存解决循环依赖的核心
+    public Object getSingleton(String beanName, boolean allowEarlyReference) {...}
+    ......
+}
+```
+
+
 
 ### BeanPostProcessor 和 BeanFactoryPostProcessor
 
@@ -102,7 +197,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 
 # 代码分析
 
-![image-20231127202003918](2023-11-26-Imspring-源码介绍（一）：IOC-实现/image-20231127202003918.png)
+<img src="image-20231127202003918.png" width="60%" height="60%">
 
 整个项目结构如上所示：
 
