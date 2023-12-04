@@ -54,7 +54,67 @@ imspring-aop 的作用是为满足条件的 Bean 创建一个代理对象，本�
 
 ### Advice
 
+**Advice 表示对 Joinpoint 执行的某些操作**。
+
+为了更好地理解这两个概念，我再举一个例子：当我们对用户进行新增操作前，需要进行权限校验。其中，调用 user.save() 的动作就是一个的 Joinpoint，权限校验就是一个 Advice，即对 Joinpoint（新增用户的动作）做 Advice（权限校验）。
+
+**在 spring-aop 中，Joinpoint 对象持有了一条 Advice chain ，调用 Joinpoint 的 proceed() 方法将采用责任链的形式依次执行各个 Advice**（注意，Advice 的执行可以互相嵌套，不是单纯的先后顺序）。
+
+JDK 动态代理使用的 InvocationHandler、cglib 使用的 MethodInterceptor，在抽象概念上可以算是 Advice（即使它们没有继承Advice）。但是它们没有所谓的 Advice chain，一个 Joinpoint 一般只能分配一个 Advice，当需要使用多个 Advice 时，需要像套娃一样层层代理。
+
+在 spring-aop 中，主要使用 Advice 的子接口——MethodInterceptor。
+
 ## 其他的几个概念
+
+在 spring-aop 中，还会使用到其他的概念，例如 Advice Filter、Advisor、Pointcut、Aspect 等。
+
+### Advice Filter
+
+**Advice Filter 一般和 Advice 绑定，它用来告诉我们，Advice 是否作用于指定的 Joinpoint**，如果 true，则将 Advice 加入到当前 Joinpoint 的 Advice chain，如果为 false，则不加入。
+
+在 spring-aop 中，常用的 Advice Filter 包括 ClassFilter 和 MethodMatcher，前者过滤的是类，后者过滤的是方法。
+
+### Pointcut
+
+**Pointcut是 AspectJ 的组件，它是一种 Advice Filter**。
+
+在 spring-aop 中，Pointcut = ClassFilter + MethodMatcher 。
+
+### Advisor
+
+Advisor是 spring-aop 原创的组件，**一个 Advisor = 一个 Advice Filter + 一个 Advice**。
+
+在 spring-aop 中，主要有两种 Advisor：IntroductionAdvisor 和 PointcutAdvisor。前者为 ClassFilter + Advice，后者为 Pointcut + Advice。
+
+### Aspect
+
+Aspect 也是 AspectJ 的组件，一组同类的 PointcutAdvisor 的集合就是一个 Aspect。
+
+## 示例
+
+在下面代码中，`printRequest` 和 `printResponse` 都是 Advice，`genericPointCut` 是 Pointcut，`printRequest + genericPointCut` 是 PointcutAdvisor，`UserServiceAspect` 是 Aspect。
+
+```java
+@Aspect
+public class UserServiceAspect {
+        
+    @Pointcut("execution(* cn.zzs.spring.UserService+.*(..)))")
+    public void genericPointCut() {
+    }
+    
+    @Before(value = "genericPointCut()")
+    public void printRequest(JoinPoint joinPoint) throws InterruptedException {
+        //······
+    }  
+    
+    @After(value = "genericPointCut()")
+    public void printResponse(JoinPoint joinPoint) throws InterruptedException {
+        //······;
+    }  
+}
+```
+
+
 
 # 项目结构
 
