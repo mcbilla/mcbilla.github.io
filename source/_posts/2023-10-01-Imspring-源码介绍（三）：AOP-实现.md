@@ -17,7 +17,7 @@ imspring-aop 的作用是为满足条件的 Bean 创建一个代理对象，本�
 
 说到 spring-aop，我们经常会提到 **Joinpoint**、**Advice**、**Pointcut**、**Aspect**、**Advisor** 等等概念，它们都是抽象出来的标准，有的来自 aopalliance，有的来自 AspectJ，也有的是 spring-aop 原创。这些概念构成 spring-aop 设计图的基础。理解它们非常难，一个原因是网上能讲清楚的不多，第二个原因是这些组件本身抽象得不够直观（spring 官网承认了这一点）。
 
-## 对Joinpoint做Advice
+## 对 Joinpoint 做 Advice
 
 在 spring-aop 的包中内嵌了 aopalliance 的包（aopalliance 就是一个制定 AOP 标准的联盟、组织），这个包是 AOP 联盟提供的一套标准，提供了 AOP 一些通用的组件。完整的 aopalliance 包，除了 aop 和 intercept，还包括了 instrument 和 reflect，后面这两个部分 spring-aop 没有引入，这里就不说了。aop 和 intercept 的包结构大致如下。
 
@@ -114,18 +114,8 @@ public class UserServiceAspect {
 }
 ```
 
-
-
-# 项目结构
-
-<img src="image-20231204163001538.png" width="60%" height="60%">
-
 # 整体流程
 
+![AOP流程.drawio](AOP流程.drawio.png)
 
-
-# 代码分析
-
-
-
-# 总结
+AOP 的整体流程图如上所示，可以看到 AOP 的入口是 AnnotationAwareAspectJAutoProxyCreator。**这个类实现了 InstantiationAwareBeanPostProcessor，因此也间接实现了 BeanPostProcessor，在前置处理器里面查找所有切面和对应的增强通知，在后置处理器里面是否有适用于当前 bean 的通知并创建代理对象，这就是 AOP 的原理**。
