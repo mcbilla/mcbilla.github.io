@@ -116,6 +116,13 @@ public class UserServiceAspect {
 
 # 整体流程
 
-![AOP流程.drawio](AOP流程.drawio.png)
+![AOP流程图.png](AOP流程图.png)
 
-AOP 的整体流程图如上所示，可以看到 AOP 的入口是 AnnotationAwareAspectJAutoProxyCreator。**这个类实现了 InstantiationAwareBeanPostProcessor，因此也间接实现了 BeanPostProcessor，在前置处理器里面查找所有切面和对应的增强通知，在后置处理器里面是否有适用于当前 bean 的通知并创建代理对象，这就是 AOP 的原理**。
+Imspring-aop 实现 AOP 的整体流程图如上所示，这个流程和 Spring 实现 AOP 的流程基本是一致的。我们只需要关注几个核心类来理解整个流程。
+
+* **AnnotationAwareAspectJAutoProxyCreator**。这个类实现了 `InstantiationAwareBeanPostProcessor` 接口，因此也间接实现了 `BeanPostProcessor `接口。在 Instantiation 前置处理器里面查找所有切面和对应的增强通知，在 Initialization 后置处理器里面是否有适用于当前 bean 的通知并创建代理对象，这就是 AOP 的原理。
+* **AbstractAspectJAdvice**：Advice 抽象类，实现了 Advice 的子接口 `MethodInterceptor`，本质上是一个拦截器，子类实现是我们常说的 `BeforeAdvice`、`AfterAdvice` 等。
+* **AspectJExpressionPointcutAdvisor**：Advisor 实现类。AspectJExpressionPointcutAdvisor = 上面的xxxAdvice + AspectJExpressionPointcut。
+* **AspectJExpressionPointcut**：Pointcut 实现类。
+* **ReflectiveMethodInvocation**：可以理解为 Joinpoint + Advisor List。Joinpoint 简单来说就是哪个地方需要被增强。ReflectiveMethodInvocation 里面保存了原始的 Bean 实例和要被增强的 Method，这两个加起来就是一个 Joinpoint。
+* **ProxyFactory**：用来创建 AOP 代理对象的工厂类，自动选择 JDK 代理或者 CGLIB 代理。
