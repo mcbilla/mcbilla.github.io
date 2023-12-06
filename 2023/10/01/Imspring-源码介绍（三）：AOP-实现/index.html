@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="Imspring 源码介绍（三）：AOP 实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Imspring 源码介绍（三）：AOP 实现">
+<meta property="og:url" content="http://yoursite.com/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="Imspring 源码介绍（三）：AOP 实现">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/image-20231204180055949.png">
+<meta property="og:image" content="http://yoursite.com/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/AOP%E6%B5%81%E7%A8%8B.drawio.png">
+<meta property="article:published_time" content="2023-10-01T12:42:27.000Z">
+<meta property="article:modified_time" content="2023-12-05T03:45:31.000Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/image-20231204180055949.png">
+
+<link rel="canonical" href="http://yoursite.com/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Imspring 源码介绍（三）：AOP 实现 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Imspring 源码介绍（三）：AOP 实现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-01 20:42:27" itemprop="dateCreated datePublished" datetime="2023-10-01T20:42:27+08:00">2023-10-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-12-05 11:45:31" itemprop="dateModified" datetime="2023-12-05T11:45:31+08:00">2023-12-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/" class="post-meta-item leancloud_visitors" data-flag-title="Imspring 源码介绍（三）：AOP 实现" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>Imspring 源码介绍（三）：AOP 实现</p>
+</blockquote>
+<span id="more"></span>
+
+<p>imspring-aop 的作用是为满足条件的 Bean 创建一个代理对象，本质是通过 BeanPostProcessor 来实现，如果不理解原理可以参考上一篇文章 <a href="">Imspring 源码介绍（二）：IOC 实现</a>。在介绍 imspring-aop 之前先介绍一下 AOP 涉及的一些概念。</p>
+<h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><p>说到 spring-aop，我们经常会提到 <strong>Joinpoint</strong>、<strong>Advice</strong>、<strong>Pointcut</strong>、<strong>Aspect</strong>、<strong>Advisor</strong> 等等概念，它们都是抽象出来的标准，有的来自 aopalliance，有的来自 AspectJ，也有的是 spring-aop 原创。这些概念构成 spring-aop 设计图的基础。理解它们非常难，一个原因是网上能讲清楚的不多，第二个原因是这些组件本身抽象得不够直观（spring 官网承认了这一点）。</p>
+<h2 id="对-Joinpoint-做-Advice"><a href="#对-Joinpoint-做-Advice" class="headerlink" title="对 Joinpoint 做 Advice"></a>对 Joinpoint 做 Advice</h2><p>在 spring-aop 的包中内嵌了 aopalliance 的包（aopalliance 就是一个制定 AOP 标准的联盟、组织），这个包是 AOP 联盟提供的一套标准，提供了 AOP 一些通用的组件。完整的 aopalliance 包，除了 aop 和 intercept，还包括了 instrument 和 reflect，后面这两个部分 spring-aop 没有引入，这里就不说了。aop 和 intercept 的包结构大致如下。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">└─org</span><br><span class="line">    └─aopalliance</span><br><span class="line">        ├─aop</span><br><span class="line">        │      Advice.class</span><br><span class="line">        │      AspectException.class</span><br><span class="line">        │</span><br><span class="line">        └─intercept</span><br><span class="line">                ConstructorInterceptor.class</span><br><span class="line">                ConstructorInvocation.class</span><br><span class="line">                Interceptor.class</span><br><span class="line">                Invocation.class</span><br><span class="line">                Joinpoint.class</span><br><span class="line">                MethodInterceptor.class</span><br><span class="line">                MethodInvocation.class</span><br></pre></td></tr></table></figure>
+
+<p>使用 UML 表示以上类的关系如下所示。可以看到，这主要包含两个部分：<strong>Joinpoint <strong>和 <strong>Advice</strong>（</strong>这是 AOP 最核心的两个概念</strong>）。</p>
+<p><img src="/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/image-20231204180055949.png" alt="image-20231204180055949"></p>
+<h3 id="Joinpoint"><a href="#Joinpoint" class="headerlink" title="Joinpoint"></a>Joinpoint</h3><p><strong>Joinpoint 表示对某个方法（构造方法或成员方法）或属性的调用</strong>。</p>
+<p>例如，我调用了 user.save() 方法，这个调用动作就属于一个 Joinpoint。Joinpoint 是一个“动态”的概念，Field、Method、Constructor 等对象是它的静态部分。</p>
+<p>如上图所示，<strong>Joinpoint 是 Advice 操作的对象</strong>。</p>
+<p>在 spring-aop 中，主要使用 Joinpoint 的子接口——MethodInvocation。</p>
+<h3 id="Advice"><a href="#Advice" class="headerlink" title="Advice"></a>Advice</h3><p><strong>Advice 表示对 Joinpoint 执行的某些操作</strong>。</p>
+<p>为了更好地理解这两个概念，我再举一个例子：当我们对用户进行新增操作前，需要进行权限校验。其中，调用 user.save() 的动作就是一个的 Joinpoint，权限校验就是一个 Advice，即对 Joinpoint（新增用户的动作）做 Advice（权限校验）。</p>
+<p><strong>在 spring-aop 中，Joinpoint 对象持有了一条 Advice chain ，调用 Joinpoint 的 proceed() 方法将采用责任链的形式依次执行各个 Advice</strong>（注意，Advice 的执行可以互相嵌套，不是单纯的先后顺序）。</p>
+<p>JDK 动态代理使用的 InvocationHandler、cglib 使用的 MethodInterceptor，在抽象概念上可以算是 Advice（即使它们没有继承Advice）。但是它们没有所谓的 Advice chain，一个 Joinpoint 一般只能分配一个 Advice，当需要使用多个 Advice 时，需要像套娃一样层层代理。</p>
+<p>在 spring-aop 中，主要使用 Advice 的子接口——MethodInterceptor。</p>
+<h2 id="其他的几个概念"><a href="#其他的几个概念" class="headerlink" title="其他的几个概念"></a>其他的几个概念</h2><p>在 spring-aop 中，还会使用到其他的概念，例如 Advice Filter、Advisor、Pointcut、Aspect 等。</p>
+<h3 id="Advice-Filter"><a href="#Advice-Filter" class="headerlink" title="Advice Filter"></a>Advice Filter</h3><p><strong>Advice Filter 一般和 Advice 绑定，它用来告诉我们，Advice 是否作用于指定的 Joinpoint</strong>，如果 true，则将 Advice 加入到当前 Joinpoint 的 Advice chain，如果为 false，则不加入。</p>
+<p>在 spring-aop 中，常用的 Advice Filter 包括 ClassFilter 和 MethodMatcher，前者过滤的是类，后者过滤的是方法。</p>
+<h3 id="Pointcut"><a href="#Pointcut" class="headerlink" title="Pointcut"></a>Pointcut</h3><p><strong>Pointcut是 AspectJ 的组件，它是一种 Advice Filter</strong>。</p>
+<p>在 spring-aop 中，Pointcut &#x3D; ClassFilter + MethodMatcher 。</p>
+<h3 id="Advisor"><a href="#Advisor" class="headerlink" title="Advisor"></a>Advisor</h3><p>Advisor是 spring-aop 原创的组件，<strong>一个 Advisor &#x3D; 一个 Advice Filter + 一个 Advice</strong>。</p>
+<p>在 spring-aop 中，主要有两种 Advisor：IntroductionAdvisor 和 PointcutAdvisor。前者为 ClassFilter + Advice，后者为 Pointcut + Advice。</p>
+<h3 id="Aspect"><a href="#Aspect" class="headerlink" title="Aspect"></a>Aspect</h3><p>Aspect 也是 AspectJ 的组件，一组同类的 PointcutAdvisor 的集合就是一个 Aspect。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>在下面代码中，<code>printRequest</code> 和 <code>printResponse</code> 都是 Advice，<code>genericPointCut</code> 是 Pointcut，<code>printRequest + genericPointCut</code> 是 PointcutAdvisor，<code>UserServiceAspect</code> 是 Aspect。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserServiceAspect</span> &#123;</span><br><span class="line">        </span><br><span class="line">    <span class="meta">@Pointcut(&quot;execution(* cn.zzs.spring.UserService+.*(..)))</span><span class="string">&quot;)</span></span><br><span class="line"><span class="string">    public void genericPointCut() &#123;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    @Before(value = &quot;</span>genericPointCut()<span class="string">&quot;)</span></span><br><span class="line"><span class="string">    public void printRequest(JoinPoint joinPoint) throws InterruptedException &#123;</span></span><br><span class="line"><span class="string">        //······</span></span><br><span class="line"><span class="string">    &#125;  </span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    @After(value = &quot;</span>genericPointCut()<span class="string">&quot;)</span></span><br><span class="line"><span class="string">    public void printResponse(JoinPoint joinPoint) throws InterruptedException &#123;</span></span><br><span class="line"><span class="string">        //······;</span></span><br><span class="line"><span class="string">    &#125;  </span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="整体流程"><a href="#整体流程" class="headerlink" title="整体流程"></a>整体流程</h1><p><img src="/2023/10/01/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9AAOP-%E5%AE%9E%E7%8E%B0/AOP%E6%B5%81%E7%A8%8B.drawio.png" alt="AOP流程.drawio"></p>
+<p>AOP 的整体流程图如上所示，可以看到 AOP 的入口是 AnnotationAwareAspectJAutoProxyCreator。<strong>这个类实现了 InstantiationAwareBeanPostProcessor，因此也间接实现了 BeanPostProcessor，在前置处理器里面查找所有切面和对应的增强通知，在后置处理器里面是否有适用于当前 bean 的通知并创建代理对象，这就是 AOP 的原理</strong>。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/09/20/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9AIOC-%E5%AE%9E%E7%8E%B0/" rel="prev" title="Imspring 源码介绍（二）：IOC 实现">
+      <i class="fa fa-chevron-left"></i> Imspring 源码介绍（二）：IOC 实现
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/10/10/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9AWebMVC-%E5%AE%9E%E7%8E%B0/" rel="next" title="Imspring 源码介绍（四）：WebMVC 实现">
+      Imspring 源码介绍（四）：WebMVC 实现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9-Joinpoint-%E5%81%9A-Advice"><span class="nav-number">1.1.</span> <span class="nav-text">对 Joinpoint 做 Advice</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Joinpoint"><span class="nav-number">1.1.1.</span> <span class="nav-text">Joinpoint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Advice"><span class="nav-number">1.1.2.</span> <span class="nav-text">Advice</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%9A%84%E5%87%A0%E4%B8%AA%E6%A6%82%E5%BF%B5"><span class="nav-number">1.2.</span> <span class="nav-text">其他的几个概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Advice-Filter"><span class="nav-number">1.2.1.</span> <span class="nav-text">Advice Filter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pointcut"><span class="nav-number">1.2.2.</span> <span class="nav-text">Pointcut</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Advisor"><span class="nav-number">1.2.3.</span> <span class="nav-text">Advisor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Aspect"><span class="nav-number">1.2.4.</span> <span class="nav-text">Aspect</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.3.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">整体流程</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

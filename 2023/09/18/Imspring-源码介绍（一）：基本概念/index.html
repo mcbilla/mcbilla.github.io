@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="Imspring 源码介绍（一）：基本概念">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Imspring 源码介绍（一）：基本概念">
+<meta property="og:url" content="http://yoursite.com/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="Imspring 源码介绍（一）：基本概念">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/image-20231128190205771.png">
+<meta property="og:image" content="http://yoursite.com/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/image-20231128190523202.png">
+<meta property="og:image" content="http://yoursite.com/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/image-20231201143314222.png">
+<meta property="article:published_time" content="2023-09-18T11:20:57.000Z">
+<meta property="article:modified_time" content="2023-12-04T08:02:33.350Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/image-20231128190205771.png">
+
+<link rel="canonical" href="http://yoursite.com/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Imspring 源码介绍（一）：基本概念 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Imspring 源码介绍（一）：基本概念
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-18 19:20:57" itemprop="dateCreated datePublished" datetime="2023-09-18T19:20:57+08:00">2023-09-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-12-04 16:02:33" itemprop="dateModified" datetime="2023-12-04T16:02:33+08:00">2023-12-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" class="post-meta-item leancloud_visitors" data-flag-title="Imspring 源码介绍（一）：基本概念" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>Imspring 源码介绍（一）：基本概念</p>
+</blockquote>
+<span id="more"></span>
+
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>Imspring-core 模块围绕 ApplicationContext 和 Beanfactory 两个 Bean 工厂实现了 Spring 的核心 IOC 功能。整个模块涉及的核心知识点如下：</p>
+<ul>
+<li><strong>Bean 的全生命周期。（重点）</strong></li>
+<li><strong>ApplicationContext 和 BeanFactory 的初始化流程。（重点）</strong></li>
+<li>包名扫描和加载。</li>
+<li>依赖注入，以及三级缓存解决循环依赖问题。</li>
+<li>使用 BeanFactoryPostProcessor 实现定制化 Bean 工厂（Configuration 配置类的基础）</li>
+<li>使用 BeanPostProcessor 实现定制化 Bean。（AOP的基础）</li>
+<li>配置文件加载和环境切换。</li>
+</ul>
+<p>为了让大家更加清楚整个流程，先介绍下 Spring 的一些基础概念和组件。</p>
+<h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><h2 id="ApplicationContext-和-BeanFactory"><a href="#ApplicationContext-和-BeanFactory" class="headerlink" title="ApplicationContext 和 BeanFactory"></a>ApplicationContext 和 BeanFactory</h2><p>这两个是 Spring 的核心概念。通俗易懂地解释，BeanFactory 是一个工厂接口，提供 IOC 的基本功能，包括读取 Bean 的 XML 配置文件，管理 Bean 的加载和实例化，维护 Bean 之间的依赖关系，管理 Bean 的生命周期等。这个接口大概长这样</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">BeanFactory</span> &#123;</span><br><span class="line">    <span class="comment">// 根据bean名称获取bean</span></span><br><span class="line">    Object <span class="title function_">getBean</span><span class="params">(String name)</span> <span class="keyword">throws</span> BeansException;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 根据bean名称和bean类型获取bean</span></span><br><span class="line">    &lt;T&gt; T <span class="title function_">getBean</span><span class="params">(String name, Class&lt;T&gt; requiredType)</span> <span class="keyword">throws</span> BeansException;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 根据bean类型获取bean，使用无参构造函数</span></span><br><span class="line">    &lt;T&gt; T <span class="title function_">getBean</span><span class="params">(Class&lt;T&gt; requiredType)</span> <span class="keyword">throws</span> BeansException;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 根据bean类型和指定参数获取bean，使用有参构造函数</span></span><br><span class="line">    &lt;T&gt; T <span class="title function_">getBean</span><span class="params">(Class&lt;T&gt; requiredType, Object... args)</span> <span class="keyword">throws</span> BeansException;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个接口的核心方法就是使用 <code>getBean()</code> 方法获取各种 Bean。我们并不需要关心这些 Bean 是怎么构造出来，只需要直接从容器取就可以了，这也符合工厂模式的理念。ApplicationContext 继承了 BeanFactory 接口，具备 BeanFactory 接口的全部功能，而且提供更丰富的特性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ApplicationContext 继承了 ListableBeanFactory 接口，ListableBeanFactory 继承了 BeanFactory 接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">ConfigurableApplicationContext</span> <span class="keyword">extends</span> <span class="title class_">ApplicationContext</span>, Lifecycle, Closeable &#123;</span><br><span class="line">    <span class="comment">// 设置多环境和加载配置文件</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">setEnvironment</span><span class="params">(ConfigurableEnvironment environment)</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置事件监听器</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">addApplicationListener</span><span class="params">(ApplicationListener&lt;?&gt; listener)</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ApplicationContext 的核心方法，完成初始化流程</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">refresh</span><span class="params">()</span> <span class="keyword">throws</span> BeansException, IllegalStateException;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 关闭 ApplicationContext 后进行资源清理</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 获取 BeanFactory 实例</span></span><br><span class="line">    ConfigurableListableBeanFactory <span class="title function_">getBeanFactory</span><span class="params">()</span> <span class="keyword">throws</span> IllegalStateException;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由上面看出 ApplicationContext 持有 BeanFactory 的实例，所以具备 BeanFactory 的全部功能，并提供更完整的框架功能。两者的区别可以用下面表格来表示。</p>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">BeanFactory</th>
+<th align="left">ApplicationContext</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Bean 实例化时机</td>
+<td align="left">BeanFactroy 采用的是延迟加载形式来注入 Bean 的，即只有在使用到某个 Bean 时（调用<code>getBean()</code>），才对该 Bean 进行加载实例化。</td>
+<td align="left">ApplicationContext 采用预加载的方式注入 Bean，在启动的时候就会调用 <code>refresh()</code> 预加载所有单例 Bean，完成整个环境的初始化。</td>
+</tr>
+<tr>
+<td align="left">Bean 扩展</td>
+<td align="left">BeanPostProcessor 和 BeanFactoryPostProcessor 手动注册</td>
+<td align="left">BeanPostProcessor 和 BeanFactoryPostProcessor 自动注册</td>
+</tr>
+<tr>
+<td align="left">上下文</td>
+<td align="left">从 XML 文件中读取上下文（XmlBeanFactory）</td>
+<td align="left">支持通过 ClassPath、FileSystem、Web、Annotation 等方式读取上下文，并且可以设置多个（有继承关系）上下文 ，使得每一个上下文都专注于一个特定的层次。</td>
+</tr>
+<tr>
+<td align="left">国际化</td>
+<td align="left">&#x2F;</td>
+<td align="left">支持国际化 i18n（ MessageSource）</td>
+</tr>
+<tr>
+<td align="left">访问资源</td>
+<td align="left">&#x2F;</td>
+<td align="left">提供统一的资源文件访问方式，加载多种不同类型的资源（ResourceLoader）</td>
+</tr>
+<tr>
+<td align="left">环境切换</td>
+<td align="left">&#x2F;</td>
+<td align="left">支持多环境切换，加载多个配置文件（Environment）</td>
+</tr>
+<tr>
+<td align="left">事件机制</td>
+<td align="left">&#x2F;</td>
+<td align="left">强大的事件监听机制，当 ApplicationContext 中发布一个事件时，所有扩展ApplicationListener 的 Bean 都将接受到这个事件，并进行相应的处理。（ApplicationEvent 和 ApplicationListener）</td>
+</tr>
+</tbody></table>
+<p>总结：</p>
+<ul>
+<li>BeanFactory 是 Spring 框架的基础设施，面向 Spring 本身。</li>
+<li>ApplicationContext 提供更多面向实际开发的功能，几乎所有场合都可以直接使用，面向使用 Spring 的开发者。日常使用建议直接使用 ApplicationContext。</li>
+</ul>
+<h2 id="Bean-生命周期"><a href="#Bean-生命周期" class="headerlink" title="Bean 生命周期"></a>Bean 生命周期</h2><p><img src="/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/image-20231128190205771.png" alt="image-20231128190205771"></p>
+<p><strong>Bean 的生命周期是指一个对象在 Spring 容器里面从创建到被销毁的整个过程</strong>。这里引用一个网上非常经典的图，这个图基本涵盖了 Bean 从初始化到被销毁的整个生命周期。为了方便记忆，可以分为四个阶段：</p>
+<ol>
+<li>实例化（Instantiation）</li>
+<li>属性赋值（Populate）</li>
+<li>初始化（Initialization）</li>
+<li>销毁（Destruction）</li>
+</ol>
+<p><img src="/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/image-20231128190523202.png" alt="image-20231128190523202"></p>
+<p>Imspring 项目严格遵循以上 Bean 生命周期的顺序，最后为了简化跳过了销毁阶段。</p>
+<h2 id="Resource-和-ResourceLoader"><a href="#Resource-和-ResourceLoader" class="headerlink" title="Resource 和 ResourceLoader"></a>Resource 和 ResourceLoader</h2><p>Spring 用 Resource 接口抽象所有的底层资源，包括 File、ClassPath、URL 等。Spring 通过 Resource 接口将对物理资源的访问方式统一为  URL 格式和 Ant 风格带通配符的资源地址。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Resource</span> <span class="keyword">extends</span> <span class="title class_">InputStreamSource</span> &#123;</span><br><span class="line">    <span class="comment">// 判断某个资源是否以物理形式存在</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">exists</span><span class="params">()</span>;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 获取资源对象的URL，不能表示为URL就抛异常</span></span><br><span class="line">    URL <span class="title function_">getURL</span><span class="params">()</span> <span class="keyword">throws</span> IOException;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 获取资源的File表示对象，不能表示为File就抛异常</span></span><br><span class="line">    File <span class="title function_">getFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Spring 提供多种 Resource 的实现类，我们可以直接使用。常用的有：</p>
+<ul>
+<li><code>FileSystemResource</code>：针对 java.io.File 的 Resource 实现类。可以消除操作系统底层差异，对不同的操作系统使用同一的 API 来访问。</li>
+<li><code>ClassPathResource</code>：访问类加载路径下的资源，对于 WEB 应用可以自动搜索位于 WEB-INF&#x2F;classes 下的资源文件，是 Spring 中是非常常用的一种资源类型。</li>
+<li><code>UrlResource</code>：java.net.URL 的 Resource 实现类。可以访问网络资源，也可以访问本地资源。支持 http、https、file、ftp、jar 等协议。</li>
+</ul>
+</blockquote>
+<p>ResourceLoader 接口是 Resource 的加载器，用于快速加载一个 Resource 资源对象。Spring 中的默认实现是 <code>DefaultResourceLoader</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">ResourceLoader</span> &#123;</span><br><span class="line">    <span class="comment">// 根据路径信息返回一个对应的 Resource 资源实例</span></span><br><span class="line">    Resource <span class="title function_">getResource</span><span class="params">(String location)</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// 返回该 ResourceLoader 所使用的 ClassLoader</span></span><br><span class="line">    <span class="meta">@Nullable</span></span><br><span class="line">    ClassLoader <span class="title function_">getClassLoader</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>简单来说，Spring 通过 Resource 和 ResourceLoader 对外提供统一的资源访问方式</strong>。</p>
+<h2 id="BeanDefinition-和-BeanDefinitionRegistry"><a href="#BeanDefinition-和-BeanDefinitionRegistry" class="headerlink" title="BeanDefinition 和 BeanDefinitionRegistry"></a>BeanDefinition 和 BeanDefinitionRegistry</h2><p>BeanDefinition 是用来描述 Bean 的元数据信息。除了我们熟悉的 Bean 的 Class 对象之外，还保存了 Bean 是否是单例、Bean 是否在容器中是懒加载、Bean 在容器中的名字等信息。Spring 依赖这些信息来完成一个 Bean 的实例化。</p>
+<p><strong>简单来说，Spring 将 Bean 的定义和 Bean 的实例分开处理。首先将类文件 Class 解析为 BeanDefinition，然后再根据 BeanDefinition 的定义，在合适的时机（例如延迟创建）创建正确类型的 Bean 实例（单例或原型）。</strong>这个 Bean 实例就是我们日常使用的 Bean。</p>
+<p>BeanDefinitionRegistry 可以理解为 BeanDefinition 的容器接口，完成 BeanDefinition 的注册、移除和删除等功能。Spring 的 BeanFactory 默认实现类 <code>DefaultListableBeanFactory</code> 实现了 BeanDefinitionRegistry 接口，使用 <code>beanDefinitionMap</code> 集合来存放所有的 BeanDefinition。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DefaultListableBeanFactory</span> <span class="keyword">extends</span> <span class="title class_">AbstractAutowireCapableBeanFactory</span></span><br><span class="line">		<span class="keyword">implements</span> <span class="title class_">ConfigurableListableBeanFactory</span>, BeanDefinitionRegistry, Serializable &#123;</span><br><span class="line">		</span><br><span class="line">    <span class="comment">// beanDefinitionMap 存放所有 Bean 的元数据信息</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, BeanDefinition&gt; beanDefinitionMap = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;(<span class="number">256</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Spring 中命名为 <code>XXXRegistry</code> 的接口或者类，在 Spring 中通常扮演注册中心的职责，维护管理对应的一组实例。</p>
+</blockquote>
+<h2 id="SingletonBeanRegistry"><a href="#SingletonBeanRegistry" class="headerlink" title="SingletonBeanRegistry"></a>SingletonBeanRegistry</h2><p>上面谈到 Spring 中 Bean 的定义和 Bean 的实例是分开处理。我们日常使用 Spring 的时候，99% 的场景都是使用 Spring Bean 的单例实例。<strong>SingletonBeanRegistry 相当于 Bean 单例实例的容器接口，提供了统一访问单例 Bean 的功能</strong>。</p>
+<p>Spring 中 SingletonBeanRegistry 的 默认实现类是 <code>DefaultSingletonBeanRegistry</code>。这个类非常非常的重要，可以认为是 Spring IOC 容器的核心内容，大名鼎鼎的三级缓存就放在这里面。除此之外还有非常多的缓存用于提高性能，并且做的事情也很多，比如解决 Bean 的循环依赖问题。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DefaultSingletonBeanRegistry</span> <span class="keyword">extends</span> <span class="title class_">SimpleAliasRegistry</span> <span class="keyword">implements</span> <span class="title class_">SingletonBeanRegistry</span> &#123;</span><br><span class="line">    ......</span><br><span class="line">    <span class="comment">// 一级缓存，存放完全初始化好的 bean，从该缓存中取出的 bean 可以直接使用，我们日常使用的 Bean 就是从这里面取</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Object&gt; singletonObjects = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;(<span class="number">256</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 二级缓存，提前曝光的单例对象的cache，存放原始的 bean 对象（尚未填充属性），用于解决循环依赖</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Object&gt; earlySingletonObjects = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;(<span class="number">16</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 三级缓存，存放 bean 工厂对象，这个对象其实是一个函数式接口，用来解决 AOP 的循环依赖</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, ObjectFactory&lt;?&gt;&gt; singletonFactories = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;(<span class="number">16</span>);</span><br><span class="line">    ......</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 注册单例对象</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">registerSingleton</span><span class="params">(String beanName, Object singletonObject)</span> &#123;...&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 获取单例对象，使用三级缓存解决循环依赖的核心</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">getSingleton</span><span class="params">(String beanName, <span class="type">boolean</span> allowEarlyReference)</span> &#123;...&#125;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="BeanPostProcessor-和-BeanFactoryPostProcessor"><a href="#BeanPostProcessor-和-BeanFactoryPostProcessor" class="headerlink" title="BeanPostProcessor 和 BeanFactoryPostProcessor"></a>BeanPostProcessor 和 BeanFactoryPostProcessor</h2><p>BeanFactoryPostProcessor 和 BeanPostProcessor 这两个接口，都是 Spring 初始化 Bean 对外暴露的扩展点。<strong>在这之前我们先明确两个概念，一个是 <code>Instantiation</code> ，一个是 <code>Initialization</code></strong> 。</p>
+<ul>
+<li><code>Instantiation</code> ：实例化 ，就是创建 Bean 的过程（比如调用构造函数）。</li>
+<li><code>Initialization</code> ：初始化， 就是对 Bean 进行赋值（比如调用 setter 方法）、配置属性的过程。</li>
+</ul>
+<p><strong>BeanFactoryPostProcessor 是针对 BeanFactory 的扩展，是在 Bean 实例化（Instantiation）之前调用的</strong>。根据名称可以看出是对 BeanFactory 的修改，比如修改 Bean 的定义或者作用域等，从而影响 Bean 实例的创建。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">BeanFactoryPostProcessor</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">postProcessBeanFactory</span><span class="params">(ConfigurableListableBeanFactory beanFactory)</span> <span class="keyword">throws</span> BeansException;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这个接口有一个很重要的实现类 <code>ConfigurationClassPostProcessor</code>。这个类负责解析带 <code>@Configuration</code> 注解的配置类，把  <code>@Bean</code>  修饰的方法和 <code>@Import</code> 引入的类加载成 Bean 注入到容器。除此之外还可以解析 <code>@ComponentScan</code>，扫描指定路径下的类文件，筛选出需要加载的 Bean。这个类是 Spring 实现自动配置的关键。</p>
+</blockquote>
+<p><strong>BeanPostProcessor  是针对 Bean 的扩展，这时候 Bean 实例化（Instantiation）已经完成了，准备开始初始化（Initialization）</strong>。初始化过程包括以下几个动作：</p>
+<ol>
+<li>执行 BeanPostProcessor#postProcessBeforeInitialization，也就是常说的前置处理。</li>
+<li>执行 InitializingBean#afterPropertiesSet。</li>
+<li>执行 init-method（@PostConstruct 修饰的方法） 。</li>
+<li>执行 BeanPostProcessor#postProcessAfterInitialization，也就是常说的后置处理。</li>
+</ol>
+<p>由此看出 BeanPostProcessor 主要是在初始化前后完成对 Bean 实例的一些修改，比如为 Bean 实例创建代理对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">BeanPostProcessor</span> &#123;</span><br><span class="line">    <span class="comment">// 在 InitializingBean#afterPropertiesSet 和 init-method 方法之前被触发</span></span><br><span class="line">    <span class="meta">@Nullable</span></span><br><span class="line">    <span class="keyword">default</span> Object <span class="title function_">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在 InitializingBean#afterPropertiesSet 和 init-method 方法之后被触发</span></span><br><span class="line">    <span class="meta">@Nullable</span></span><br><span class="line">    <span class="keyword">default</span> Object <span class="title function_">postProcessAfterInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>BeanPostProcessor 有一个非常重要的子接口：InstantiationAwareBeanPostProcessor，这个接口定义的方法主要是在 Bean 实例化（Instantiation）前后执行。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">InstantiationAwareBeanPostProcessor</span> <span class="keyword">extends</span> <span class="title class_">BeanPostProcessor</span> &#123;</span><br><span class="line">    <span class="comment">// 在 BeanFactoryPostProcessor 执行之后，Bean 实例化之前执行</span></span><br><span class="line">    <span class="meta">@Nullable</span></span><br><span class="line">    <span class="keyword">default</span> Object <span class="title function_">postProcessBeforeInstantiation</span><span class="params">(Class&lt;?&gt; beanClass, String beanName)</span> <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 在实例化之后，初始化之前执行</span></span><br><span class="line">    <span class="keyword">default</span> <span class="type">boolean</span> <span class="title function_">postProcessAfterInstantiation</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 在 postProcessAfterInstantiation 执行之后，初始化之前执行</span></span><br><span class="line">    <span class="meta">@Nullable</span></span><br><span class="line">    <span class="keyword">default</span> PropertyValues <span class="title function_">postProcessProperties</span><span class="params">(PropertyValues pvs, Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>BeanPostProcessor 和 InstantiationAwareBeanPostProcessor 这两个扩展点非常重要，是 AOP 的基础。<strong>这两个接口中的方法对容器中所有的 Bean 都生效，在每个 Bean 实例化之后都会调到这两个接口的方法，判断该 Bean 是否满足创建代理对象的条件，如果满足的话就创建并返回代理对象，这就是 AOP 的原理</strong>。上面的过程，可以使用下面的流程图来描述。</p>
+<p><img src="/2023/09/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/image-20231201143314222.png" alt="image-20231201143314222"></p>
+<h2 id="Environment、Profile-和-Property"><a href="#Environment、Profile-和-Property" class="headerlink" title="Environment、Profile 和 Property"></a>Environment、Profile 和 Property</h2><p>Spring 中的 Environment 相当于一个外部资源的容器。<strong>Spring 在启动的时候会把所有外部配置源中的属性，包括本地配置文件、远程配置文件（比如 Nacos、Apollo），都加载到 Environment 中保存起来。</strong></p>
+<p><strong>Environment 再进行进一步细分的话，分为 Property 和 Profile 两部分</strong>。</p>
+<ul>
+<li>Property：配置项，本质是配置文件的一组键值对配置信息。在项目中会把配置项从代码中分离出来，这样的好处在于修改起来很容易，只需修改下配置文件或命令行参数，然后重启一下就可以了。</li>
+<li>Profile：配置环境。大多数项目都有多套配置对应多个环境，一般来说有开发环境、测试环境和生产环境，这里的环境就是 Profile。程序读取 Profile 的值，根据 Profile 的不同展示不同的特性。</li>
+</ul>
+<blockquote>
+<p>从本质上讲，Profile 也是属于 Property 的一种，作用是负责环境的切换。只是这个配置太重要了，也比较特殊，所以作为一个单独的概念来处理。</p>
+</blockquote>
+<p>简单总结，<strong>Environment &#x3D; Property + Profile</strong>。</p>
+<p>既然涉及到属性读取，我们肯定需要一个工具从外部配置源读取文件，<code>PropertyResolver</code> 接口承担了这个角色，负责解析外部配置源，加载和获取 Property。<code>Environment</code>  接口继承了  <code>PropertyResolver  </code>接口，提供了 Profile 的相关功能，用于加载和获取 Profile。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Environment</span> <span class="keyword">extends</span> <span class="title class_">PropertyResolver</span> &#123;</span><br><span class="line">    String[] getActiveProfiles();</span><br><span class="line">    String[] getDefaultProfiles();</span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">acceptsProfiles</span><span class="params">(Profiles profiles)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">PropertyResolver</span> &#123;</span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">containsProperty</span><span class="params">(String key)</span>;</span><br><span class="line">    String <span class="title function_">getProperty</span><span class="params">(String key)</span>;</span><br><span class="line">    String <span class="title function_">getProperty</span><span class="params">(String key, String defaultValue)</span>;</span><br><span class="line">    &lt;T&gt; T <span class="title function_">getProperty</span><span class="params">(String key, Class&lt;T&gt; targetType)</span>;</span><br><span class="line">    &lt;T&gt; T <span class="title function_">getProperty</span><span class="params">(String key, Class&lt;T&gt; targetType, T defaultValue)</span>;</span><br><span class="line">    String <span class="title function_">resolvePlaceholders</span><span class="params">(String text)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Spring 提供多个 Environment 的实现，<code>StandardXXX</code> 开头的是标准实现，其中最常用的就是 <code>StandardServletEnvironment</code>，负责加载 Web 应用的环境信息，例如从 <code>WEB-INF/web.xml</code> 加载 servlet 上下文等。</p>
+<p>Environment 本身也会被保存为容器中的一个 Bean 实例。绝大数情况下，bean 都不需要直接访问 Environment 实例，而是通过类似 @Value 注解的方式把属性值注入进来。</p>
+<p>如果后面项目中实在需要用到 Environment，可以手动将 Environment 实例注入到该业务 Bean 中，也可以实现  <code>EnvironmentAware</code>  接口，得到 Environment 类型的 Bean 实例之后可以通过 <code>getProperty()</code> 获取具体属性值。</p>
+</blockquote>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li><p>BeanFactory 是 Spring 的容器工厂接口，提供 IOC 的基本功能。ApplicationContext 继承了 BeanFactory 接口，具备 BeanFactory 的全部功能并提供更丰富的特性。</p>
+</li>
+<li><p>Bean 生命周期是指一个对象在 Spring 容器里面从创建到被销毁的整个过程，包括：实例化（Instantiation）、属性赋值（Populate）、初始化（Initialization）和销毁（Destruction）四个阶段。</p>
+</li>
+<li><p>Resource 接口把所有的底层资源抽象为统一的类，通过 URL 格式和 Ant 风格带通配符的资源地址进行访问。ResourceLoader 接口是 Resource 的加载器，用于快速加载一个 Resource 资源对象。</p>
+</li>
+<li><p>Spring 中 Bean 的定义和 Bean 的实例是分开处理的。</p>
+<ul>
+<li>BeanDefinition 相当于 Bean 的定义，用来描述 Bean 的元数据信息。Spring 依赖这些元数据来完成一个 Bean 的实例化。BeanDefinitionRegistry 是 BeanDefinition 的容器接口，完成 BeanDefinition 的注册、移除和删除等功能。</li>
+<li>SingletonBeanRegistry 是 Bean 单例实例的容器接口，提供了统一访问单例 Bean 的功能。</li>
+</ul>
+</li>
+<li><p>BeanFactoryPostProcessor 和 BeanPostProcessor 这两个接口，都是 Spring 初始化 Bean 对外暴露的扩展点，负责在 Bean 实例化（Instantiation）和初始化（Initialization）前后对 Bean 实例进行增强操作。</p>
+</li>
+<li><p>Environment 是 Spring 存放外部资源的容器。Spring 在启动的时候会把所有外部配置源中的属性，包括本地配置文件、远程配置文件（比如 Nacos、Apollo），都加载到 Environment 中保存起来。Environment &#x3D; Property + Profile。</p>
+<ul>
+<li>Property：配置项，本质是配置文件的一组键值对配置信息。</li>
+<li>Profile：配置环境，通过切换 Profile 显示不同环境的特性。</li>
+</ul>
+</li>
+</ul>
+<p>上面这些就是 Spring 源码的核心概念，包括一些重要的实现类也列了出来。记不住这些概念也没关系，先大概有个印象，在源码里面这些概念和类会反复出现，不断加深印象。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/15/Javadoc%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%A6%E7%BB%86%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/" rel="prev" title="Javadoc生成的详细操作教程">
+      <i class="fa fa-chevron-left"></i> Javadoc生成的详细操作教程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/09/20/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9AIOC-%E5%AE%9E%E7%8E%B0/" rel="next" title="Imspring 源码介绍（二）：IOC 实现">
+      Imspring 源码介绍（二）：IOC 实现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ApplicationContext-%E5%92%8C-BeanFactory"><span class="nav-number">2.1.</span> <span class="nav-text">ApplicationContext 和 BeanFactory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bean-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">2.2.</span> <span class="nav-text">Bean 生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Resource-%E5%92%8C-ResourceLoader"><span class="nav-number">2.3.</span> <span class="nav-text">Resource 和 ResourceLoader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanDefinition-%E5%92%8C-BeanDefinitionRegistry"><span class="nav-number">2.4.</span> <span class="nav-text">BeanDefinition 和 BeanDefinitionRegistry</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SingletonBeanRegistry"><span class="nav-number">2.5.</span> <span class="nav-text">SingletonBeanRegistry</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanPostProcessor-%E5%92%8C-BeanFactoryPostProcessor"><span class="nav-number">2.6.</span> <span class="nav-text">BeanPostProcessor 和 BeanFactoryPostProcessor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Environment%E3%80%81Profile-%E5%92%8C-Property"><span class="nav-number">2.7.</span> <span class="nav-text">Environment、Profile 和 Property</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

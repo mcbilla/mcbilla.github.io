@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="Imspring 源码介绍（五）：事务实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Imspring 源码介绍（五）：事务实现">
+<meta property="og:url" content="http://yoursite.com/2023/10/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="飙戈的博客">
+<meta property="og:description" content="Imspring 源码介绍（五）：事务实现">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2023/10/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0/image-20231206102158962.png">
+<meta property="og:image" content="http://yoursite.com/2023/10/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0/image-20231206102339188.png">
+<meta property="og:image" content="http://yoursite.com/2023/10/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0/image-20231206103159609.png">
+<meta property="article:published_time" content="2023-10-18T12:42:58.000Z">
+<meta property="article:modified_time" content="2023-12-06T07:11:56.394Z">
+<meta property="article:author" content="mcbilla">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2023/10/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0/image-20231206102158962.png">
+
+<link rel="canonical" href="http://yoursite.com/2023/10/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Imspring 源码介绍（五）：事务实现 | 飙戈的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c54cee131e68bbf3e1a2ae155d8aa5ca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飙戈的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2023/10/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="mcbilla">
+      <meta itemprop="description" content="Constant dropping wears the stone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飙戈的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Imspring 源码介绍（五）：事务实现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-18 20:42:58" itemprop="dateCreated datePublished" datetime="2023-10-18T20:42:58+08:00">2023-10-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-12-06 15:11:56" itemprop="dateModified" datetime="2023-12-06T15:11:56+08:00">2023-12-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/10/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0/" class="post-meta-item leancloud_visitors" data-flag-title="Imspring 源码介绍（五）：事务实现" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2023/10/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2023/10/18/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>Imspring 源码介绍（五）：事务实现</p>
+</blockquote>
+<span id="more"></span>
+
+<p>事务（Transaction）是数据库系统执行过程中的一个逻辑处理单元，可由一条简单的 SQL 语句组成，也可以由一组复杂的 SQL 语句组成，这些 SQL 语句要么都成功，要么都失败，这就是事务的目的。</p>
+<p>Spring 事务依赖于底层数据库对事务的支持，如果底层数据库不支持事务，Spring 事务就会失效。Spring 事务基于数据库事务提供一套抽象的事务管理接口，底层由各数据库自己实现，并结合 Spring AOP 实现声明式事务，可以做到对程序无侵入实现事务功能，简化了程序使用事务的步骤。</p>
+<p>在介绍 Spring 事务之前，先简单事务的一些基本概念。</p>
+<h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><h2 id="事务ACID特性"><a href="#事务ACID特性" class="headerlink" title="事务ACID特性"></a>事务ACID特性</h2><p>事务应该满足 ACID 特性，以 Mysql 的 InnoDB 引擎为例：</p>
+<ul>
+<li>原子性（Atomicity）：事务是不可分割的最小单位，整个事务要么一起成功，要么一起失败。<strong>原子性通过 undo log 来保证</strong>。</li>
+<li>一致性（Consistency）：事务使得系统从一个一致的状态转换到另一个一致状态，事务执行结束后，数据库的完整性约束没有被破坏。<strong>一致性靠其他三个特性来保证</strong>。</li>
+<li>隔离性（Isolation）：一个事务内部对其他事务是隔离的，一个事务所做的修改在最终提交以前，对其他事务是不可见的。<strong>隔离性通过锁（写写）或者 MVCC（写读）来保证</strong>。</li>
+<li>持久性（Durability）事务一旦提交，那么就是永久性的，不会因为宕机等故障导致数据丢失。<strong>持久性通过 binlog、redo log 来保证</strong>。</li>
+</ul>
+<h2 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h2><p>多个事务在并发执行的过程，当前事务的执行结果是否对其他事务可见、什么时候可见？这个问题会引发下面的可见性问题。按问题的严重程度排序是：<strong>脏写 &gt; 脏读 &gt; 不可重复读 &gt; 幻读</strong>。</p>
+<ul>
+<li><p><strong>脏写</strong>：也称为数据丢失、更新丢失，简单来说就是一个事务的更新操作会被另一个事务的更新操作所覆盖，从而导致数据的不一致，属于最严重的问题。一般有两种情况：</p>
+<ul>
+<li><p>事务 A 的回滚覆盖了事务 B 已提交的修改，造成事务 B 的修改丢失。</p>
+</li>
+<li><p>事务 A 的提交覆盖了事务 B 已提交的修改，造成事务 B 的修改丢失。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>脏读</strong>：一个事务读到了另一个事务修改过但是未提交的数据。</p>
+</li>
+</ul>
+<img src="image-20231206102158962.png" width="70%" height="70%">
+
+<ul>
+<li><strong>不可重复读</strong>：在没有脏读的情况下，因为其他事务多次修改数据并提交，一个事务多次读取同一个数据不一致。也就是同一个数据无法重复读取，违反了数据库事务一致性的要求。</li>
+</ul>
+<img src="image-20231206102339188.png" width="70%" height="70%">
+
+<blockquote>
+<p>其实不可重复读在一些场景下也不是问题，比如我就希望在一个事务中，别的事务修改提交数据后，我立马也能读到，那就需要不可重复读。</p>
+</blockquote>
+<ul>
+<li><strong>幻读</strong>：一个事务用同样的条件查询，由于另一个事务新增了数据，导致看到了之前没有的数据。幻读和不可重复读的区别是：不可重复读针对 update，幻读针对 insert。</li>
+</ul>
+<img src="image-20231206103159609.png" width="70%" height="70%">
+
+<p>上面的四个问题，脏写可以通过乐观锁或悲观锁的方式来解决，剩下的3个问题，其实是数据库读一致性造成的。SQL 标准定义了四种事务隔离机制，用来解决事务的可见性问题。</p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>定义</th>
+<th>解决问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>未提交读（READ UNCOMMITTED，简称RU）</strong></td>
+<td>事务中的修改，即使没有提交，对其他事务也是可见的。</td>
+<td>会发生脏读、不可重复读、幻读的问题</td>
+</tr>
+<tr>
+<td><strong>提交读（READ COMMITTED，简称RC）</strong></td>
+<td>一个事务可以读取其他已经提交的事务所做的修改。也就是说在事务处理期间，如果其他事务对数据进行多次修改提交，那么当前事务每次读取到的值可能都不一样。</td>
+<td>解决了脏读的问题，会发生不可重复读、幻读的问题。</td>
+</tr>
+<tr>
+<td><strong>可重复读（REPEATABLE READ，简称RR）</strong></td>
+<td>保证在同一个事务中多次读取同样数据的结果是一样的。也就是说在事务处理期间，如果其他事务对数据进行多次修改提交，也能保证当前事务每次读到的数据都是一致的；但是如果其他事务插入了新的数据，当前事务还是会出现前后读到不同数据的情况，会发生幻读的问题。</td>
+<td>解决了脏读、不可重复读的问题，会发生幻读的问题</td>
+</tr>
+<tr>
+<td><strong>可串行化（SERIALIZABLE）</strong></td>
+<td>强制事务串行执行，需要加锁实现。</td>
+<td>脏读、不可重复读、幻读的问题都不会发生</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>Spring 比 Mysql 多了一种隔离级别 default，表示使用数据库默认的事务隔离级别。</p>
+</blockquote>
+<h2 id="事务传播类型"><a href="#事务传播类型" class="headerlink" title="事务传播类型"></a>事务传播类型</h2><p>Spring 事务传播类型是 Spring 为了业务层之间调用事务的关系而提出的，即数据库层面是不存在事务传播行为的。Spring 中存在 7 种传播类型。</p>
+<ul>
+<li><strong>REQUIRED</strong>：如果当前没有事务，则自己新建一个事务，如果当前存在事务，则加入这个事务。Spring 默认的事务的传播类型。</li>
+<li><strong>SUPPORTS</strong>：当前存在事务，则加入当前事务，如果当前没有事务，就以非事务方法执行。</li>
+<li><strong>MANDATORY</strong>：当前存在事务，则加入当前事务，如果当前事务不存在，则抛出异常。</li>
+<li><strong>REQUIRES_NEW</strong>：创建一个新事务，如果存在当前事务，则挂起该事务。新事务和原事务是两个独立的事务。</li>
+<li><strong>NOT_SUPPORTED</strong>：始终以非事务方式执行，如果当前存在事务，则挂起当前事务。</li>
+<li><strong>NEVER</strong>：不使用事务，如果当前事务存在，则抛出异常。</li>
+<li><strong>NESTED</strong>：如果当前事务存在，则在嵌套事务中执行，否则和 REQUIRED 一样开启一个事务。</li>
+</ul>
+<h2 id="Spring-事务组件"><a href="#Spring-事务组件" class="headerlink" title="Spring 事务组件"></a>Spring 事务组件</h2><p>Spring 事务管理抽象主要包括 3 个接口：</p>
+<ul>
+<li><strong>TransactionManager</strong>：事务管理器</li>
+<li><strong>TransactionDefinition</strong>：事务定义信息（隔离，传播，超时，只读）</li>
+<li><strong>TransactionStatus</strong>：事务具体运行状态</li>
+</ul>
+<p>这三个组件我们一般是这样用的：<strong>先把 <code>@Transactional</code> 注解里面的配置解析并封装成 <code>TransactionDefinition</code> 对象，作为参数传递给 <code>PlatformTransactionManager</code> 的 <code>getTransaction()</code> 方法来开启事务，返回一个 <code>TransactionStatus</code> 对象表示事务运行状态，然后根据 <code>TransactionStatus</code> 的状态（是否 rollbackOnly、Completed 等）来判断是执行 <code>commit()</code> 还是 <code>rollback()</code> 。</strong></p>
+<h3 id="TransactionManager"><a href="#TransactionManager" class="headerlink" title="TransactionManager"></a>TransactionManager</h3><p><code>TransactionManager</code> 接口是个空接口，一般我们会使用子接口 <code>PlatformTransactionManager</code>。PlatformTransactionManager 是 Spring 提供的平台事务管理器，用于管理事务。该接口中提供了三个事务操作方法，具体如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">PlatformTransactionManager</span> <span class="keyword">extends</span> <span class="title class_">TransactionManager</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据事务定义信息从事务环境中返加一个已存在的事务，或者创建一个新的事务，并用 TransactionStatus 描述这个事务的状态。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    TransactionStatus <span class="title function_">getTransaction</span><span class="params">(<span class="meta">@Nullable</span> TransactionDefinition definition)</span> <span class="keyword">throws</span> TransactionException;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 提交事务。如果事务状态已经被标识为 rollback-only，则该方法将执行一个回滚事务操作。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">commit</span><span class="params">(TransactionStatus status)</span> <span class="keyword">throws</span> TransactionException;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 回滚事务</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">rollback</span><span class="params">(TransactionStatus status)</span> <span class="keyword">throws</span> TransactionException;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Spring 将事务管理器的实现委托给底层具体的持久化框架来完成。因此，Spring 为不同的持久化框架提供了 PlatformTransactionManager 接口的实现类。</p>
+<table>
+<thead>
+<tr>
+<th>实现类</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>org.springframework.jdbc.datasource. DataSourceTransactionManager</strong></td>
+<td>使用 SpringJDBC 或 Mybatis 等基于 DataSource 数据源的持久化持久时，使用此事务管理器。最常用的事务管理器。</td>
+</tr>
+<tr>
+<td>org.springframework.orm.jpa. JpaTransactionManager</td>
+<td>使用 JPA 进行持久化时，使用该事务管理器</td>
+</tr>
+<tr>
+<td>org.springframework.orm.hibernateX. HibernateTransactionManager</td>
+<td>使用 HibernateX.0(X可为3，4，5) 进行持久化时，使用此事务管理器</td>
+</tr>
+<tr>
+<td>org.springframework.orm.jdo. JdoTransactionManager</td>
+<td>使用 JDO 进行持久化时，使用此事务管理器</td>
+</tr>
+<tr>
+<td>org.springframework.transaction.jta. JtaTransactionManager</td>
+<td>具有多个数据源的全局事务使用该事务管理器（不管采用何种持久化技术）</td>
+</tr>
+</tbody></table>
+<h3 id="TransactionDefinition"><a href="#TransactionDefinition" class="headerlink" title="TransactionDefinition"></a>TransactionDefinition</h3><p>TransactionDefinition 接口定义了 Spring 的事务属性以及获取事务属性的方法。一般情况下我们会使用子接口 <code>TransactionAttribute</code> 的实现类，解析 <code>@Transactional</code> 注解里面的配置解析并封装成 <code>TransactionAttribute</code> 对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">TransactionDefinition</span> &#123;</span><br><span class="line">    <span class="comment">// 定义七种事务传播类型</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">PROPAGATION_REQUIRED</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="variable">PROPAGATION_SUPPORTS</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">    ......</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 定义五种事务隔离级别</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">ISOLATION_DEFAULT</span> <span class="operator">=</span> -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="variable">ISOLATION_READ_UNCOMMITTED</span> <span class="operator">=</span> <span class="number">1</span>;  <span class="comment">// same as java.sql.Connection.TRANSACTION_READ_UNCOMMITTED;</span></span><br><span class="line">    </span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取事务的传播类型</span></span><br><span class="line">    <span class="keyword">default</span> <span class="type">int</span> <span class="title function_">getPropagationBehavior</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> PROPAGATION_REQUIRED;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取事务的隔离级别</span></span><br><span class="line">    <span class="keyword">default</span> <span class="type">int</span> <span class="title function_">getIsolationLevel</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> ISOLATION_DEFAULT;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取事务的超时时间</span></span><br><span class="line">    <span class="keyword">default</span> <span class="type">int</span> <span class="title function_">getTimeout</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> TIMEOUT_DEFAULT;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取事务名称</span></span><br><span class="line">    <span class="keyword">default</span> String <span class="title function_">getName</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 获取事务是否只读</span></span><br><span class="line">    <span class="keyword">default</span> <span class="type">boolean</span> <span class="title function_">isReadOnly</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="TransactionStatus"><a href="#TransactionStatus" class="headerlink" title="TransactionStatus"></a>TransactionStatus</h3><p>TransactionStatus 代表事务的具体运行状态，可以通过该接口获取事务运行期的状态信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">TransactionExecution</span> &#123;</span><br><span class="line">    <span class="comment">// 获取事务是否完成</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">isNewTransaction</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置事务回滚</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">setRollbackOnly</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取是否回滚</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">isRollbackOnly</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取事务是否完成</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">isCompleted</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">TransactionStatus</span> <span class="keyword">extends</span> <span class="title class_">TransactionExecution</span>, SavepointManager, Flushable &#123;</span><br><span class="line">    <span class="comment">// 获取是否存在保存点</span></span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">hasSavepoint</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 刷新事务</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">flush</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="其他组件"><a href="#其他组件" class="headerlink" title="其他组件"></a>其他组件</h3><p>除了上面三大组件，Spring 为了实现事务机制还定义了一些其他组件。</p>
+<h4 id="TransactionInterceptor"><a href="#TransactionInterceptor" class="headerlink" title="TransactionInterceptor"></a>TransactionInterceptor</h4><p>TransactionInterceptor 可以看作一种特殊的 AOP Advice，专门用来处理 Spring 事务。TransactionInterceptor 定义了处理事务的主流程，是 Spring 声明式事务的核心类。</p>
+<h4 id="TransactionAttributeSource"><a href="#TransactionAttributeSource" class="headerlink" title="TransactionAttributeSource"></a>TransactionAttributeSource</h4><p>上面提到 Spring 容器在启动的时候就会解析所有 <code>@Transaction</code> 方法，并封装为 TransactionAttribute 对象。TransactionAttributeSource 就是用来缓存这些 TransactionAttribute 对象的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// key是MethodClassKey，用于唯一确定某个类中的某个方法，value是事务属性</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Map&lt;Object, TransactionAttribute&gt; attributeCache = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;(<span class="number">1024</span>);</span><br></pre></td></tr></table></figure>
+
+<p>TransactionAttributeSource 的实现类有一个属性 <code>attributeCache</code> 缓存了所有 TransactionAttribute 对象，当某个 <code>@Transaction</code> 方法被调用的时候，从这里获取 TransactionAttribute。</p>
+<h4 id="TransactionAttributeSourceAdvisor"><a href="#TransactionAttributeSourceAdvisor" class="headerlink" title="TransactionAttributeSourceAdvisor"></a>TransactionAttributeSourceAdvisor</h4><p>TransactionAttributeSourceAdvisor 可以看作一种特殊的 AOP Advisor。按照 AOP 的定义：Advisor &#x3D; Advice + Advice Filter（这里的 Advice Filter 是 Pointcut），所以 <strong>TransactionAttributeSourceAdvisor &#x3D; TransactionInterceptor + TransactionAttributeSourcePointcut</strong>。</p>
+<p>TransactionInterceptor 的作用上面已经解释过，TransactionAttributeSourcePointcut 的作用是校验当前方法是否事务方法，原理是使用当前类 + 当前方法作为 key，从 TransactionAttributeSource 获取 TransactionAttribute，如果能获取到说明当前方法是事务方法。</p>
+<h4 id="TransactionSynchronization"><a href="#TransactionSynchronization" class="headerlink" title="TransactionSynchronization"></a>TransactionSynchronization</h4><p>TransactionSynchronization 是可以注册到事务处理过程中的回调接口。它就像是事务处理的事件监听器，当事务处理的某些规定时点发生时，会调用 TransactionSynchronization 上的一些方法来执行相应的回调逻辑。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">TransactionSynchronization</span> &#123;</span><br><span class="line">    <span class="comment">// 事务提交状态</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">STATUS_COMMITTED</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 事务回滚状态</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">STATUS_ROLLED_BACK</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 系统异常状态</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">STATUS_UNKNOWN</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 事务提交之前</span></span><br><span class="line">    <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">beforeCommit</span><span class="params">(<span class="type">boolean</span> readOnly)</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 操作完成之前(包含事务成功或者事务回滚)</span></span><br><span class="line">    <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">beforeCompletion</span><span class="params">()</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 事务成功提交之后</span></span><br><span class="line">    <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">afterCommit</span><span class="params">()</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 操作完成之后(包含事务成功或者事务回滚)</span></span><br><span class="line">    <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">afterCompletion</span><span class="params">(<span class="type">int</span> status)</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="TransactionSynchronizationManager"><a href="#TransactionSynchronizationManager" class="headerlink" title="TransactionSynchronizationManager"></a>TransactionSynchronizationManager</h4><p>TransactionSynchronizationManager 是用来管理每个线程的 DB 连接资源、事务同步器（TransactionSynchronization）、当前事务各种状态的管理类。TransactionSynchronizationManager 中定义了很多 ThreadLocal 变量用来保存这些信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">TransactionSynchronizationManager</span> &#123;</span><br><span class="line">    <span class="comment">// 保存DB连接资源。使用 Object 来保存是因为每种平台的DB连接资源对象可能不一样，比如：JDBC，Hibernate，EJB 等使用的 DB 连接对象是不一样的。 </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Map&lt;Object, Object&gt;&gt; resources = <span class="keyword">new</span> <span class="title class_">NamedThreadLocal</span>&lt;&gt;(<span class="string">&quot;Transactional resources&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 事务同步回调。每个线程可以注册多个事务同步回调</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt; synchronizations = <span class="keyword">new</span> <span class="title class_">NamedThreadLocal</span>&lt;&gt;(<span class="string">&quot;Transaction synchronizations&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 当前事务的名称  </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;String&gt; currentTransactionName = <span class="keyword">new</span> <span class="title class_">NamedThreadLocal</span>&lt;&gt;(<span class="string">&quot;Current transaction name&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 当前事务是否只读  </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Boolean&gt; currentTransactionReadOnly = <span class="keyword">new</span> <span class="title class_">NamedThreadLocal</span>&lt;&gt;(<span class="string">&quot;Current transaction read-only status&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 当前事务的隔离级别  </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Integer&gt; currentTransactionIsolationLevel = <span class="keyword">new</span> <span class="title class_">NamedThreadLocal</span>&lt;&gt;(<span class="string">&quot;Current transaction isolation level&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 事务是否开启  </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Boolean&gt; actualTransactionActive = <span class="keyword">new</span> <span class="title class_">NamedThreadLocal</span>&lt;&gt;(<span class="string">&quot;Actual transaction active&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>TransactionSynchronizationManager 的作用是：</p>
+<ol>
+<li>屏蔽了底层数据库的差异，统一使用 <code>TransactionSynchronizationManager#getResource()</code> 获取当前的数据库连接资源。</li>
+<li>执行事务同步器的回调。使用 <code>triggerXXX()</code> 之类的方法执行当前事务同步器的方法。</li>
+</ol>
+<h2 id="Spring-事务失效"><a href="#Spring-事务失效" class="headerlink" title="Spring 事务失效"></a>Spring 事务失效</h2><p>Spring 事务在下面 7 种情形会失效，这里不是文章的重点，简单了解一下即可。</p>
+<ol>
+<li><p>未启用 Spring 事务管理功能：<code>@EnableTransactionManagement</code> 注解用来启用 Spring 事务自动管理事务的功能。</p>
+</li>
+<li><p>方法不是 public 类型的：<code>@Transaction</code> 用在了非 public 方法上，事务将无效。</p>
+</li>
+<li><p>数据源未配置事务管理器：Spring 是通过事务管理器 <code>TransactionManager</code> 来管理事务，每个数据源都要配置。</p>
+</li>
+<li><p>自身调用问题：<code>@Transactional</code> 基于 AOP 实现事务功能，同类方法调用会导致事务失效，只有在代理对象之间进行调用时，才会触发切面逻辑。可以在类中注入该类代理对象，然后在嵌套的方法中调用代理对象的方法。</p>
+</li>
+<li><p>异常类型错误：默认情况下，发生 <code>RuntimeException</code> 和 <code>Error</code> 类型及子类的异常，Spring 事务才会回滚。可以自定义回滚的异常类型，<code>@Transactional(rollbackFor = &#123;异常类型列表&#125;)</code>。</p>
+</li>
+<li><p>异常被吞：在方法中 catch 异常后没有向上抛出。</p>
+</li>
+<li><p>业务和 Spring 事务代码不在一个线程：Spring 事务实现中使用了 ThreadLocal，要求业务代码和 Spring 事务的代码必须在一个线程中，才会受 Spring 事务的控制。</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/10/10/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9AWebMVC-%E5%AE%9E%E7%8E%B0/" rel="prev" title="Imspring 源码介绍（四）：WebMVC 实现">
+      <i class="fa fa-chevron-left"></i> Imspring 源码介绍（四）：WebMVC 实现
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1ACID%E7%89%B9%E6%80%A7"><span class="nav-number">1.1.</span> <span class="nav-text">事务ACID特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB"><span class="nav-number">1.2.</span> <span class="nav-text">事务隔离级别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E4%BC%A0%E6%92%AD%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.3.</span> <span class="nav-text">事务传播类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-%E4%BA%8B%E5%8A%A1%E7%BB%84%E4%BB%B6"><span class="nav-number">1.4.</span> <span class="nav-text">Spring 事务组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TransactionManager"><span class="nav-number">1.4.1.</span> <span class="nav-text">TransactionManager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TransactionDefinition"><span class="nav-number">1.4.2.</span> <span class="nav-text">TransactionDefinition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TransactionStatus"><span class="nav-number">1.4.3.</span> <span class="nav-text">TransactionStatus</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%BB%84%E4%BB%B6"><span class="nav-number">1.4.4.</span> <span class="nav-text">其他组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TransactionInterceptor"><span class="nav-number">1.4.4.1.</span> <span class="nav-text">TransactionInterceptor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TransactionAttributeSource"><span class="nav-number">1.4.4.2.</span> <span class="nav-text">TransactionAttributeSource</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TransactionAttributeSourceAdvisor"><span class="nav-number">1.4.4.3.</span> <span class="nav-text">TransactionAttributeSourceAdvisor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TransactionSynchronization"><span class="nav-number">1.4.4.4.</span> <span class="nav-text">TransactionSynchronization</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TransactionSynchronizationManager"><span class="nav-number">1.4.4.5.</span> <span class="nav-text">TransactionSynchronizationManager</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-%E4%BA%8B%E5%8A%A1%E5%A4%B1%E6%95%88"><span class="nav-number">1.5.</span> <span class="nav-text">Spring 事务失效</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mcbilla"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">mcbilla</p>
+  <div class="site-description" itemprop="description">Constant dropping wears the stone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/mcbilla" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;mcbilla" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mcbilla</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'NL3uHcex1UcrXkcOvkLDH1p8-gzGzoHsz',
+      appKey     : 'lBSzvyvWKyPT9clWgSrVZxzF',
+      placeholder: "一起来讨论吧～",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
