@@ -156,3 +156,5 @@ ModelAndView 里面的 View 不是完整的，仅仅是一个页面视图名称�
 10. DispatcherServlet 把渲染好的页面返回给用户。
 
 # 整体流程
+
+![SpringWebMVC时序图](SpringWebMVC时序图.png)
