@@ -155,6 +155,12 @@ ModelAndView 里面的 View 不是完整的，仅仅是一个页面视图名称�
 9. DispatcherServlet 根据 View 使用 JSP/Freemarker 等技术渲染视图，即将模型数据填充至视图中。
 10. DispatcherServlet 把渲染好的页面返回给用户。
 
-# 整体流程
+# 代码整体流程
 
 ![SpringWebMVC时序图](SpringWebMVC时序图.png)
+
+imspring-mvc 的整体流程如上图所示，整个流程和上面的 *Spring MVC 工作流程示意图* 基本一致。
+
+1. 在 `WEB-INF/web.xml` 里面配置好 `SpringServletContextListener`，注意 Listener 会在所有 servlet 初始化之前执行。在 tomcat 启动的时候，在 `SpringServletContextListener` 里面创建 ApplicationContext 容器，并设置到 servlet 上下文。
+2. `DispatchServlet` 设置了跟随 tomcat 启动而启动，所以 `DispatchServlet` 进行 `init()` 初始化，从 servlet 上下文获取 ApplicationContext 容器，然后从 ApplicationContext 容器里面获取 `HandlerMapping` 和 `HandlerAdapter` 的实例，并把上面的内容保存起来，至此 `DispatchServlet` 已经具备使用 Spring 容器的能力！
+3. 请求进来，统一由 `DispatchServlet` 拦截。不管是什么请求方式的请求（GET/POST），最终都进去 `doDispatch()` 方法，进行主流程处理，这就是 Spring WebMVC 的整体流程。

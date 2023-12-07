@@ -116,13 +116,21 @@ public class UserServiceAspect {
 
 # 整体流程
 
-![AOP流程图.png](AOP流程图.png)
+![SpringAOP时序图.png](SpringAOP时序图.png)
 
-Imspring-aop 实现 AOP 的整体流程图如上所示，这个流程和 Spring 实现 AOP 的流程基本是一致的。我们只需要关注几个核心类来理解整个流程。
+Imspring-aop 实现 AOP 的整体流程图如上所示，这个流程和 Spring 实现 AOP 的流程基本是一致的。为了让大家更清楚这个流程，先介绍几个核心类：
 
 * **AnnotationAwareAspectJAutoProxyCreator**。这个类实现了 `InstantiationAwareBeanPostProcessor` 接口，因此也间接实现了 `BeanPostProcessor `接口。在 Instantiation 前置处理器里面查找所有切面和对应的增强通知，在 Initialization 后置处理器里面是否有适用于当前 bean 的通知并创建代理对象，这就是 AOP 的原理。
 * **AbstractAspectJAdvice**：Advice 抽象类，实现了 Advice 的子接口 `MethodInterceptor`，本质上是一个拦截器，子类实现是我们常说的 `BeforeAdvice`、`AfterAdvice` 等。
 * **AspectJExpressionPointcutAdvisor**：Advisor 实现类。AspectJExpressionPointcutAdvisor = 上面的xxxAdvice + AspectJExpressionPointcut。
 * **AspectJExpressionPointcut**：Pointcut 实现类。
-* **ReflectiveMethodInvocation**：可以理解为 Joinpoint + Advisor List。Joinpoint 简单来说就是哪个地方需要被增强。ReflectiveMethodInvocation 里面保存了原始的 Bean 实例和要被增强的 Method，这两个加起来就是一个 Joinpoint。
-* **ProxyFactory**：用来创建 AOP 代理对象的工厂类，自动选择 JDK 代理或者 CGLIB 代理。
+* **ReflectiveMethodInvocation**：可以理解为 **Joinpoint + Advisor List**。Joinpoint 简单来说就是哪个地方需要被增强。ReflectiveMethodInvocation 里面保存了原始的 Bean 实例和要被增强的 Method，这两个加起来就是一个 Joinpoint。Advisor List 是从代理对象里面获取的。
+* **ProxyFactory**：用来创建 AOP 代理对象的工厂类，根据类是否实现接口，自动选择 `JdkDynamicAopProxy` 或 `CglibAopProxy` 创建代理对象。
+
+上面的整体流程可以概括为：
+
+1. ApplicationContext 容器启动，在 Bean 实例化之前，进入 `AnnotationAwareAspectJAutoProxyCreator` 的 Instantiation 前置处理。这一步会扫描容器中所有 @Aspect 切面类，为类中的每个 Advice 方法（包含`@Before`、`@After`等注解）创建一个 `AspectJExpressionPointcutAdvisor`，然后把每个 Aspect 切面对应的 Advisor List 缓存到  `advisorsCache`。
+
+2. Bean 进入初始化阶段，进入 `AnnotationAwareAspectJAutoProxyCreator` 的 Initialization 后置处理。这一步从 `advisorsCache` 获取所有的 Advisor List，找出和当前 Bean 匹配的所有 Advisor，实现方法是挨个使用 Advisor 里面的 Pointcut 和当前的 Bean 进行匹配。如果匹配的 Advisor 为空，就返回原始 Bean；否则就为当前 Bean 和 Advisor 创建 JDK 或者 CGLIB 代理对象。至此 ApplicationContext 容器启动完成。
+3. 用户调用目标方法，实际上会调用上一步创建的代理对象。如果代理对象的 Advisor 为空（这里为空是指 Advice 类型为 EMPTY_ADVICE），就通过反射直接调用原始 Bean 的目标方法；否则就原始 Bean 和 Advisor 等信息封装成 `ReflectiveMethodInvocation`，执行 `proceed()`。
+4.  `proceed()`方法里面，对原始 Bean 和 Advice 方法进行递归链式调用。这里会调用 `AbstractAspectJAdvice#invokeAdviceMethod`，真正去执行 Advice 方法。这就是 Spring AOP 的整体流程。
