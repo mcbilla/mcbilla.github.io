@@ -30,8 +30,9 @@
 <meta property="og:image" content="http://yoursite.com/2023/10/10/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9AWebMVC-%E5%AE%9E%E7%8E%B0/image-20231205125117722.png">
 <meta property="og:image" content="http://yoursite.com/2023/10/10/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9AWebMVC-%E5%AE%9E%E7%8E%B0/image-20231205194756544.png">
 <meta property="og:image" content="http://yoursite.com/2023/10/10/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9AWebMVC-%E5%AE%9E%E7%8E%B0/image-20231205140014461.png">
+<meta property="og:image" content="http://yoursite.com/2023/10/10/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9AWebMVC-%E5%AE%9E%E7%8E%B0/SpringWebMVC%E6%97%B6%E5%BA%8F%E5%9B%BE.png">
 <meta property="article:published_time" content="2023-10-10T12:42:45.000Z">
-<meta property="article:modified_time" content="2023-12-05T12:20:16.513Z">
+<meta property="article:modified_time" content="2023-12-07T09:04:35.803Z">
 <meta property="article:author" content="mcbilla">
 <meta property="article:tag" content="Spring">
 <meta name="twitter:card" content="summary">
@@ -232,7 +233,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-12-05 20:20:16" itemprop="dateModified" datetime="2023-12-05T20:20:16+08:00">2023-12-05</time>
+                <time title="修改时间：2023-12-07 17:04:35" itemprop="dateModified" datetime="2023-12-07T17:04:35+08:00">2023-12-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -344,7 +345,14 @@
 <li>DispatcherServlet 根据 View 使用 JSP&#x2F;Freemarker 等技术渲染视图，即将模型数据填充至视图中。</li>
 <li>DispatcherServlet 把渲染好的页面返回给用户。</li>
 </ol>
-<h1 id="流程分析"><a href="#流程分析" class="headerlink" title="流程分析"></a>流程分析</h1>
+<h1 id="代码整体流程"><a href="#代码整体流程" class="headerlink" title="代码整体流程"></a>代码整体流程</h1><p><img src="/2023/10/10/Imspring-%E6%BA%90%E7%A0%81%E4%BB%8B%E7%BB%8D%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9AWebMVC-%E5%AE%9E%E7%8E%B0/SpringWebMVC%E6%97%B6%E5%BA%8F%E5%9B%BE.png" alt="SpringWebMVC时序图"></p>
+<p>imspring-mvc 的整体流程如上图所示，整个流程和上面的 <em>Spring MVC 工作流程示意图</em> 基本一致。</p>
+<ol>
+<li>在 <code>WEB-INF/web.xml</code> 里面配置好 <code>SpringServletContextListener</code>，注意 Listener 会在所有 servlet 初始化之前执行。在 tomcat 启动的时候，在 <code>SpringServletContextListener</code> 里面创建 ApplicationContext 容器，并设置到 servlet 上下文。</li>
+<li><code>DispatchServlet</code> 设置了跟随 tomcat 启动而启动，所以 <code>DispatchServlet</code> 进行 <code>init()</code> 初始化，从 servlet 上下文获取 ApplicationContext 容器，然后从 ApplicationContext 容器里面获取 <code>HandlerMapping</code> 和 <code>HandlerAdapter</code> 的实例，并把上面的内容保存起来，至此 <code>DispatchServlet</code> 已经具备使用 Spring 容器的能力！</li>
+<li>请求进来，统一由 <code>DispatchServlet</code> 拦截。不管是什么请求方式的请求（GET&#x2F;POST），最终都进去 <code>doDispatch()</code> 方法，进行主流程处理，这就是 Spring WebMVC 的整体流程。</li>
+</ol>
+
     </div>
 
     
@@ -428,7 +436,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MVC-%E5%88%86%E5%B1%82%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.</span> <span class="nav-text">MVC 分层结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-MVC-%E7%BB%84%E4%BB%B6"><span class="nav-number">1.2.</span> <span class="nav-text">Spring MVC 组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DispatcherServlet"><span class="nav-number">1.2.1.</span> <span class="nav-text">DispatcherServlet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Handler"><span class="nav-number">1.2.2.</span> <span class="nav-text">Handler</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerMapping"><span class="nav-number">1.2.3.</span> <span class="nav-text">HandlerMapping</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerInterceptor"><span class="nav-number">1.2.4.</span> <span class="nav-text">HandlerInterceptor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerExecutionChain"><span class="nav-number">1.2.5.</span> <span class="nav-text">HandlerExecutionChain</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerAdapter"><span class="nav-number">1.2.6.</span> <span class="nav-text">HandlerAdapter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ModelAndView"><span class="nav-number">1.2.7.</span> <span class="nav-text">ModelAndView</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ViewResolver"><span class="nav-number">1.2.8.</span> <span class="nav-text">ViewResolver</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-MVC-%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">1.3.</span> <span class="nav-text">Spring MVC 工作流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">流程分析</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MVC-%E5%88%86%E5%B1%82%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.</span> <span class="nav-text">MVC 分层结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-MVC-%E7%BB%84%E4%BB%B6"><span class="nav-number">1.2.</span> <span class="nav-text">Spring MVC 组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DispatcherServlet"><span class="nav-number">1.2.1.</span> <span class="nav-text">DispatcherServlet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Handler"><span class="nav-number">1.2.2.</span> <span class="nav-text">Handler</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerMapping"><span class="nav-number">1.2.3.</span> <span class="nav-text">HandlerMapping</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerInterceptor"><span class="nav-number">1.2.4.</span> <span class="nav-text">HandlerInterceptor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerExecutionChain"><span class="nav-number">1.2.5.</span> <span class="nav-text">HandlerExecutionChain</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerAdapter"><span class="nav-number">1.2.6.</span> <span class="nav-text">HandlerAdapter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ModelAndView"><span class="nav-number">1.2.7.</span> <span class="nav-text">ModelAndView</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ViewResolver"><span class="nav-number">1.2.8.</span> <span class="nav-text">ViewResolver</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-MVC-%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">1.3.</span> <span class="nav-text">Spring MVC 工作流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">代码整体流程</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
