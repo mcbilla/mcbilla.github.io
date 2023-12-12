@@ -50,7 +50,7 @@ $ npm run deploy
 
 ## 博客迁移
 
-**目前 Hexo 上博客已经迁移到 NotionNext 上，新博客地址还是使用原来的访问域名 www.mcbilla.com**。
+**目前 Hexo 上博客已经迁移到 NotionNext 上，新博客地址还是使用原来的域名 www.mcbilla.com 来访问**  。
 
 进行博客和笔记迁移是一件繁琐的事情，为什么大费周章的来做这个事情呢？
 
